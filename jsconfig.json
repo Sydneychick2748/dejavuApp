@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "node", // Change this to "node"
+    "skipLibCheck": true,
     "paths": {
       "@/*": ["./src/*"]
     }

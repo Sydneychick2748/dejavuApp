@@ -1,26 +1,27 @@
 import Image from "next/image";
 import styles from "./page.module.css";
+import { Button } from "@/components/ui/button"
+import { HStack } from "@chakra-ui/react"
+import {Slider} from "@/components/ui/slider"
 
 export default function Home() {
   return (
     <div className={styles.page}>
       <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
+       
         <ol>
           <li>
-            Get started by editing <code>src/app/page.js</code>.
+            This is DejaVuAI official site 
           </li>
           <li>Save and see your changes instantly.</li>
         </ol>
+        <HStack>
+      <Button>Click me</Button>
+      <Button>Click me</Button>
+    </HStack>
+    <Slider/>
 
-        <div className={styles.ctas}>
+        {/* <div className={styles.ctas}>
           <a
             className={styles.primary}
             href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
@@ -44,7 +45,7 @@ export default function Home() {
           >
             Read our docs
           </a>
-        </div>
+        </div> */}
       </main>
       <footer className={styles.footer}>
         <a
