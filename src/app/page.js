@@ -3,6 +3,7 @@ import styles from "./page.module.css";
 import { Button } from "@/components/ui/button"
 import { HStack } from "@chakra-ui/react"
 import {Slider} from "@/components/ui/slider"
+import { Avatar } from "@/components/ui/avatar";
 
 export default function Home() {
   return (
@@ -20,6 +21,7 @@ export default function Home() {
       <Button>Click me</Button>
     </HStack>
     <Slider/>
+    <Avatar/>
 
         {/* <div className={styles.ctas}>
           <a
@@ -90,6 +92,14 @@ export default function Home() {
           />
           Go to nextjs.org →
         </a>
+        <a
+            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={styles.secondary}
+          >
+            Read our docs
+          </a>
       </footer>
     </div>
   );
