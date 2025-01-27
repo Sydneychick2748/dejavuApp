@@ -1,9 +1,11 @@
-import { Button } from '@chakra-ui/react'
-// import Image from 'next/image';
+
 
 export default function Home() {
   return (
     <div>
+
+      
+
       <h1>Welcome to</h1>
         {/* <Image src="" alt="" width={} height={}></Image> */}
         <h1>DejaVuAI</h1>
@@ -11,6 +13,8 @@ export default function Home() {
         <Button>Log In</Button>
         <Button>Sign Up</Button>
         <Button>Let's Get Started</Button>      
+
     </div>
   );
 }
+
