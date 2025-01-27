@@ -6,6 +6,7 @@ import Image from "next/image";
 export default function Footer() {
     return (
         <div>
+
             {/* <div className="absolute -z-10 inset -0">
             <Image
             alt="description"
