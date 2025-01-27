@@ -17,7 +17,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body  suppressHydrationWarning>
-      <Provider>
+        <Provider>
         <Header />
         {children}
         <Footer />
