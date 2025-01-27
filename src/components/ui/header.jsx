@@ -6,6 +6,7 @@ import Image from "next/image";
 export default function Header() {
     return (
         <div>
+            <p>I'm an awesome Header</p>
             {/* <div className="absolute -z-10 inset -0">
             <Image
             alt="description"
