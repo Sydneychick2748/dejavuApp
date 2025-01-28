@@ -31,7 +31,40 @@ export default function Contact() {
         </Text>
 
        
-       
+        <Box w="" maxW="" mx="" p={6} bg="" borderRadius="" boxShadow="">
+        <Heading as="h1" size="xl" color="blue.600">
+         We Would love to Connect
+        </Heading>
+      <VStack spacing={4} as="form">
+        <Input
+          type="text"
+          name="first-name"
+          placeholder="First Name*"
+          required
+          
+          borderColor=""
+        />
+        <Input
+          type="text"
+          name="last-name"
+          placeholder="Last Name*"
+          required
+         
+          borderColor=""
+        />
+        <Input
+          type="email"
+          name="email"
+          placeholder="Email*"
+          required
+          
+          borderColor=""
+        />
+        <Button type="submit" colorScheme="" w="">
+          Submit
+        </Button>
+      </VStack>
+    </Box>
 
         {/* Contact Email */}
         <VStack spacing={4}>
