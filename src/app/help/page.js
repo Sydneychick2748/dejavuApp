@@ -14,7 +14,7 @@ export default function Help() {
         </Heading>
 
         {/* Description */}
-        <Text fontSize="lg" color="gray.700" textAlign="center">
+        <Text  fontSize="lg" color="gray.700" textAlign="center">
         HERE YOU CAN FIND TUTORIALS THAT WILL HELP YOU NAVIGATE THROUGH THE WEBSITE. PLEASE REQUEST A DEMO IF FURTHER ASSISTANCE IS NEEDED. THANKS
         </Text>
 
