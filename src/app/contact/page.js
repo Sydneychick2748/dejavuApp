@@ -30,41 +30,49 @@ export default function Contact() {
           out what DejaVuAI can do for your business, please send us a message so we can get in touch.
         </Text>
 
-       
-        <Box w="" maxW="" mx="" p={6} bg="" borderRadius="" boxShadow="">
-        <Heading as="h1" size="xl" color="blue.600">
-         We Would love to Connect
-        </Heading>
-      <VStack spacing={4} as="form">
-        <Input
-          type="text"
-          name="first-name"
-          placeholder="First Name*"
-          required
-          
-          borderColor=""
-        />
-        <Input
-          type="text"
-          name="last-name"
-          placeholder="Last Name*"
-          required
-         
-          borderColor=""
-        />
-        <Input
-          type="email"
-          name="email"
-          placeholder="Email*"
-          required
-          
-          borderColor=""
-        />
-        <Button type="submit" colorScheme="" w="">
-          Submit
-        </Button>
-      </VStack>
-    </Box>
+        <Box w="100%" maxW="500px" mx="auto" p={6} bg="gray.50" borderRadius="md">
+      <Heading as="h1" size="lg" textAlign="center" mb={6}>
+        Contact Us
+      </Heading>
+
+      {/* Native Form */}
+      <form>
+        <VStack spacing={4}>
+          {/* First Name */}
+          <Input
+            type="text"
+            name="first-name"
+            placeholder="First Name*"
+            required
+            borderColor="gray.300"
+          />
+
+          {/* Last Name */}
+          <Input
+            type="text"
+            name="last-name"
+            placeholder="Last Name*"
+            required
+            borderColor="gray.300"
+          />
+
+          {/* Email */}
+          <Input
+            type="email"
+            name="email"
+            placeholder="Email*"
+            required
+            borderColor="gray.300"
+          />
+
+          {/* Submit Button */}
+          <Button type="submit" colorScheme="blue" w="full">
+            Submit
+          </Button>
+        </VStack>
+      </form>
+      </Box>
+        
 
         {/* Contact Email */}
         <VStack spacing={4}>
