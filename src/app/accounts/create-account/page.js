@@ -10,6 +10,11 @@ import {
   Button,
   Image,
 } from '@chakra-ui/react';
+import {
+  PasswordInput,
+  PasswordStrengthMeter,
+} from "@/components/ui/password-input"
+
 
 export default function CreateAccount() {
   return (
@@ -84,24 +89,39 @@ export default function CreateAccount() {
               />
 
               {/* Password */}
-              <Input
+              {/* <Input
                 type="password"
                 name="password"
                 placeholder="Password*"
                 required
                 borderColor="gray.300"
                 autoComplete="new-password"
-              />
-
+              /> */}
+              <PasswordInput  type="password"
+                name="password"
+                placeholder="Password*"
+                required
+                borderColor="gray.300"
+                autoComplete="new-password"/>
+              
+<PasswordStrengthMeter />
+<PasswordInput type="password"
+                name="confirm-password"
+                placeholder="Confirm Password*"
+                required
+                borderColor="gray.300"
+                autoComplete="new-password" />
+              
+              <PasswordStrengthMeter  />
               {/* Confirm Password */}
-              <Input
+              {/* <Input
                 type="password"
                 name="confirm-password"
                 placeholder="Confirm Password*"
                 required
                 borderColor="gray.300"
                 autoComplete="new-password"
-              />
+              /> */}
 
               {/* Submit Button */}
               <Button type="submit" colorScheme="blue" w="100%">
