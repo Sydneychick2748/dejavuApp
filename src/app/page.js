@@ -1,6 +1,7 @@
 'use client';
 
 import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
+
 export default function Home() {
   return (
     <Box w="100%" h="100vh" display="flex" justifyContent="center" alignItems="center" bg="gray.50">
@@ -12,21 +13,28 @@ export default function Home() {
         <Heading as="h1" size="xl" color="black">
           DejaVuAI
         </Heading>
-        <Text fontSize="lg" color="gray.700">
+        <Text >
           Trace The Untraceable
         </Text>
 
         {/* Buttons */}
         <VStack spacing={4}>
-          <Button colorScheme="blue" size="lg">
+          <Button >
             Log In
           </Button>
-          <Button colorScheme="teal" size="lg">
-            Sign Up
-          </Button>
-          <Button colorScheme="purple" size="lg">
+          <Button  size="lg">
+  Sign Up
+</Button>
+
+
+          <Button  className='btn-home'>
             Let's Get Started
           </Button>
+          
+      <Button variant="solid" bg="teal.500" color="white" _hover={{ bg: "teal.600" }}>
+  Let's Get Started
+</Button>
+
         </VStack>
       </VStack>
     </Box>
