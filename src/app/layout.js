@@ -1,8 +1,8 @@
 
 import "./globals.css";
 import { Provider } from "@/components/ui/provider"
-import Header from '@/components/ui/header'
-import Footer from '@/components/ui/footer'
+import Header from '@/components/ui/header1'
+import Footer from '@/components/ui/footer1'
 
 
 
