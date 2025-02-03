@@ -1,21 +1,15 @@
-
 import "./globals.css";
+
 import { Provider } from "@/components/ui/provider"
-import Header from '@/components/ui/header1'
-import Footer from '@/components/ui/footer1'
-
-
-
-
-
+import Header from "@/components/ui/header1"
+import Footer from "@/components/ui/footer1"
 export const metadata = {
   title: "DejaVuAI",
   description: "amazing site right here",
 };
-
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang= "en" suppressHydrationWarning>
       <body  suppressHydrationWarning>
         <Provider>
         <Header />
