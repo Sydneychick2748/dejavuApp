@@ -1,8 +1,12 @@
+<<<<<<< HEAD
+import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
+=======
 
 
 
 import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
 
+>>>>>>> aad5f1dbf04246ace354c31cb8d64870cd2bf7e1
 export default function Home() {
   return (
     <Box w="100%" h="100vh" display="flex" justifyContent="center" alignItems="center" bg="gray.50">
