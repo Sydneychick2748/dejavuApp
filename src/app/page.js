@@ -1,4 +1,5 @@
-'use client';
+
+
 
 import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
 
@@ -16,7 +17,6 @@ export default function Home() {
         <Text >
           Trace The Untraceable
         </Text>
-
         {/* Buttons */}
         <VStack spacing={4}>
           <Button >
