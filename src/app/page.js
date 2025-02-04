@@ -1,7 +1,6 @@
-import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Image, VStack } from '@chakra-ui/react';
 
 
-import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
 export default function Home() {
   return (
     <Box w="100%" h="100vh" display="flex" justifyContent="center" alignItems="center" bg="gray.50">
@@ -10,12 +9,22 @@ export default function Home() {
         <Heading as="h1" size="2xl" color="blue.600">
           Welcome to
         </Heading>
+        
         <Heading as="h1" size="xl" color="black">
           DejaVuAI
         </Heading>
         <Text fontSize="lg" color="gray.700">
           Trace The Untraceable
         </Text>
+        {/* Image Section */}
+                <Box w="40%" display="flex" justifyContent="center" alignItems="center">
+                  <Image
+                    src="/images/logos/dvai-icon.png"
+                    alt="Company Logo"
+                    // width="0"
+                    // height="150px"
+                  />
+                </Box>
         {/* Buttons */}
         <VStack spacing={4}>
           <Button colorScheme="blue" size="lg">
