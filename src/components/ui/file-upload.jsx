@@ -1,3 +1,4 @@
+'use client';
 function _nullishCoalesce(lhs, rhsFn) {
   if (lhs != null) {
     return lhs
@@ -5,7 +6,6 @@ function _nullishCoalesce(lhs, rhsFn) {
     return rhsFn()
   }
 }
-;('use client')
 
 import {
   Button,
