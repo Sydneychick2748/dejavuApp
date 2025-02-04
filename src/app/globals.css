@@ -1,0 +1,22 @@
+/* globals.css */
+/* Define a gradient background for the header */
+.headerFooter1-gradient {
+    background: linear-gradient(90deg, #162D5C, #4985FA);
+    /* Customize colors here */
+    color: white;
+    /* Adjust text color */
+    padding: 16px;
+    /* Add padding */
+    text-align: center;
+}
+
+/* Optional: Add box shadow for depth */
+.headerFooter1-gradient {
+
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+.btn-home{
+    color:aqua;
+    background-color: #4985FA;
+}
+
