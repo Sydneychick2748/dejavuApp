@@ -29,8 +29,6 @@ const styles = {
 
 
 
-
-
 export default function Home() {
   return (
     <Box
@@ -60,9 +58,11 @@ export default function Home() {
         {/* <Heading as="h1" style ={styles.headingDejavu}>
           DejaVuAI
         </Heading> */}
+
         <Text style={styles.textStyle} >
           Trace The Untraceable
         </Text>
+
         {/* Image Section
         <Box w="40%" display="flex" justifyContent="center" alignItems="center">
           <Image
@@ -73,20 +73,13 @@ export default function Home() {
           />
         </Box> */}
         {/* Buttons */}
+
         <VStack spacing={4}>
+          
           <Button>Log In</Button>
           <Button size="lg">Sign Up</Button>
-
           <Button className="btn-home">Let's Get Started</Button>
 
-          <Button
-            variant="solid"
-            bg="teal.500"
-            color="white"
-            _hover={{ bg: "teal.600" }}
-          >
-            Let's Get Started
-          </Button>
         </VStack>
       </VStack>
     </Box>
