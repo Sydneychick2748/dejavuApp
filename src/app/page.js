@@ -1,49 +1,51 @@
-
-
-import { Box, Button, Heading, Text, VStack } from '@chakra-ui/react';
+import { Box, Button, Heading, Text, Image, VStack } from "@chakra-ui/react";
 
 export default function Home() {
   return (
-    <Box w="100%" h="100vh" display="flex" justifyContent="center" alignItems="center" bg="gray.50">
+    <Box
+      w="100%"
+      h="100vh"
+      display="flex"
+      justifyContent="center"
+      alignItems="center"
+      bg="gray.50"
+      bgImage="url('/images/background/DejaVuBackground.png')"
+    >
+
       <VStack spacing={6} textAlign="center">
         {/* Titles */}
-        <Heading as="h1" size="2xl" color="blue.600">
+        <Heading as="h1" size="6xl" color="#00264A">
           Welcome to
         </Heading>
-        
-        <Heading as="h1" size="xl" color="black">
+
+        <Heading as="h1" fontSize="120px" color="#00264A">
           DejaVuAI
         </Heading>
-        <Text >
-          Trace The Untraceable
-        </Text>
+        <Text fontSize="20px" color="#00264A">Trace The Untraceable</Text>
         {/* Image Section */}
-                <Box w="40%" display="flex" justifyContent="center" alignItems="center">
-                  <Image
-                    src="/images/logos/dvai-icon.png"
-                    alt="Company Logo"
-                    // width="0"
-                    // height="150px"
-                  />
-                </Box>
+        <Box w="40%" display="flex" justifyContent="center" alignItems="center">
+          <Image
+            src="/images/logos/dvai-icon.png"
+            alt="Company Logo"
+            // width="0"
+            // height="150px"
+          />
+        </Box>
         {/* Buttons */}
         <VStack spacing={4}>
-          <Button >
-            Log In
-          </Button>
-          <Button  size="lg">
-  Sign Up
-</Button>
+          <Button>Log In</Button>
+          <Button size="lg">Sign Up</Button>
 
+          <Button className="btn-home">Let's Get Started</Button>
 
-          <Button  className='btn-home'>
+          <Button
+            variant="solid"
+            bg="teal.500"
+            color="white"
+            _hover={{ bg: "teal.600" }}
+          >
             Let's Get Started
           </Button>
-          
-      <Button variant="solid" bg="teal.500" color="white" _hover={{ bg: "teal.600" }}>
-  Let's Get Started
-</Button>
-
         </VStack>
       </VStack>
     </Box>
