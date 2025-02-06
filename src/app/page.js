@@ -1,4 +1,4 @@
-import { Box, Button, Heading, Text, Image, VStack } from "@chakra-ui/react";
+import { Box, Button, Heading, Text, Image, VStack, HStack } from "@chakra-ui/react";
 
 const styles = {
   headingWelcome: {
@@ -72,15 +72,16 @@ export default function Home() {
             // height="150px"
           />
         </Box> */}
-        {/* Buttons */}
 
-        <VStack spacing={4}>
-          
+        {/* Buttons */}
+        {/* HStack arranges items horizontally  */}
+        <HStack spacing={4}>
+
           <Button>Log In</Button>
           <Button size="lg">Sign Up</Button>
           <Button className="btn-home">Let's Get Started</Button>
 
-        </VStack>
+        </HStack>
       </VStack>
     </Box>
   );
