@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
-import { Box, VStack, Button, Text, Input, Image } from "@chakra-ui/react";
-import { FaCloudUploadAlt } from "react-icons/fa"; // Import upload icon
+import { Box, VStack, Button, Text, Input, Image, Link } from "@chakra-ui/react";
+import { FaCloudUploadAlt } from "react-icons/fa";
 
 export default function UploadFiles() {
   const [files, setFiles] = useState([]);
@@ -45,7 +45,7 @@ export default function UploadFiles() {
         <Text fontSize="lg" fontWeight="bold">
           Database Name
         </Text>
-        <Input placeholder="Enter a name for your database" />
+         <Input placeholder="Enter a database"  color="black" />
       </form>
 
       {/* Custom Drag and Drop Zone with Icon */}
@@ -65,29 +65,63 @@ export default function UploadFiles() {
       >
         <FaCloudUploadAlt size={40} color="gray" /> {/* Upload Icon */}
         <input {...getInputProps()} />
-        <Text mt={2}>Drag and drop files here, or click to select files</Text>
+        <Text mt={2} color="black">Drag and drop files here, or click to select files</Text>
       </Box>
 
-      {/* Display Uploaded Files as Previews */}
+      {/* Display Uploaded Files as Previews with Metadata */}
       {files.map((file, index) => (
-        <Box key={index} display="flex" alignItems="center" w="full" p={2} border="1px solid" borderColor="gray.200" borderRadius="md" mb={2}>
+        <Box
+          key={index}
+          display="flex"
+          alignItems="center"
+          w="full"
+          p={2}
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="md"
+          mb={2}
+        >
           <input
             type="checkbox"
             checked={selectedFiles.includes(file)}
             onChange={() => handleSelectFile(file)}
-            style={{ marginRight: '8px' }}
+            style={{ marginRight: "8px" }}
           />
 
           {/* Show Preview for Images & Videos */}
           {file.type.startsWith("image") ? (
-            <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="50px" borderRadius="md" mr={2} />
+            <Image
+              src={URL.createObjectURL(file)}
+              alt={file.name}
+              boxSize="50px"
+              borderRadius="md"
+              mr={2}
+            />
           ) : file.type.startsWith("video") ? (
-            <video src={URL.createObjectURL(file)} controls width="50" height="50" style={{ marginRight: "8px", borderRadius: "4px" }} />
+            <video
+              src={URL.createObjectURL(file)}
+              controls
+              width="50"
+              height="50"
+              style={{ marginRight: "8px", borderRadius: "4px" }}
+            />
           ) : (
             <Text w="full" isTruncated>
               {file.name}
             </Text>
           )}
+
+          {/* File Metadata */}
+          <Box flex="1" ml={2}>
+            <Text fontWeight="bold">{file.name}</Text>
+            <Text fontSize="sm" color="gray.500">
+              {file.type} - {(file.size / 1024 / 1024).toFixed(2)} MB
+            </Text>
+            {/* More Info Link */}
+            <Link href="#" color="blue.500" fontSize="sm">
+              More info
+            </Link>
+          </Box>
 
           <Button
             onClick={() => handleRemoveFile(file)}
