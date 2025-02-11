@@ -1,6 +1,14 @@
-/* globals.css */
-/* Define a gradient background for the header */
-.headerFooter1-gradient {
+/* Ensure full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+  
+.headerFooter1-gradient { 
     background: linear-gradient(90deg, #162D5C, #4985FA);
     /* Customize colors here */
     color: white;
