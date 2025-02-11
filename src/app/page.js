@@ -1,5 +1,4 @@
 import { Box, Button, Heading, Text, Image, VStack, HStack, Spacer } from "@chakra-ui/react";
-
 const styles = {
   backgroundBox: {
     width: "100%",
@@ -35,7 +34,6 @@ const styles = {
   //   textAlign: "right",
   // },
 };
-
 export default function Home() {
   return (
     <Box style={styles.backgroundBox}>
@@ -56,7 +54,6 @@ export default function Home() {
         >
           Welcome to
         </Heading>
-
         {/* Welcome Logo */}
         <Image
           src="/images/logos/DVAI-Logo-Horizontal-Dark.png"
@@ -69,7 +66,6 @@ export default function Home() {
           mx="auto"
           mt="10px"
         />
-
         <Text
           fontSize={["xl", "2xl", "3xl"]}
           color="#00264A"
@@ -83,7 +79,6 @@ export default function Home() {
         >
           Trace The Untraceable
         </Text>
-
         {/* Buttons */}
         <HStack
           spacing={6}
@@ -100,7 +95,7 @@ export default function Home() {
             bg="#4D89FF"
             color="white"
             borderRadius="20px"
-            _hover={{ bg: "#3B6CD9" }}         
+            _hover={{ bg: "#3B6CD9" }}
           >
             <Image src="/images/logos/photon-icon.png" boxSize="20px" mr={2} />
             LOG IN
@@ -117,11 +112,8 @@ export default function Home() {
             <Image src="/images/logos/photon-icon.png" boxSize="20px" mr={2} />
             SIGN UP
           </Button>
-          
           <Spacer display={["none", "block"]} /> {/* Keeps spacing */}
-
           {/* Adjust width and move LET'S GET STARTED button */}
-          
           <Button
             className="btn-letsGetStarted"
             size={["sm", "md", "lg"]}
