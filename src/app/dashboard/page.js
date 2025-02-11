@@ -2,6 +2,7 @@
 import { VStack, Text, Input } from "@chakra-ui/react";
 import UploadFiles from "./upload-files/UploadFiles"; // ✅ Correct import
 import "./dashboard.css";
+import "../globals.css";
 
 export default function Dashboard() {
   return (
