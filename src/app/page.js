@@ -32,14 +32,19 @@ const styles = {
 export default function Home() {
   return (
     <Box
-      w="100%"
-      h="100vh"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-      bg="gray.50"
-      bgImage="url('/images/background/DejaVuBackground.png')"
-    >
+    w="100%"
+    h="100vh"
+    display="flex"
+    justifyContent="center"
+    alignItems="center"
+    bg="gray.50"
+    bgImage="url('/images/background/DejaVuBackground.png')"
+    bgSize="cover"  // ✅ Ensures the image covers the entire area
+    bgPosition="center" // ✅ Centers the image
+    bgRepeat="no-repeat" // ✅ Prevents tiling
+    bgAttachment="fixed" // ✅ Keeps background static when scrolling
+  >
+  
       <VStack spacing={6} textAlign="center">
         {/* Titles */}
         <Heading as="h1" style={styles.headingWelcome}>
