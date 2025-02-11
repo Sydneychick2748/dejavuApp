@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
       <body  suppressHydrationWarning>
         <Provider>
         {/* {router.pathname === 'localhost:3000' ? <Header2 /> : <Header1 />} */}
-        {pathname === 'accounts/create-account' || pathname === 'accounts/login' || pathname === 'accounts/profile' || pathname === '/contact' || pathname === '/dashboard/upload-files' || pathname === '/help' || pathname === '/dashboard' ? <Header2 /> : <Header1 />}
+        {pathname === '/accounts/create-account' || pathname === '/accounts/login' || pathname === '/accounts/profile' || pathname === '/contact' || pathname === '/dashboard/upload-files' || pathname === '/help' || pathname === '/dashboard' ? <Header2 /> : <Header1 />}
         {children}
         <Footer1 />
         </Provider>
