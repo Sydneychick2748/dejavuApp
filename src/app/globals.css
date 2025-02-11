@@ -1,6 +1,7 @@
-/* globals.css */
-/* Define a gradient background for the header */
-.headerFooter1-gradient {
+
+
+  
+.headerFooter1-gradient { 
     background: linear-gradient(90deg, #162D5C, #4985FA);
     /* Customize colors here */
     color: white;
