@@ -1,22 +1,47 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useDropzone } from "react-dropzone";
 import { Box, VStack, Button, Text, Input, Image, Link } from "@chakra-ui/react";
 import { FaCloudUploadAlt } from "react-icons/fa";
+
+// API endpoint
+const API_URL = "http://localhost:3001/databases"; 
 
 export default function UploadFiles() {
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
   const [databaseName, setDatabaseName] = useState("");
-  const [databases, setDatabases] = useState({});
+  const [databases, setDatabases] = useState([]);
   const [showMonaLisa, setShowMonaLisa] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); // Error state
+  const [errorMessage, setErrorMessage] = useState(""); 
 
-  /**
-   * Handles file drop
-   * Prevents upload if database name is empty
-   */
+  // Fetch databases from backend on load
+  useEffect(() => {
+    console.log("Fetching databases from backend...");
+    const loadDatabases = async () => {
+      try {
+        const response = await fetch(API_URL);
+        if (!response.ok) throw new Error("Failed to fetch databases");
+        const data = await response.json();
+        setDatabases(data);
+        console.log("Fetched Databases:", data);
+      } catch (error) {
+        console.error("Error fetching databases:", error);
+      }
+    };
+
+    loadDatabases();
+  }, []);
+
+
+
+
+
+
+  
+
+  // Handle file drop
   const onDrop = (acceptedFiles) => {
     if (!databaseName.trim()) {
       setErrorMessage("Please enter a database name before uploading files.");
@@ -24,7 +49,6 @@ export default function UploadFiles() {
     }
 
     console.log("Dropped files:", acceptedFiles);
-
     if (acceptedFiles.length > 0) {
       setShowMonaLisa(true);
       setLoadingMessage("Files are loading...");
@@ -32,80 +56,76 @@ export default function UploadFiles() {
       setTimeout(() => {
         setShowMonaLisa(false);
         setLoadingMessage("");
-        setFiles([...files, ...acceptedFiles]);
+        setFiles((prev) => [...prev, ...acceptedFiles]);
       }, 3000);
     }
   };
 
-  /**
-   * Clears error when user types in the database name field
-   */
+  // Handle name input
   const handleDatabaseNameChange = (e) => {
     setDatabaseName(e.target.value);
-    if (errorMessage) setErrorMessage(""); // Clear error when name is entered
+    if (errorMessage) setErrorMessage("");
   };
 
-  /**
-   * Handles file selection/deselection
-   */
+  // Handle file selection
   const handleSelectFile = (file) => {
     console.log("Toggling file selection:", file);
-    setSelectedFiles((prevSelectedFiles) =>
-      prevSelectedFiles.includes(file)
-        ? prevSelectedFiles.filter((f) => f !== file)
-        : [...prevSelectedFiles, file]
+    setSelectedFiles((prev) =>
+      prev.includes(file) ? prev.filter((f) => f !== file) : [...prev, file]
     );
   };
 
-  /**
-   * Handles file removal
-   */
+  // Handle file removal
   const handleRemoveFile = (fileToRemove) => {
     console.log("Removing file:", fileToRemove);
-    setFiles(files.filter((file) => file !== fileToRemove));
-    setSelectedFiles((prevSelectedFiles) =>
-      prevSelectedFiles.filter((file) => file !== fileToRemove)
-    );
+    setFiles((prev) => prev.filter((file) => file !== fileToRemove));
+    setSelectedFiles((prev) => prev.filter((file) => file !== fileToRemove));
   };
 
-  /**
-   * Saves the database and logs to console
-   */
-  const handleSaveDatabase = () => {
+  // Save database
+  const handleSaveDatabase = async () => {
     if (!databaseName.trim()) {
       setErrorMessage("Database name is required!");
       return;
     }
-
     if (selectedFiles.length === 0) {
       setErrorMessage("No files selected to save.");
       return;
     }
 
-    setErrorMessage(""); // Clear error message on success
-
     const newDatabase = {
-      ...databases,
-      [databaseName]: selectedFiles, // Save only selected files
+      name: databaseName,
+      files: selectedFiles.map((file) => file.name), // Store only file names
     };
 
-    setDatabases(newDatabase);
+    console.log("Saving Database:", newDatabase);
 
-    console.log("Saved Database:", { name: databaseName, files: selectedFiles });
+    try {
+      const response = await fetch(API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newDatabase),
+      });
 
-    setDatabaseName("");
-    setFiles([]);
-    setSelectedFiles([]);
+      if (!response.ok) throw new Error("Failed to save database");
+
+      const savedData = await response.json();
+      console.log("Database saved successfully:", savedData);
+
+      setDatabases((prev) => [...prev, savedData]);
+      setDatabaseName("");
+      setFiles([]);
+      setSelectedFiles([]);
+    } catch (error) {
+      console.error("Error saving database:", error);
+    }
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    onDrop,
-    multiple: true,
-  });
+  // Dropzone configuration
+  const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: true });
 
   return (
     <VStack spacing={6} align="start" w="full" p={4}>
-      {/* Database Name Input */}
       <form>
         <Text fontSize="lg" fontWeight="bold" color="black">
           Database Name
@@ -116,14 +136,9 @@ export default function UploadFiles() {
           value={databaseName}
           onChange={handleDatabaseNameChange}
         />
-        {errorMessage && (
-          <Text color="red.500" fontSize="sm" mt={2}>
-            {errorMessage}
-          </Text>
-        )}
+        {errorMessage && <Text color="red.500" fontSize="sm" mt={2}>{errorMessage}</Text>}
       </form>
 
-      {/* Drag and Drop Zone */}
       <Box
         {...getRootProps()}
         p={4}
@@ -145,123 +160,61 @@ export default function UploadFiles() {
         </Text>
       </Box>
 
-      {/* Loading Message and Mona Lisa */}
       {showMonaLisa && (
         <Box textAlign="center" w="full">
-          <Text fontSize="lg" color="blue.500" mb={4}>
-            {loadingMessage}
-          </Text>
-          <Image
-            src="/images/logos/Mona_Lisa.jpg"
-            alt="Loading Mona Lisa"
-            boxSize="150px"
-            borderRadius="md"
-            objectFit="cover"
-            mx="auto"
-          />
+          <Text fontSize="lg" color="blue.500" mb={4}>{loadingMessage}</Text>
+          <Image src="/images/logos/Mona_Lisa.jpg" alt="Loading Mona Lisa" boxSize="150px" borderRadius="md" objectFit="cover" mx="auto" />
         </Box>
       )}
 
-      {/* Uploaded Files */}
-      {!showMonaLisa &&
-        files.map((file, index) => (
-          <Box
-            key={index}
-            display="flex"
-            alignItems="center"
-            w="full"
-            p={2}
-            border="1px solid"
-            borderColor="gray.200"
-            borderRadius="md"
-            mb={2}
-          >
-            <input
-              type="checkbox"
-              checked={selectedFiles.includes(file)}
-              onChange={() => handleSelectFile(file)}
-              style={{ marginRight: "8px", color: "blue" }}
-            />
+      {/* Display uploaded files with previews */}
+      {!showMonaLisa && files.map((file, index) => (
+        <Box
+          key={index}
+          display="flex"
+          alignItems="center"
+          w="full"
+          p={2}
+          border="1px solid"
+          borderColor="gray.200"
+          borderRadius="md"
+          mb={2}
+        >
+          <input type="checkbox" checked={selectedFiles.includes(file)} onChange={() => handleSelectFile(file)} style={{ marginRight: "8px" }} />
 
-            {file.type.startsWith("image") ? (
-              <Image
-                src={URL.createObjectURL(file)}
-                alt={file.name}
-                boxSize="50px"
-                borderRadius="md"
-                mr={2}
-              />
-            ) : file.type.startsWith("video") ? (
-              <video
-                src={URL.createObjectURL(file)}
-                controls
-                width="50"
-                height="50"
-                style={{ marginRight: "8px", borderRadius: "4px" }}
-              />
-            ) : (
-              <Text w="full" isTruncated>
-                {file.name}
-              </Text>
-            )}
-
-            <Box flex="1" ml={2}>
-              <Text fontWeight="bold" color="gray.500">
-                {file.name}
-              </Text>
-              <Text fontSize="sm" color="gray.500">
-                {file.type} - {(file.size / 1024 / 1024).toFixed(2)} MB
-              </Text>
-              <Link href="#" color="blue.500" fontSize="sm">
-                More info
-              </Link>
-            </Box>
-
-            <Button
-              onClick={() => handleRemoveFile(file)}
-              ml={2}
-              size="sm"
-              variant="outline"
-              colorScheme="red"
-            >
-              Remove
-            </Button>
-          </Box>
-        ))}
-
-      {/* Clear All Files Button */}
-      {files.length > 0 && (
-        <Button onClick={() => setFiles([])} colorScheme="red" variant="outline">
-          Clear All Files
-        </Button>
-      )}
-
-      {/* Selected Files with Current Database */}
-      {selectedFiles.length > 0 && (
-        <Box mt={4} w="full" p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
-          <Text fontSize="lg" fontWeight="bold" color="black" mb={2}>
-            Current Database: {databaseName}
-          </Text>
-          <Text fontWeight="bold" color="blue.500" mb={2}>
-            Selected Files:
-          </Text>
-          {selectedFiles.map((file, index) => (
-            <Text key={index} fontSize="sm" color="gray.500">
+          {file.type.startsWith("image/") ? (
+            <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} />
+          ) : file.type.startsWith("video/") ? (
+            <video src={URL.createObjectURL(file)} controls width="120" height="80" style={{ marginRight: "8px", borderRadius: "4px" }} />
+          ) : (
+            <Text fontSize="sm" color="gray.700" w="full">
               {file.name}
             </Text>
-          ))}
+          )}
+
+          <Box flex="1" ml={2}>
+            <Text fontWeight="bold" color="black">{file.name}</Text>
+            <Text fontSize="sm" color="gray.500">Type: {file.type || "Unknown"}</Text>
+            <Text fontSize="sm" color="gray.500">Size: {(file.size / 1024 / 1024).toFixed(2)} MB</Text>
+          </Box>
+
+          <Button onClick={() => handleRemoveFile(file)} ml={2} size="sm" variant="outline" colorScheme="red">
+            Remove
+          </Button>
+        </Box>
+      ))}
+
+      {files.length > 0 && <Button onClick={() => setFiles([])} colorScheme="red" variant="outline">Clear All Files</Button>}
+
+      {selectedFiles.length > 0 && (
+        <Box mt={4} w="full" p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
+          <Text fontSize="lg" fontWeight="bold" color="black" mb={2}>Current Database: {databaseName}</Text>
+          <Text fontWeight="bold" color="blue.500" mb={2}>Selected Files:</Text>
+          {selectedFiles.map((file, index) => <Text key={index} fontSize="sm" color="gray.500">{file.name}</Text>)}
         </Box>
       )}
 
-      {/* Save Database Button */}
-      <Button
-        colorScheme="teal"
-        variant="solid"
-        onClick={handleSaveDatabase}
-        disabled={!databaseName.trim() || selectedFiles.length === 0}
-      >
-        Save Database
-      </Button>
+      <Button colorScheme="teal" variant="solid" onClick={handleSaveDatabase} disabled={!databaseName.trim() || selectedFiles.length === 0}>Save Database</Button>
     </VStack>
   );
 }

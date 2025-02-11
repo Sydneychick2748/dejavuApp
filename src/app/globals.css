@@ -1,6 +1,7 @@
-/* globals.css */
-/* Define a gradient background for the header */
-.headerFooter1-gradient {
+
+
+  
+.headerFooter1-gradient { 
     background: linear-gradient(90deg, #162D5C, #4985FA);
     /* Customize colors here */
     color: white;
@@ -16,8 +17,25 @@
 }
 
 
-.btn-home{
-    color:aqua;
-    background-color: #4985FA;
+ /* .btn-logIn{
+    color:white;
+    background-color: #4D89FF;
+    font-weight: 600;
+    border-radius: 20px;
+    
 }
 
+.btn-signUp{
+    color:white;
+    background-color: #4D89FF;
+    font-weight: 600;
+    border-radius: 20px;
+    
+}
+.btn-letsGetStarted{
+    color:white;
+    background-color: #4D89FF;
+    font-weight: 600;
+    border-radius: 20px;
+    font-family: "'Poppins', sans-serif";
+}  */
