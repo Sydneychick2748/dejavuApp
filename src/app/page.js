@@ -139,7 +139,7 @@ const styles = {
 
 export default function Home() {
   return (
-    <Box style={styles.backgroundBox}>
+
       <VStack spacing={6} textAlign="center">
         {/* Titles */}
         <Heading
