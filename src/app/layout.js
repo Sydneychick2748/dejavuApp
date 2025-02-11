@@ -12,7 +12,6 @@ import { usePathname } from 'next/navigation'
 //   description: "amazing site right here",
 // };
 
-
 export default function RootLayout({ children }) {
   const pathname = usePathname()
   console.log('pathname is ', pathname)
