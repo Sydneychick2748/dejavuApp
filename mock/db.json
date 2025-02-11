@@ -1,0 +1,73 @@
+{
+  "databases": [
+    {
+      "name": "Test Database",
+      "files": [
+        "testfile1.png",
+        "testfile2.pdf"
+      ],
+      "id": "c04e"
+    },
+    {
+      "id": "e78a",
+      "name": "ana",
+      "files": [
+        "11007520637(5).html",
+        "learn_numbers.svg"
+      ]
+    },
+    {
+      "id": "72e8",
+      "name": "boo",
+      "files": [
+        "White - Wave 1.png"
+      ]
+    },
+    {
+      "id": "924e",
+      "name": "newnew",
+      "files": [
+        "686_1692602169602.jpeg",
+        "701_1692935419309.jpeg",
+        "privacy.svg"
+      ]
+    },
+    {
+      "id": "9a4a",
+      "name": "newnew",
+      "files": [
+        "686_1692602169602.jpeg",
+        "701_1692935419309.jpeg"
+      ]
+    },
+    {
+      "id": "8870",
+      "name": "fdiuhfd",
+      "files": [
+        "Photon Searcher Icon (4).png"
+      ]
+    },
+    {
+      "id": "457f",
+      "name": "ana",
+      "files": [
+        "learn_numbers.svg"
+      ]
+    },
+    {
+      "id": "3a5b",
+      "name": "ana",
+      "files": [
+        "learn_numbers.svg"
+      ]
+    },
+    {
+      "id": "1efa",
+      "name": "foo",
+      "files": [
+        "luca-bravo-9l_326FISzk-unsplash.jpg",
+        "Photon Watcher Icon.png"
+      ]
+    }
+  ]
+}
