@@ -1,4 +1,12 @@
 import { Box, Button, Heading, Text, Image, VStack } from "@chakra-ui/react";
+// import windowSizeCalc from "./windowsizeCalc";
+
+// const headerHeight = document.querySelector('header').offsetHeight;
+//     const footerHeight = document.querySelector('footer').offsetHeight;
+//     const viewportHeight = window.innerHeight;
+
+//     const windowSizeCalc = viewportHeight - (headerHeight + footerHeight);
+
 
 const styles = {
   headingWelcome: {
