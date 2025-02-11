@@ -1,4 +1,5 @@
 import { Box, Heading } from "@chakra-ui/react";
+import Link from 'next/link';
 
 export default function Header2() {
     return (
