@@ -3,11 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "concurrently \"json-server --watch mock/db.json --port 3001\" \"next dev\"",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "backend": "json-server --watch mock/db.json --port 3001"
   },
+  
   "dependencies": {
     "@chakra-ui/react": "^3.5.1",
     "@emotion/react": "^11.14.0",
