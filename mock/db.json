@@ -8,6 +8,15 @@
         "file1.png",
         "file2.pdf"
       ]
+    },
+    {
+      "id": "1739394281747",
+      "firstName": "ana",
+      "lastName": "bennett",
+      "email": "ana@ana.com",
+      "phone": "(619) 991-7062",
+      "password": "$2b$10$Thlfk8coXxW7eMctO1AosOsE3BHayaPRtqBpSABAjTh7XHfWaENS6",
+      "files": []
     }
   ],
   "databases": [
