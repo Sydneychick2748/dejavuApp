@@ -157,7 +157,7 @@ export default function Contact() {
 
           <Link
             href="mailto:support@example.com"
-            fontSize="lg"
+            fontSize="xl"
             fontWeight="bold"
             color="blue.600"
             _hover={{ textDecoration: "underline" }}
