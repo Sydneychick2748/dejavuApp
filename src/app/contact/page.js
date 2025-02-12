@@ -8,8 +8,6 @@ import {
   Link,
   Icon,
   HStack,
-  FormControl,
-  FormLabel,
   Input,
   Button,
 } from "@chakra-ui/react";
@@ -83,7 +81,7 @@ export default function Contact() {
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl" // Adds border radius
-                _hover={{ borderColor: "blue.400" }} // Blue border on hover
+                _hover={{ borderColor: "blue.600" }} // Blue border on hover
                 _focus={{
                   borderColor: "blue.500",
                   boxShadow: "0 0 0 2px blue.200",
@@ -99,7 +97,7 @@ export default function Contact() {
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl"
-                _hover={{ borderColor: "blue.400" }}
+                _hover={{ borderColor: "blue.600" }}
                 _focus={{
                   borderColor: "blue.500",
                   boxShadow: "0 0 0 2px blue.200",
@@ -115,7 +113,7 @@ export default function Contact() {
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl"
-                _hover={{ borderColor: "blue.400" }}
+                _hover={{ borderColor: "blue.600" }}
                 _focus={{
                   borderColor: "blue.500",
                   boxShadow: "0 0 0 2px blue.200",
@@ -125,10 +123,12 @@ export default function Contact() {
               {/* Submit Button */}
               <Button
                 type="submit"
-                bg="blue.500" // Default blue background
-                color="white" // Default white text
+                bg="blue.500" 
+                color="white" 
                 w="full"
-                borderRadius="xl"
+                borderRadius="2xl"
+                fontWeight="bold" // Makes text bold
+                fontSize="lg" // Increases text size
                 _hover={{
                   bg: "white", // Turns white on hover
                   color: "blue.500", // Changes text color to blue
@@ -139,7 +139,7 @@ export default function Contact() {
                   boxShadow: "0 0 0 2px blue.200",
                 }}
               >
-                Submit
+                SUBMIT
               </Button>
             </VStack>
           </form>
