@@ -1,49 +1,96 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
+import { useRouter } from "next/navigation"; // Import Next.js Router
 import {
   Box,
   Heading,
   Text,
   VStack,
-  Input,
   Button,
   HStack,
   Image,
-} from '@chakra-ui/react';
+  Input,
+} from "@chakra-ui/react";
+import { PasswordInput } from "@/components/ui/password-input"; // Chakra UI Password Input
 
 export default function CreateAccount() {
+  const router = useRouter(); // Initialize router for navigation
+
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phone: '',
-    password: '',
+    firstName: "",
+    lastName: "",
+    email: "",
+    confirmEmail: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
   });
-  const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
+
+  const [errors, setErrors] = useState({
+    emailMatch: "",
+    passwordMatch: "",
+  });
+
+  const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+
+    // Live validation for emails and passwords
+    if (e.target.name === "confirmEmail") {
+      if (e.target.value !== formData.email) {
+        setErrors((prev) => ({ ...prev, emailMatch: "❌ Emails do not match!" }));
+      } else {
+        setErrors((prev) => ({ ...prev, emailMatch: "" }));
+      }
+    }
+
+    if (e.target.name === "confirmPassword") {
+      if (e.target.value !== formData.password) {
+        setErrors((prev) => ({ ...prev, passwordMatch: "❌ Passwords do not match!" }));
+      } else {
+        setErrors((prev) => ({ ...prev, passwordMatch: "" }));
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError('');
-    setMessage('');
+    setMessage("");
 
-    const response = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+    // Final validation before sending
+    if (formData.email !== formData.confirmEmail) {
+      setErrors((prev) => ({ ...prev, emailMatch: "❌ Emails do not match!" }));
+      console.log("Email mismatch:", formData.email, formData.confirmEmail);
+      return;
+    }
+
+    if (formData.password !== formData.confirmPassword) {
+      setErrors((prev) => ({ ...prev, passwordMatch: "❌ Passwords do not match!" }));
+      console.log("Password mismatch:", formData.password, formData.confirmPassword);
+      return;
+    }
+
+    const response = await fetch("/api/auth/signup", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(formData),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      setError(data.message || 'Something went wrong');
+      console.log("Signup Error:", data.message);
+      setMessage("❌ " + (data.message || "Something went wrong"));
     } else {
-      setMessage('Account created successfully! You can now log in.');
+      console.log("Signup Success:", data);
+      setMessage("✅ Account created successfully! Redirecting to login...");
+      
+      // Redirect to login page after 2 seconds
+      setTimeout(() => {
+        router.push("/accounts/login");
+      }, 2000);
     }
   };
 
@@ -65,25 +112,33 @@ export default function CreateAccount() {
         borderRadius="lg"
         boxShadow="md"
       >
+        {/* Form Section */}
         <Box w="60%" p={6}>
           <Heading as="h1" size="xl" color="blue.600" textAlign="center" mb={4}>
             CREATE AN ACCOUNT
           </Heading>
-          {error && <Text color="red.500">{error}</Text>}
-          {message && <Text color="green.500">{message}</Text>}
+
+          {message && <Text color={message.startsWith("❌") ? "red.500" : "green.500"}>{message}</Text>}
+
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
-              <Input name="firstName" placeholder="First Name*" onChange={handleChange} required />
-              <Input name="lastName" placeholder="Last Name*" onChange={handleChange} required />
-              <Input name="email" type="email" placeholder="Email*" onChange={handleChange} required />
-              <Input name="phone" placeholder="Phone*" onChange={handleChange} required />
-              <Input name="password" type="password" placeholder="Password*" onChange={handleChange} required />
+              <Input name="firstName" placeholder="First Name*" onChange={handleChange} required bg="white" color="black" />
+              <Input name="lastName" placeholder="Last Name*" onChange={handleChange} required bg="white" color="black" />
+              <Input name="email" type="email" placeholder="Email*" onChange={handleChange} required bg="white" color="black" />
+              <Input name="confirmEmail" type="email" placeholder="Confirm Email*" onChange={handleChange} required bg="white" color="black" />
+              {errors.emailMatch && <Text color="red.500">{errors.emailMatch}</Text>}
+              <Input name="phone" placeholder="Phone*" onChange={handleChange} required bg="white" color="black" />
+              <PasswordInput name="password" placeholder="Password*" onChange={handleChange} required bg="white" color="black" />
+              <PasswordInput name="confirmPassword" placeholder="Confirm Password*" onChange={handleChange} required bg="white" color="black" />
+              {errors.passwordMatch && <Text color="red.500">{errors.passwordMatch}</Text>}
               <Button type="submit" colorScheme="blue" w="100%">
                 Submit
               </Button>
             </VStack>
           </form>
         </Box>
+
+        {/* Image Section */}
         <Box w="40%" display="flex" justifyContent="center" alignItems="center">
           <Image src="/images/logos/dvai-icon.png" alt="Company Logo" width="150px" height="150px" />
         </Box>
