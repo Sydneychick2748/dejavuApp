@@ -5,13 +5,14 @@ import {
   Box,
   Heading,
   VStack,
-  Input,
   Button,
   Link,
   HStack,
   Image,
   Text,
+  Input,
 } from "@chakra-ui/react";
+import { PasswordInput } from "@/components/ui/password-input"; // Using Chakra's PasswordInput
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -21,6 +22,7 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log("Attempting login with:", { email, password });
 
     const response = await fetch("/api/auth/login", {
       method: "POST",
@@ -31,15 +33,16 @@ export default function Login() {
     });
 
     const data = await response.json();
+    console.log("Login Response:", data);
 
     if (response.ok) {
-      setSuccessMessage("Login successful! Redirecting...");
+      setSuccessMessage("✅ Login successful! Redirecting...");
       setErrorMessage("");
-      // Redirect user after login (replace with your dashboard page)
       setTimeout(() => {
-        window.location.href = "/dashboard";
+        window.location.href = "/dashboard"; // Redirects to dashboard
       }, 2000);
     } else {
+      console.log("❌ Login failed:", data.message);
       setErrorMessage(data.message);
       setSuccessMessage("");
     }
@@ -74,6 +77,7 @@ export default function Login() {
 
           <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
+              {/* Email Input - Now with White Background and Black Text */}
               <Input
                 type="email"
                 name="email"
@@ -82,18 +86,22 @@ export default function Login() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 borderColor="gray.300"
+                bg="white"
+                color="black"
+                _placeholder={{ color: "gray.600" }} // Placeholder text color
                 autoComplete="email"
               />
 
-              <Input
-                type="password"
+              {/* Chakra UI Password Input with Visibility Toggle - Fixed Text Colors */}
+              <PasswordInput
                 name="password"
                 placeholder="Password*"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                borderColor="gray.300"
-                autoComplete="current-password"
+                bg="white"
+                color="black"
+                _placeholder={{ color: "gray.600" }}
               />
 
               <Link href="/forgot-password" color="blue.500" alignSelf="flex-start">
