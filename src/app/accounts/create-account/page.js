@@ -1,22 +1,52 @@
 'use client';
 
+import { useState } from 'react';
 import {
   Box,
   Heading,
   Text,
   VStack,
-  HStack,
   Input,
   Button,
+  HStack,
   Image,
 } from '@chakra-ui/react';
-import {
-  PasswordInput,
-  PasswordStrengthMeter,
-} from "@/components/ui/password-input"
-
 
 export default function CreateAccount() {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    password: '',
+  });
+  const [error, setError] = useState('');
+  const [message, setMessage] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setMessage('');
+
+    const response = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      setError(data.message || 'Something went wrong');
+    } else {
+      setMessage('Account created successfully! You can now log in.');
+    }
+  };
+
   return (
     <Box
       w="100%"
@@ -35,110 +65,27 @@ export default function CreateAccount() {
         borderRadius="lg"
         boxShadow="md"
       >
-        {/* Form Section */}
         <Box w="60%" p={6}>
-          {/* Page Title */}
           <Heading as="h1" size="xl" color="blue.600" textAlign="center" mb={4}>
             CREATE AN ACCOUNT
           </Heading>
-          <Text color="red.500" fontWeight="bold" textAlign="center" mb={6}>
-            PLEASE FILL OUT ALL FIELDS*
-          </Text>
-
-          {/* Form */}
-          <form>
+          {error && <Text color="red.500">{error}</Text>}
+          {message && <Text color="green.500">{message}</Text>}
+          <form onSubmit={handleSubmit}>
             <VStack spacing={4}>
-              {/* First Name */}
-              <Input
-                type="text"
-                name="first-name"
-                placeholder="First Name*"
-                required
-                borderColor="gray.300"
-                autoComplete="given-name"
-              />
-
-              {/* Last Name */}
-              <Input
-                type="text"
-                name="last-name"
-                placeholder="Last Name*"
-                required
-                borderColor="gray.300"
-                autoComplete="family-name"
-              />
-
-              {/* Email */}
-              <Input
-                type="email"
-                name="email"
-                placeholder="Email*"
-                required
-                borderColor="gray.300"
-                autoComplete="email"
-              />
-
-              {/* Phone Number */}
-              <Input
-                type="tel"
-                name="phone"
-                placeholder="Phone (xxx) xxx-xxxx*"
-                required
-                borderColor="gray.300"
-                autoComplete="tel"
-              />
-
-              {/* Password */}
-              {/* <Input
-                type="password"
-                name="password"
-                placeholder="Password*"
-                required
-                borderColor="gray.300"
-                autoComplete="new-password"
-              /> */}
-              <PasswordInput  type="password"
-                name="password"
-                placeholder="Password*"
-                required
-                borderColor="gray.300"
-                autoComplete="new-password"/>
-              
-<PasswordStrengthMeter />
-<PasswordInput type="password"
-                name="confirm-password"
-                placeholder="Confirm Password*"
-                required
-                borderColor="gray.300"
-                autoComplete="new-password" />
-              
-              <PasswordStrengthMeter  />
-              {/* Confirm Password */}
-              {/* <Input
-                type="password"
-                name="confirm-password"
-                placeholder="Confirm Password*"
-                required
-                borderColor="gray.300"
-                autoComplete="new-password"
-              /> */}
-
-              {/* Submit Button */}
+              <Input name="firstName" placeholder="First Name*" onChange={handleChange} required />
+              <Input name="lastName" placeholder="Last Name*" onChange={handleChange} required />
+              <Input name="email" type="email" placeholder="Email*" onChange={handleChange} required />
+              <Input name="phone" placeholder="Phone*" onChange={handleChange} required />
+              <Input name="password" type="password" placeholder="Password*" onChange={handleChange} required />
               <Button type="submit" colorScheme="blue" w="100%">
                 Submit
               </Button>
             </VStack>
           </form>
         </Box>
-
-        {/* Image Section */}
         <Box w="40%" display="flex" justifyContent="center" alignItems="center">
-          <Image
-            src="/images/logos/dvai-icon.png"
-            alt="Company Logo"
-            width="150px"
-            height="150px"
-          />
+          <Image src="/images/logos/dvai-icon.png" alt="Company Logo" width="150px" height="150px" />
         </Box>
       </HStack>
     </Box>
