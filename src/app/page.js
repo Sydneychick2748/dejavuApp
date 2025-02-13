@@ -1,4 +1,9 @@
+"use client"
+
+import { useRouter } from "next/navigation"; // Import useRouter
 import { Box, Button, Heading, Text, Image, VStack, HStack, Spacer } from "@chakra-ui/react";
+
+
 const styles = {
   backgroundBox: {
     width: "100%",
@@ -13,28 +18,11 @@ const styles = {
     backgroundRepeat: "no-repeat",
     padding: "20px",
   },
-  // welcomeImage: {
-  //   width: ["65%", "55%", "0%"], // Responsive width: 90% on small screens, 75% on medium, 50% on large
-  //   height: "auto", // Maintain aspect ratio
-  //   objectFit: "contain",
-  //   marginTop: [4, 8, 10], // Adjust margin dynamically
-  // },
-  // headingWelcome: {
-  //   fontSize: ["2xl", "3xl", "4xl"], // Responsive font size
-  //   color: "#00264A",
-  //   fontFamily: "'Poppins', sans-serif",
-  //   fontWeight: "100",
-  //   textAlign: "center", // Center text on smaller screens
-  //   marginBottom: "20px",
-  // },
-  // welcomeSlogan: {
-  //   fontSize: ["lg", "xl", "2xl"], // Adjust text size based on screen size
-  //   color: "#00264A",
-  //   fontWeight: "500",
-  //   textAlign: "right",
-  // },
+ 
 };
 export default function Home() {
+  const router = useRouter(); // Initialize router
+
   return (
     <Box style={styles.backgroundBox}>
       <VStack spacing={6} textAlign="center">
@@ -67,15 +55,15 @@ export default function Home() {
           mt="10px"
         />
         <Text
-          fontSize={["xl", "2xl", "3xl"]}
+          fontSize={["lg", "xl", "3xl"]}
           color="#00264A"
           fontWeight="400"
           textAlign="right"
-          alignSelf="flex-end"
+          alignSelf="center"
           width="100%" // Ensures it takes full width
-          pr={["20px", "40px", "50px"]} // Adjust right padding for positioning
+          pr={["10px", "40px", "50px"]} // Adjust right padding for positioning
           pb="40px"
-          mt="-30px"
+          mt="-10px"
         >
           Trace The Untraceable
         </Text>
@@ -86,16 +74,17 @@ export default function Home() {
           maxW="1200px"
           px={6}
           flexWrap="wrap" // Allows buttons to wrap on smaller screens
-          justify="space-between" // Spreads buttons apart
+          justify="center" // Spreads buttons apart
         >
           <Button
             className="btn-logIn"
             size={["sm", "md", "lg"]}
-            ml={["30px", "50px", "80px"]}
+            // ml={["30px", "50px", "80px"]}
             bg="#4D89FF"
             color="white"
             borderRadius="20px"
             _hover={{ bg: "#3B6CD9" }}
+            onClick={() => router.push("/accounts/login")} // Navigate to login page
           >
             <Image src="/images/logos/photon-icon.png" boxSize="20px" mr={2} />
             LOG IN
@@ -103,11 +92,12 @@ export default function Home() {
           <Button
             className="btn-signUp"
             size={["sm", "md", "lg"]}
-            ml={["20px", "40px", "60px"]}
+            // ml={["20px", "40px", "60px"]}
             bg="#4D89FF"
             color="white"
             borderRadius="20px"
             _hover={{ bg: "#3B6CD9" }}
+            onClick={() => router.push("/accounts/create-account")} // Navigate to sign-up page
           >
             <Image src="/images/logos/photon-icon.png" boxSize="20px" mr={2} />
             SIGN UP
@@ -117,11 +107,12 @@ export default function Home() {
           <Button
             className="btn-letsGetStarted"
             size={["sm", "md", "lg"]}
-            ml={["50px", "80px", "100px"]}
+            // ml={["50px", "80px", "100px"]}
             bg="#4D89FF"
             color="white"
             borderRadius="20px"
             _hover={{ bg: "#3B6CD9" }}
+            onClick={() => router.push("/help")} // Navigate to dashboard
           >
             <Image src="/images/logos/photon-icon.png" boxSize="20px" mr={2} />
             LET'S GET STARTED
@@ -131,3 +122,4 @@ export default function Home() {
     </Box>
   );
 }
+
