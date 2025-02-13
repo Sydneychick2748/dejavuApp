@@ -1,50 +1,117 @@
-'use client';
+"use client";
 
-import { Box, VStack, Heading, Text, HStack, Link, Icon, Image } from '@chakra-ui/react';
-import { MdChatBubbleOutline } from 'react-icons/md';
+import {
+  Box,
+  VStack,
+  Heading,
+  Text,
+  HStack,
+  Link,
+  Icon,
+  Image,
+} from "@chakra-ui/react";
+import { MdChatBubbleOutline } from "react-icons/md";
 // import Image from 'next/image';
+
+const styles = {
+  helpContainer: {
+    width: "100%",
+    minHeight: "85vh",
+    display: "flex",
+    justifyContent: "flex-start",
+    alignItems: "center",
+    flexDirection: "column",
+    backgroundImage:
+      "url('/images/logos/DejavuAILogoOpacity.png'), url('/images/background/DejaVuBackground.png')",
+    backgroundSize: "550px, cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    padding: "40px",
+  },
+};
 
 export default function Help() {
   return (
-    <Box bg="gray.50" w="100%" minH="100vh" p={6}>
-      <VStack spacing={8} align="center">
+    <Box style={styles.helpContainer}>
+      <VStack spacing={4} align="center">
         {/* Header */}
-        <Heading as="h1" size="2xl" color="blue.600">
+        <Heading
+          as="h1"
+          size={{ base: "xl", md: "4xl", lg: "6xl" }}
+          color="blue.600"
+          textAlign="center"
+          px={4}
+          mt={10} // Moves it up
+        >
           HELP/TRAININGS
         </Heading>
 
         {/* Description */}
-        <Text  fontSize="lg" color="gray.700" textAlign="center">
-        HERE YOU CAN FIND TUTORIALS THAT WILL HELP YOU NAVIGATE THROUGH THE WEBSITE. PLEASE REQUEST A DEMO IF FURTHER ASSISTANCE IS NEEDED. THANKS
+        <Text
+          fontSize={{ base: "md", md: "xl", lg: "2xl" }}
+          color="gray.700"
+          textAlign="center"
+          fontWeight="500"
+          maxW="800px"
+          mt={8}
+          mx="auto"
+          px={4}
+          mb={8}
+        >
+          HERE YOU CAN FIND TUTORIALS THAT WILL HELP YOU NAVIGATE THROUGH THE
+          WEBSITE. PLEASE REQUEST A DEMO IF FURTHER ASSISTANCE IS NEEDED.
         </Text>
 
         {/* Request a Demo Section */}
         <VStack spacing={2} align="center">
-          <HStack spacing={3} align="center">
-            <Icon as={MdChatBubbleOutline} boxSize={8} color="green.500" />
-            <Text fontSize="lg" fontWeight="bold" color="black">
-              REQUEST A DEMO
-            </Text>
-          </HStack>
-          <Link href="mailto:sales@dejavuai.com" fontSize="lg" fontWeight="bold" color="blue.600">
-            sales@dejavuai.com
-          </Link>
+          <VStack spacing={1} align="center">
+            {" "}
+            {/* Groups text and link together */}
+            <HStack spacing={3} align="center" mt={8}>
+              <Image
+                src="/images/logos/Message.png" // Replace with your image path
+                alt="Demo Request"
+                boxSize={{ base: "50px", md: "70px", lg: "90px" }} // Responsive size
+              />
+              <Text
+                fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }} // Adjust text size for different screens
+                fontWeight="500"
+                color="black"
+                fontFamily="'Poppins', sans-serif"
+              >
+                REQUEST A DEMO
+              </Text>
+            </HStack>
+            {/* Link placed directly under REQUEST A DEMO */}
+            <Link
+              href="mailto:sales@dejavuai.com"
+              fontSize={{ base: "sm", md: "md", lg: "lg" }} // Smaller font size
+              fontWeight="500"
+              color="black"
+              alignSelf="flex-end" // Moves it to the right
+              mr="125px" 
+              mt={-8} // Moves it up
+              _hover={{ textDecoration: "underline" }} // Underline on hover
+            >
+              sales@dejavuai.com
+            </Link>
+          </VStack>
         </VStack>
 
         {/* Footer */}
-        <Box bg="" w="" py={4} textAlign="" mt={8}>
+        {/* <Box bg="" w="" py={4} textAlign="" mt={8}>
           <VStack spacing={2}>
-          <Image
-        src="/images/logos/photon-icon.png" // or "/photon-icon.png" depending on the renamed file
-        alt="Company Logo"
-        width={100} // Adjust width as needed
-        height={100} // Adjust height as needed
-      />
+            <Image
+              src="/images/logos/photon-icon.png" // or "/photon-icon.png" depending on the renamed file
+              alt="Company Logo"
+              width={100} // Adjust width as needed
+              height={100} // Adjust height as needed
+            />
             <Heading as="h2" size="md" color="black">
               THANKS A BUNCH!
             </Heading>
           </VStack>
-        </Box>
+        </Box> */}
       </VStack>
     </Box>
   );
