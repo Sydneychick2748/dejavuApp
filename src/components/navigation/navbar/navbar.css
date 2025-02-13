@@ -1,0 +1,24 @@
+.header-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    font: bolder;
+}
+
+.menu-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-grow: 17;
+    justify-content: space-evenly;
+}
+
+.logo-div {
+    height: 2vh;
+    flex-grow: 1;
+}
+
+.profile-layout {
+    height: 1vh;
+    flex-grow: 1;
+    align-self: flex-start;
+}
