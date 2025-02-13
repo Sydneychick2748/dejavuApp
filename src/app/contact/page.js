@@ -19,8 +19,8 @@ const styles = {
     minHeight: "85vh",
     padding: "20px",
     textAlign: "center",
-    backgroundImage: "url('/images/background/DejaVuBackground.png')",
-    backgroundSize: "cover",
+    backgroundImage: "url('/images/logos/DejavuAILogoOpacity.png'), url('/images/background/DejaVuBackground.png')", 
+    backgroundSize: "750px, cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
     display: "flex",
@@ -37,12 +37,12 @@ export default function Contact() {
         {/* Page Title */}
         <Heading
           as="h1"
-          size={{ base: "xl", md: "2xl", lg: "4xl" }}
+          size={{ base: "xl", md: "4xl", lg: "5xl" }}
           color="blue.600"
           textAlign="center"
           px={4}
         >
-          Contact Us
+          CONTACT US
         </Heading>
 
         {/* Description */}
@@ -61,23 +61,34 @@ export default function Contact() {
           business, please send us a message so we can get in touch.
         </Text>
 
-        <Box
+        <Heading
+          as="h1"
+          size={{ base: "xl", md: "3xl", lg: "4xl" }}
+          color="blue.600"
+          textAlign="center"
+          px={4}
+        >
+          We'd Love To Connect!
+        </Heading>
+
+        {/* <Box
           w="100%"
           maxW="500px"
           mx="auto"
           p={6}
           bg="gray.50"
           borderRadius="md"
-        >
+        > */}
           {/* Native Form */}
-          <form>
-            <VStack spacing={4}>
+          <form style={{ width: "100%", maxWidth: "500px" }}>
+            <VStack spacing={6} w="full">
               {/* First Name */}
               <Input
                 type="text"
                 name="first-name"
                 placeholder="First Name*"
                 required
+                bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl" // Adds border radius
@@ -94,6 +105,7 @@ export default function Contact() {
                 name="last-name"
                 placeholder="Last Name*"
                 required
+                bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl"
@@ -110,6 +122,7 @@ export default function Contact() {
                 name="email"
                 placeholder="Email*"
                 required
+                bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
                 color="gray.800"
                 borderRadius="2xl"
@@ -143,7 +156,7 @@ export default function Contact() {
               </Button>
             </VStack>
           </form>
-        </Box>
+        {/* </Box> */}
 
         {/* Contact Email */}
         <VStack spacing={4}>
