@@ -102,6 +102,7 @@ export default function Login() {
                 bg="white"
                 color="black"
                 _placeholder={{ color: "gray.600" }}
+                autoComplete="new-password"
               />
 
               <Link href="/forgot-password" color="blue.500" alignSelf="flex-start">
