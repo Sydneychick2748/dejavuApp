@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Next.js Router
+import { useRouter } from "next/navigation"; 
 import {
   Box,
   Heading,
@@ -12,10 +12,10 @@ import {
   Image,
   Input,
 } from "@chakra-ui/react";
-import { PasswordInput } from "@/components/ui/password-input"; // Chakra UI Password Input
+import { PasswordInput } from "@/components/ui/password-input"; 
 
 export default function CreateAccount() {
-  const router = useRouter(); // Initialize router for navigation
+  const router = useRouter(); 
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -82,23 +82,32 @@ export default function CreateAccount() {
       return; // Prevent submission if phone is invalid
     }
 
-    const response = await fetch("/api/auth/signup", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(formData),
-    });
+    console.log("Submitting data:", formData); // Debugging
 
-    const data = await response.json();
+    try {
+      const response = await fetch("/api/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-    if (!response.ok) {
-      setMessage("❌ " + (data.message || "Something went wrong"));
-    } else {
-      setMessage("✅ Account created successfully! Redirecting to login...");
-      
-      // Redirect to login page after 2 seconds
-      setTimeout(() => {
-        router.push("/accounts/login");
-      }, 2000);
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.error("Signup Error:", data.message);
+        setMessage("❌ " + (data.message || "Something went wrong"));
+      } else {
+        console.log("Signup Success:", data);
+        setMessage("✅ Account created successfully! Redirecting to login...");
+        
+        // Redirect to login page after 2 seconds
+        setTimeout(() => {
+          router.push("/accounts/login");
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Network error:", error);
+      setMessage("❌ Something went wrong. Please try again.");
     }
   };
 
