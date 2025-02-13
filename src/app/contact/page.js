@@ -37,7 +37,7 @@ export default function Contact() {
         {/* Page Title */}
         <Heading
           as="h1"
-          size={{ base: "xl", md: "4xl", lg: "5xl" }}
+          size={{ base: "xl", md: "4xl", lg: "6xl" }}
           color="blue.600"
           textAlign="center"
           px={4}
@@ -50,6 +50,7 @@ export default function Contact() {
           fontSize={{ base: "md", md: "lg", lg: "xl" }}
           color="gray.700"
           textAlign="center"
+          fontWeight="600"
           maxW="800px"
           mt={8}
           mx="auto"
@@ -64,7 +65,7 @@ export default function Contact() {
         <Heading
           as="h1"
           size={{ base: "xl", md: "3xl", lg: "4xl" }}
-          color="blue.600"
+          color="#00264A"
           textAlign="center"
           px={4}
         >
@@ -90,7 +91,8 @@ export default function Contact() {
                 required
                 bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
-                color="gray.800"
+                color="black"
+                fontWeight="bold"
                 borderRadius="2xl" // Adds border radius
                 _hover={{ borderColor: "blue.600" }} // Blue border on hover
                 _focus={{
@@ -107,7 +109,8 @@ export default function Contact() {
                 required
                 bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
-                color="gray.800"
+                color="black"
+                fontWeight="bold"
                 borderRadius="2xl"
                 _hover={{ borderColor: "blue.600" }}
                 _focus={{
@@ -124,7 +127,8 @@ export default function Contact() {
                 required
                 bg="white" // Makes input background white
                 borderColor="gray.500" // Darker gray border
-                color="gray.800"
+                color="black"
+                fontWeight="bold"
                 borderRadius="2xl"
                 _hover={{ borderColor: "blue.600" }}
                 _focus={{
