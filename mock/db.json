@@ -62,6 +62,33 @@
       "phone": "457-234-1111",
       "password": "$2b$10$HSKbd11yMl3iKD0fRh59fOCz0UgvVZkAvX4nPtUPDOCk5HknFMH2m",
       "files": []
+    },
+    {
+      "id": "1739471789824",
+      "firstName": "larry",
+      "lastName": "barry",
+      "email": "larry@larry.com",
+      "phone": "619-123-1111",
+      "password": "$2b$10$vB5YGw2XfLSQKFJMsWcUx.2aIuAw.dsP2Rp/yvN7H2iObyxl4tzUK",
+      "files": []
+    },
+    {
+      "id": "1739473095560",
+      "firstName": "ben",
+      "lastName": "Bennett",
+      "email": "ben@ben.com",
+      "phone": "(619) 991-7062",
+      "password": "$2b$10$hzDQe8q9ZSFdq6DAn2ngfOHnFM9Yhkvua.bnhA9X/fqp6jPTlG5He",
+      "files": []
+    },
+    {
+      "id": "1739473270224",
+      "firstName": "hat",
+      "lastName": "cat",
+      "email": "hat@hat.com",
+      "phone": "111-222-1234",
+      "password": "$2b$10$X//gNsrK3rhwpfXqcGkIw.UoNxC7VAmZKV3UrCoJ1zGyofT7ezbb2",
+      "files": []
     }
   ],
   "databases": [
