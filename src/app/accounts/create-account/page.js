@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; // Import Next.js Router
+import { useRouter } from "next/navigation"; // Next.js Router
 import {
   Box,
   Heading,
@@ -30,28 +30,36 @@ export default function CreateAccount() {
   const [errors, setErrors] = useState({
     emailMatch: "",
     passwordMatch: "",
+    phoneFormat: "",
   });
 
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
 
     // Live validation for emails and passwords
-    if (e.target.name === "confirmEmail") {
-      if (e.target.value !== formData.email) {
-        setErrors((prev) => ({ ...prev, emailMatch: "❌ Emails do not match!" }));
-      } else {
-        setErrors((prev) => ({ ...prev, emailMatch: "" }));
-      }
+    if (name === "confirmEmail") {
+      setErrors((prev) => ({
+        ...prev,
+        emailMatch: value !== formData.email ? "❌ Emails do not match!" : "",
+      }));
     }
 
-    if (e.target.name === "confirmPassword") {
-      if (e.target.value !== formData.password) {
-        setErrors((prev) => ({ ...prev, passwordMatch: "❌ Passwords do not match!" }));
-      } else {
-        setErrors((prev) => ({ ...prev, passwordMatch: "" }));
-      }
+    if (name === "confirmPassword") {
+      setErrors((prev) => ({
+        ...prev,
+        passwordMatch: value !== formData.password ? "❌ Passwords do not match!" : "",
+      }));
+    }
+
+    if (name === "phone") {
+      const phoneRegex = /^(\(\d{3}\)\d{3}-\d{4}|\d{3}-\d{3}-\d{4})$/;
+      setErrors((prev) => ({
+        ...prev,
+        phoneFormat: phoneRegex.test(value) ? "" : "❌ Invalid phone format! Use (XXX)XXX-XXXX or XXX-XXX-XXXX",
+      }));
     }
   };
 
@@ -62,14 +70,16 @@ export default function CreateAccount() {
     // Final validation before sending
     if (formData.email !== formData.confirmEmail) {
       setErrors((prev) => ({ ...prev, emailMatch: "❌ Emails do not match!" }));
-      console.log("Email mismatch:", formData.email, formData.confirmEmail);
       return;
     }
 
     if (formData.password !== formData.confirmPassword) {
       setErrors((prev) => ({ ...prev, passwordMatch: "❌ Passwords do not match!" }));
-      console.log("Password mismatch:", formData.password, formData.confirmPassword);
       return;
+    }
+
+    if (errors.phoneFormat) {
+      return; // Prevent submission if phone is invalid
     }
 
     const response = await fetch("/api/auth/signup", {
@@ -81,10 +91,8 @@ export default function CreateAccount() {
     const data = await response.json();
 
     if (!response.ok) {
-      console.log("Signup Error:", data.message);
       setMessage("❌ " + (data.message || "Something went wrong"));
     } else {
-      console.log("Signup Success:", data);
       setMessage("✅ Account created successfully! Redirecting to login...");
       
       // Redirect to login page after 2 seconds
@@ -127,10 +135,22 @@ export default function CreateAccount() {
               <Input name="email" type="email" placeholder="Email*" onChange={handleChange} required bg="white" color="black" />
               <Input name="confirmEmail" type="email" placeholder="Confirm Email*" onChange={handleChange} required bg="white" color="black" />
               {errors.emailMatch && <Text color="red.500">{errors.emailMatch}</Text>}
-              <Input name="phone" placeholder="Phone*" onChange={handleChange} required bg="white" color="black" />
-              <PasswordInput name="password" placeholder="Password*" onChange={handleChange} required bg="white" color="black" />
-              <PasswordInput name="confirmPassword" placeholder="Confirm Password*" onChange={handleChange} required bg="white" color="black" />
+
+              <Input
+                name="phone"
+                placeholder="Phone* (XXX)XXX-XXXX or XXX-XXX-XXXX"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                autoComplete="tel"
+              />
+              {errors.phoneFormat && <Text color="red.500">{errors.phoneFormat}</Text>}
+
+              <PasswordInput name="password" placeholder="Password*" onChange={handleChange} required bg="white" color="black" autoComplete="new-password"  />
+              <PasswordInput name="confirmPassword" placeholder="Confirm Password*" onChange={handleChange} required bg="white" color="black"  autoComplete="new-password" />
               {errors.passwordMatch && <Text color="red.500">{errors.passwordMatch}</Text>}
+
               <Button type="submit" colorScheme="blue" w="100%">
                 Submit
               </Button>
