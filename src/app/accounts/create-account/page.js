@@ -31,6 +31,7 @@ export default function CreateAccount() {
     emailMatch: "",
     passwordMatch: "",
     phoneFormat: "",
+    passwordStrength: "",
   });
 
   const [message, setMessage] = useState("");
@@ -61,6 +62,14 @@ export default function CreateAccount() {
         phoneFormat: phoneRegex.test(value) ? "" : "❌ Invalid phone format! Use (XXX)XXX-XXXX or XXX-XXX-XXXX",
       }));
     }
+
+    if (name === "password") {
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      setErrors((prev) => ({
+        ...prev,
+        passwordStrength: passwordRegex.test(value) ? "" : "❌ Password must be at least 8 characters long and include uppercase, lowercase, and a number.",
+      }));
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -78,8 +87,8 @@ export default function CreateAccount() {
       return;
     }
 
-    if (errors.phoneFormat) {
-      return; // Prevent submission if phone is invalid
+    if (errors.phoneFormat || errors.passwordStrength) {
+      return; // Prevent submission if there are validation errors
     }
 
     console.log("Submitting data:", formData); // Debugging
@@ -129,7 +138,6 @@ export default function CreateAccount() {
         borderRadius="lg"
         boxShadow="md"
       >
-        {/* Form Section */}
         <Box w="60%" p={6}>
           <Heading as="h1" size="xl" color="blue.600" textAlign="center" mb={4}>
             CREATE AN ACCOUNT
@@ -147,6 +155,7 @@ export default function CreateAccount() {
 
               <Input
                 name="phone"
+                type="tel"
                 placeholder="Phone* (XXX)XXX-XXXX or XXX-XXX-XXXX"
                 onChange={handleChange}
                 required
@@ -157,6 +166,7 @@ export default function CreateAccount() {
               {errors.phoneFormat && <Text color="red.500">{errors.phoneFormat}</Text>}
 
               <PasswordInput name="password" placeholder="Password*" onChange={handleChange} required bg="white" color="black" autoComplete="new-password"  />
+              {errors.passwordStrength && <Text color="red.500">{errors.passwordStrength}</Text>}
               <PasswordInput name="confirmPassword" placeholder="Confirm Password*" onChange={handleChange} required bg="white" color="black"  autoComplete="new-password" />
               {errors.passwordMatch && <Text color="red.500">{errors.passwordMatch}</Text>}
 
@@ -165,11 +175,6 @@ export default function CreateAccount() {
               </Button>
             </VStack>
           </form>
-        </Box>
-
-        {/* Image Section */}
-        <Box w="40%" display="flex" justifyContent="center" alignItems="center">
-          <Image src="/images/logos/dvai-icon.png" alt="Company Logo" width="150px" height="150px" />
         </Box>
       </HStack>
     </Box>
