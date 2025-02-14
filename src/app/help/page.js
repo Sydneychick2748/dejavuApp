@@ -31,6 +31,9 @@ const styles = {
 };
 
 export default function Help() {
+
+  
+
   return (
     <Box style={styles.helpContainer}>
       <VStack spacing={4} align="center">
