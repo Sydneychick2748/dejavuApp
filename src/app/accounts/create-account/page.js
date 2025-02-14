@@ -64,10 +64,10 @@ export default function CreateAccount() {
     }
 
     if (name === "password") {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       setErrors((prev) => ({
         ...prev,
-        passwordStrength: passwordRegex.test(value) ? "" : "❌ Password must be at least 8 characters long and include uppercase, lowercase, and a number.",
+        passwordStrength: passwordRegex.test(value) ? "" : "❌ Password must be at least 8 characters long and include uppercase, lowercase, a number, and a symbol.",
       }));
     }
   };
