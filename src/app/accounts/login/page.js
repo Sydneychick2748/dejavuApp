@@ -307,6 +307,7 @@ export default function Login() {
                 borderRadius="full"
                 alignSelf="center"
                 mt="150px" // Moves button further down
+                _hover={{ bg: "#3B6CD9" }}
               >
                 SUBMIT
               </Button>
@@ -324,8 +325,9 @@ export default function Login() {
           <Image
             src="/images/logos/dvai-icon.png"
             alt="Company Logo"
-            maxW="80%"
-            mt="40"
+            maxW="100%"
+            // mt="10"
+            pl="100px"
           />
         </Box>
       </Flex>
