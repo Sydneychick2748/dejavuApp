@@ -54,13 +54,13 @@
 //     console.log("Login Response:", data);
 
 //     if (response.ok) {
-//       setSuccessMessage("✅ Login successful! Redirecting...");
+//       setSuccessMessage("Login successful! Redirecting...");
 //       setErrorMessage("");
 //       setTimeout(() => {
 //         window.location.href = "/dashboard"; // Redirects to dashboard
 //       }, 2000);
 //     } else {
-//       console.log("❌ Login failed:", data.message);
+//       console.log("x Login failed:", data.message);
 //       setErrorMessage(data.message);
 //       setSuccessMessage("");
 //     }
@@ -215,7 +215,7 @@ export default function Login() {
     console.log("Login Response:", data);
 
     if (response.ok) {
-      setSuccessMessage("✅ Login successful! Redirecting...");
+      setSuccessMessage("Login successful! Redirecting...");
       setErrorMessage("");
       setTimeout(() => {
         window.location.href = "/dashboard";
