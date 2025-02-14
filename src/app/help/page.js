@@ -31,6 +31,9 @@ const styles = {
 };
 
 export default function Help() {
+
+  
+
   return (
     <Box style={styles.helpContainer}>
       <VStack spacing={4} align="center">
@@ -64,17 +67,15 @@ export default function Help() {
 
         {/* Request a Demo Section */}
         <VStack spacing={2} align="center">
-          <VStack spacing={1} align="center">
-            {" "}
-            {/* Groups text and link together */}
+          <VStack spacing={2} align="center">
             <HStack spacing={3} align="center" mt={8}>
               <Image
-                src="/images/logos/Message.png" // Replace with your image path
+                src="/images/logos/Message.png"
                 alt="Demo Request"
-                boxSize={{ base: "50px", md: "70px", lg: "90px" }} // Responsive size
+                boxSize={{ base: "50px", md: "70px", lg: "90px" }}
               />
               <Text
-                fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }} // Adjust text size for different screens
+                fontSize={{ base: "2xl", md: "3xl", lg: "4xl" }}
                 fontWeight="500"
                 color="black"
                 fontFamily="'Poppins', sans-serif"
@@ -82,16 +83,13 @@ export default function Help() {
                 REQUEST A DEMO
               </Text>
             </HStack>
-            {/* Link placed directly under REQUEST A DEMO */}
             <Link
               href="mailto:sales@dejavuai.com"
-              fontSize={{ base: "sm", md: "md", lg: "lg" }} // Smaller font size
+              fontSize={{ base: "sm", md: "md", lg: "lg" }}
               fontWeight="500"
               color="black"
-              alignSelf="flex-end" // Moves it to the right
-              mr="125px" 
-              mt={-8} // Moves it up
-              _hover={{ textDecoration: "underline" }} // Underline on hover
+              _hover={{ textDecoration: "underline" }}
+              mt={-5}
             >
               sales@dejavuai.com
             </Link>

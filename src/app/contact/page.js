@@ -165,9 +165,9 @@ export default function Contact() {
         {/* Contact Email */}
         <VStack spacing={4}>
           <HStack spacing={3} align="center">
-            <Icon as={MdEmail} boxSize={6} mt={8} color="blue.500" />{" "}
+            <Icon as={MdEmail} boxSize={10} mt={8} color="blue.500" />{" "}
             {/* Email icon next to text */}
-            <Text fontSize="xl" color="black" mt={8} fontWeight="bold">
+            <Text fontSize="2xl" color="black" mt={8} fontWeight="bold">
               Email Us
             </Text>
           </HStack>
