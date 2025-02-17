@@ -6,7 +6,6 @@ import UploadFiles from "./upload-files/UploadFiles";
 import { ImageProvider } from "@/contexts/ImageContext"; // ✅ Import the correct ImageContext
 import "./dashboard.css";
 import "../globals.css";
-
 export default function Dashboard() {
   return (
     <ImageProvider> {/* ✅ Wrap everything inside ImageProvider */}
