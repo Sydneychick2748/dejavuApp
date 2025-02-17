@@ -1,21 +1,24 @@
-import { useSearchParams } from "next/navigation";
+"use client";
+
+import { useContext } from "react";
+import { ImageContext } from "@/contexts/ImageContext"; // :white_check_mark: Import the correct context
 import { Box, Image, Text } from "@chakra-ui/react";
-
 export default function SearchFor() {
-  const searchParams = useSearchParams();
-  const imageUrl = searchParams.get("image");
-
+  const { selectedImage } = useContext(ImageContext); // :white_check_mark: Use the context
   return (
-    <Box textAlign="center" mt={10}>
-      {imageUrl ? (
-        <Image 
-          src={decodeURIComponent(imageUrl)} 
-          alt="Selected Image" 
-          maxW="500px" 
+    <Box>
+      <Text fontSize="lg" fontWeight="bold">
+        Search For Image
+      </Text>
+      {selectedImage ? (
+        <Image
+          src={selectedImage}
+          alt="Selected"
+          boxSize="300px"
           borderRadius="md"
         />
       ) : (
-        <Text fontSize="lg" color="red.500">No image selected.</Text>
+        <Text>No image selected</Text>
       )}
     </Box>
   );
