@@ -1,5 +1,7 @@
 "use client";
-import { useState, useEffect, useContext } from "react"; // :white_check_mark: Add useContext
+import { useState, useEffect, useContext } from "react"; // ✅ Add useContext
+
+
 import { useDropzone } from "react-dropzone";
 import {
   Box,
@@ -11,9 +13,12 @@ import {
   Link,
 } from "@chakra-ui/react";
 import { FaCloudUploadAlt } from "react-icons/fa";
-import { ImageContext } from "@/contexts/ImageContext"; // :white_check_mark: Import context
+
+import { ImageContext } from "@/contexts/ImageContext"; // ✅ Import context
+
 // API endpoint
 const API_URL = "http://localhost:3001/databases";
+
 export default function UploadFiles() {
   const [files, setFiles] = useState([]);
   const [selectedFiles, setSelectedFiles] = useState([]);
@@ -22,8 +27,10 @@ export default function UploadFiles() {
   const [showMonaLisa, setShowMonaLisa] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+
   // const router = useRouter();
-  const { setSelectedImage } = useContext(ImageContext); // :white_check_mark: Get function from context
+  const { setSelectedImage } = useContext(ImageContext); // ✅ Get function from context
+
   // Fetch databases from backend on load
   useEffect(() => {
     console.log("Fetching databases from backend...");
@@ -40,6 +47,7 @@ export default function UploadFiles() {
     };
     loadDatabases();
   }, []);
+
   // Handle file drop
   const onDrop = (acceptedFiles) => {
     if (!databaseName.trim()) {
@@ -112,18 +120,26 @@ export default function UploadFiles() {
     onDrop,
     multiple: true,
   });
+
   // Navigate to searchFor.js with the selected image
+
+
   // const handleSelectSingleImage = (file) => {
   //   console.log("Navigating to SearchFor with file:", file);
   //   const fileUrl = URL.createObjectURL(file);
   //   router.push(`/search-for?image=${encodeURIComponent(fileUrl)}`);
   // };
+
+
   // Handle selecting an image
   const handleSelectSingleImage = (file) => {
     console.log("Selecting image for SearchFor:", file);
     const fileUrl = URL.createObjectURL(file);
-    setSelectedImage(fileUrl); // :white_check_mark: Update context with selected image
+    setSelectedImage(fileUrl); // ✅ Update context with selected image
   };
+
+
+
   return (
     <VStack spacing={6} align="start" w="full" p={4}>
       <form>
@@ -197,6 +213,7 @@ export default function UploadFiles() {
               onChange={() => handleSelectFile(file)}
               style={{ marginRight: "8px" }}
             />
+
             {file.type.startsWith("image/") ? (
              <Image
              src={URL.createObjectURL(file)}
@@ -220,6 +237,7 @@ export default function UploadFiles() {
                 {file.name}
               </Text>
             )}
+
             <Box flex="1" ml={2}>
               <Text fontWeight="bold" color="black">
                 {file.name}
@@ -231,6 +249,7 @@ export default function UploadFiles() {
                 Size: {(file.size / 1024 / 1024).toFixed(2)} MB
               </Text>
             </Box>
+
             <Button
               onClick={() => handleRemoveFile(file)}
               ml={2}
@@ -242,6 +261,7 @@ export default function UploadFiles() {
             </Button>
           </Box>
         ))}
+
       {files.length > 0 && (
         <Button
           onClick={() => setFiles([])}
@@ -251,6 +271,7 @@ export default function UploadFiles() {
           Clear All Files
         </Button>
       )}
+
       {selectedFiles.length > 0 && (
         <Box
           mt={4}
@@ -276,6 +297,7 @@ export default function UploadFiles() {
       {/* // this is the image that once you click on it will go to the searchFor  */}
       {/* <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} cursor="pointer" onClick={() => handleSelectSingleImage(file)} />
        */}
+
       <Button
         colorScheme="teal"
         variant="solid"

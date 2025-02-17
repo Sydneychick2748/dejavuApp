@@ -2,9 +2,12 @@
 
 import { VStack } from "@chakra-ui/react";
 import SearchFor from "./search-for/searchFor"; // :white_check_mark: Correct import
+import { VStack } from "@chakra-ui/react";
+import SearchFor from "./search-for/searchFor"; // ✅ Correct import
 import SearchParams from "./search-params/searchParams";
 import UploadFiles from "./upload-files/UploadFiles";
 import { ImageProvider } from "@/contexts/ImageContext"; // :white_check_mark: Import the correct ImageContext
+import { ImageProvider } from "@/contexts/ImageContext"; // ✅ Import the correct ImageContext
 import "./dashboard.css";
 import "../globals.css";
 export default function Dashboard() {
@@ -16,6 +19,7 @@ export default function Dashboard() {
         <SearchParams />
       </VStack>
     </ImageProvider>
+   
   );
 }
 
