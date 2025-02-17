@@ -1,11 +1,23 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react"; // ✅ Add useContext
+
+
 import { useDropzone } from "react-dropzone";
-import { Box, VStack, Button, Text, Input, Image, Link } from "@chakra-ui/react";
+import {
+  Box,
+  VStack,
+  Button,
+  Text,
+  Input,
+  Image,
+  Link,
+} from "@chakra-ui/react";
 import { FaCloudUploadAlt } from "react-icons/fa";
 
+import { ImageContext } from "@/contexts/ImageContext"; // ✅ Import context
+
 // API endpoint
-const API_URL = "http://localhost:3001/databases"; 
+const API_URL = "http://localhost:3001/databases";
 
 export default function UploadFiles() {
   const [files, setFiles] = useState([]);
@@ -16,6 +28,8 @@ export default function UploadFiles() {
   const [loadingMessage, setLoadingMessage] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
 
+  // const router = useRouter();
+  const { setSelectedImage } = useContext(ImageContext); // ✅ Get function from context
 
   // Fetch databases from backend on load
   useEffect(() => {
@@ -34,13 +48,6 @@ export default function UploadFiles() {
 
     loadDatabases();
   }, []);
-
-
-
-
-
-
-  
 
   // Handle file drop
   const onDrop = (acceptedFiles) => {
@@ -123,14 +130,29 @@ export default function UploadFiles() {
   };
 
   // Dropzone configuration
-  const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: true });
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    multiple: true,
+  });
 
-// this is supposed to go to the searchFor.js
+  // Navigate to searchFor.js with the selected image
+
+
   // const handleSelectSingleImage = (file) => {
   //   console.log("Navigating to SearchFor with file:", file);
-  //   router.push(`/search-for?image=${encodeURIComponent(URL.createObjectURL(file))}`);
+  //   const fileUrl = URL.createObjectURL(file);
+  //   router.push(`/search-for?image=${encodeURIComponent(fileUrl)}`);
   // };
-  
+
+
+  // Handle selecting an image
+  const handleSelectSingleImage = (file) => {
+    console.log("Selecting image for SearchFor:", file);
+    const fileUrl = URL.createObjectURL(file);
+    setSelectedImage(fileUrl); // ✅ Update context with selected image
+  };
+
+
 
   return (
     <VStack spacing={6} align="start" w="full" p={4}>
@@ -144,7 +166,11 @@ export default function UploadFiles() {
           value={databaseName}
           onChange={handleDatabaseNameChange}
         />
-        {errorMessage && <Text color="red.500" fontSize="sm" mt={2}>{errorMessage}</Text>}
+        {errorMessage && (
+          <Text color="red.500" fontSize="sm" mt={2}>
+            {errorMessage}
+          </Text>
+        )}
       </form>
 
       <Box
@@ -170,64 +196,134 @@ export default function UploadFiles() {
 
       {showMonaLisa && (
         <Box textAlign="center" w="full">
-          <Text fontSize="lg" color="blue.500" mb={4}>{loadingMessage}</Text>
-          <Image src="/images/logos/Mona_Lisa.jpg" alt="Loading Mona Lisa" boxSize="150px" borderRadius="md" objectFit="cover" mx="auto" />
+          <Text fontSize="lg" color="blue.500" mb={4}>
+            {loadingMessage}
+          </Text>
+          <Image
+            src="/images/logos/Mona_Lisa.jpg"
+            alt="Loading Mona Lisa"
+            boxSize="150px"
+            borderRadius="md"
+            objectFit="cover"
+            mx="auto"
+          />
         </Box>
       )}
 
       {/* Display uploaded files with previews */}
-      {!showMonaLisa && files.map((file, index) => (
-        <Box
-          key={index}
-          display="flex"
-          alignItems="center"
-          w="full"
-          p={2}
-          border="1px solid"
-          borderColor="gray.200"
-          borderRadius="md"
-          mb={2}
-        >
-          <input type="checkbox" checked={selectedFiles.includes(file)} onChange={() => handleSelectFile(file)} style={{ marginRight: "8px" }} />
+      {!showMonaLisa &&
+        files.map((file, index) => (
+          <Box
+            key={index}
+            display="flex"
+            alignItems="center"
+            w="full"
+            p={2}
+            border="1px solid"
+            borderColor="gray.200"
+            borderRadius="md"
+            mb={2}
+          >
+            <input
+              type="checkbox"
+              checked={selectedFiles.includes(file)}
+              onChange={() => handleSelectFile(file)}
+              style={{ marginRight: "8px" }}
+            />
 
-          {file.type.startsWith("image/") ? (
-            <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} />
-          ) : file.type.startsWith("video/") ? (
-            <video src={URL.createObjectURL(file)} controls width="120" height="80" style={{ marginRight: "8px", borderRadius: "4px" }} />
-          ) : (
-            <Text fontSize="sm" color="gray.700" w="full">
-              {file.name}
-            </Text>
-          )}
+            {file.type.startsWith("image/") ? (
+             <Image
+             src={URL.createObjectURL(file)}
+             alt={file.name}
+             boxSize="80px"
+             borderRadius="md"
+             mr={3}
+             cursor="pointer"
+             onClick={() => handleSelectSingleImage(file)}
+           />
+            ) : file.type.startsWith("video/") ? (
+              <video
+                src={URL.createObjectURL(file)}
+                controls
+                width="120"
+                height="80"
+                style={{ marginRight: "8px", borderRadius: "4px" }}
+              />
+            ) : (
+              <Text fontSize="sm" color="gray.700" w="full">
+                {file.name}
+              </Text>
+            )}
 
-          <Box flex="1" ml={2}>
-            <Text fontWeight="bold" color="black">{file.name}</Text>
-            <Text fontSize="sm" color="gray.500">Type: {file.type || "Unknown"}</Text>
-            <Text fontSize="sm" color="gray.500">Size: {(file.size / 1024 / 1024).toFixed(2)} MB</Text>
+            <Box flex="1" ml={2}>
+              <Text fontWeight="bold" color="black">
+                {file.name}
+              </Text>
+              <Text fontSize="sm" color="gray.500">
+                Type: {file.type || "Unknown"}
+              </Text>
+              <Text fontSize="sm" color="gray.500">
+                Size: {(file.size / 1024 / 1024).toFixed(2)} MB
+              </Text>
+            </Box>
+
+            <Button
+              onClick={() => handleRemoveFile(file)}
+              ml={2}
+              size="sm"
+              variant="outline"
+              colorScheme="red"
+            >
+              Remove
+            </Button>
           </Box>
+        ))}
 
-          <Button onClick={() => handleRemoveFile(file)} ml={2} size="sm" variant="outline" colorScheme="red">
-            Remove
-          </Button>
-        </Box>
-      ))}
-
-      {files.length > 0 && <Button onClick={() => setFiles([])} colorScheme="red" variant="outline">Clear All Files</Button>}
+      {files.length > 0 && (
+        <Button
+          onClick={() => setFiles([])}
+          colorScheme="red"
+          variant="outline"
+        >
+          Clear All Files
+        </Button>
+      )}
 
       {selectedFiles.length > 0 && (
-        <Box mt={4} w="full" p={4} border="1px solid" borderColor="gray.300" borderRadius="md">
-          <Text fontSize="lg" fontWeight="bold" color="black" mb={2}>Current Database: {databaseName}</Text>
-          <Text fontWeight="bold" color="blue.500" mb={2}>Selected Files:</Text>
-          {selectedFiles.map((file, index) => <Text key={index} fontSize="sm" color="gray.500">{file.name}</Text>)}
+        <Box
+          mt={4}
+          w="full"
+          p={4}
+          border="1px solid"
+          borderColor="gray.300"
+          borderRadius="md"
+        >
+          <Text fontSize="lg" fontWeight="bold" color="black" mb={2}>
+            Current Database: {databaseName}
+          </Text>
+          <Text fontWeight="bold" color="blue.500" mb={2}>
+            Selected Files:
+          </Text>
+          {selectedFiles.map((file, index) => (
+            <Text key={index} fontSize="sm" color="gray.500">
+              {file.name}
+            </Text>
+          ))}
         </Box>
       )}
 
       {/* // this is the image that once you click on it will go to the searchFor  */}
- {/* <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} cursor="pointer" onClick={() => handleSelectSingleImage(file)} />
- */}
+      {/* <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} cursor="pointer" onClick={() => handleSelectSingleImage(file)} />
+       */}
 
-
-      <Button colorScheme="teal" variant="solid" onClick={handleSaveDatabase} disabled={!databaseName.trim() || selectedFiles.length === 0}>Save Database</Button>
+      <Button
+        colorScheme="teal"
+        variant="solid"
+        onClick={handleSaveDatabase}
+        disabled={!databaseName.trim() || selectedFiles.length === 0}
+      >
+        Save Database
+      </Button>
     </VStack>
   );
 }
