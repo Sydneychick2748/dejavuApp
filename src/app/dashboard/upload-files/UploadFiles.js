@@ -14,7 +14,8 @@ export default function UploadFiles() {
   const [databases, setDatabases] = useState([]);
   const [showMonaLisa, setShowMonaLisa] = useState(false);
   const [loadingMessage, setLoadingMessage] = useState("");
-  const [errorMessage, setErrorMessage] = useState(""); 
+  const [errorMessage, setErrorMessage] = useState("");
+
 
   // Fetch databases from backend on load
   useEffect(() => {
@@ -124,6 +125,13 @@ export default function UploadFiles() {
   // Dropzone configuration
   const { getRootProps, getInputProps } = useDropzone({ onDrop, multiple: true });
 
+// this is supposed to go to the searchFor.js
+  // const handleSelectSingleImage = (file) => {
+  //   console.log("Navigating to SearchFor with file:", file);
+  //   router.push(`/search-for?image=${encodeURIComponent(URL.createObjectURL(file))}`);
+  // };
+  
+
   return (
     <VStack spacing={6} align="start" w="full" p={4}>
       <form>
@@ -213,6 +221,11 @@ export default function UploadFiles() {
           {selectedFiles.map((file, index) => <Text key={index} fontSize="sm" color="gray.500">{file.name}</Text>)}
         </Box>
       )}
+
+      {/* // this is the image that once you click on it will go to the searchFor  */}
+ {/* <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} cursor="pointer" onClick={() => handleSelectSingleImage(file)} />
+ */}
+
 
       <Button colorScheme="teal" variant="solid" onClick={handleSaveDatabase} disabled={!databaseName.trim() || selectedFiles.length === 0}>Save Database</Button>
     </VStack>
