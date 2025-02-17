@@ -45,22 +45,18 @@ export default function UploadFiles() {
         console.error("Error fetching databases:", error);
       }
     };
-
     loadDatabases();
   }, []);
-
   // Handle file drop
   const onDrop = (acceptedFiles) => {
     if (!databaseName.trim()) {
       setErrorMessage("Please enter a database name before uploading files.");
       return;
     }
-
     console.log("Dropped files:", acceptedFiles);
     if (acceptedFiles.length > 0) {
       setShowMonaLisa(true);
       setLoadingMessage("Files are loading...");
-
       setTimeout(() => {
         setShowMonaLisa(false);
         setLoadingMessage("");
@@ -68,13 +64,11 @@ export default function UploadFiles() {
       }, 3000);
     }
   };
-
   // Handle name input
   const handleDatabaseNameChange = (e) => {
     setDatabaseName(e.target.value);
     if (errorMessage) setErrorMessage("");
   };
-
   // Handle file selection
   const handleSelectFile = (file) => {
     console.log("Toggling file selection:", file);
@@ -82,14 +76,12 @@ export default function UploadFiles() {
       prev.includes(file) ? prev.filter((f) => f !== file) : [...prev, file]
     );
   };
-
   // Handle file removal
   const handleRemoveFile = (fileToRemove) => {
     console.log("Removing file:", fileToRemove);
     setFiles((prev) => prev.filter((file) => file !== fileToRemove));
     setSelectedFiles((prev) => prev.filter((file) => file !== fileToRemove));
   };
-
   // Save database
   const handleSaveDatabase = async () => {
     if (!databaseName.trim()) {
@@ -100,26 +92,20 @@ export default function UploadFiles() {
       setErrorMessage("No files selected to save.");
       return;
     }
-
     const newDatabase = {
       name: databaseName,
       files: selectedFiles.map((file) => file.name), // Store only file names
     };
-
     console.log("Saving Database:", newDatabase);
-
     try {
       const response = await fetch(API_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newDatabase),
       });
-
       if (!response.ok) throw new Error("Failed to save database");
-
       const savedData = await response.json();
       console.log("Database saved successfully:", savedData);
-
       setDatabases((prev) => [...prev, savedData]);
       setDatabaseName("");
       setFiles([]);
@@ -128,7 +114,6 @@ export default function UploadFiles() {
       console.error("Error saving database:", error);
     }
   };
-
   // Dropzone configuration
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -172,7 +157,6 @@ export default function UploadFiles() {
           </Text>
         )}
       </form>
-
       <Box
         {...getRootProps()}
         p={4}
@@ -193,7 +177,6 @@ export default function UploadFiles() {
           Drag and drop files here, or click to select files
         </Text>
       </Box>
-
       {showMonaLisa && (
         <Box textAlign="center" w="full">
           <Text fontSize="lg" color="blue.500" mb={4}>
@@ -209,7 +192,6 @@ export default function UploadFiles() {
           />
         </Box>
       )}
-
       {/* Display uploaded files with previews */}
       {!showMonaLisa &&
         files.map((file, index) => (
@@ -230,7 +212,6 @@ export default function UploadFiles() {
               onChange={() => handleSelectFile(file)}
               style={{ marginRight: "8px" }}
             />
-
             {file.type.startsWith("image/") ? (
              <Image
              src={URL.createObjectURL(file)}
@@ -254,7 +235,6 @@ export default function UploadFiles() {
                 {file.name}
               </Text>
             )}
-
             <Box flex="1" ml={2}>
               <Text fontWeight="bold" color="black">
                 {file.name}
@@ -266,7 +246,6 @@ export default function UploadFiles() {
                 Size: {(file.size / 1024 / 1024).toFixed(2)} MB
               </Text>
             </Box>
-
             <Button
               onClick={() => handleRemoveFile(file)}
               ml={2}
@@ -278,7 +257,6 @@ export default function UploadFiles() {
             </Button>
           </Box>
         ))}
-
       {files.length > 0 && (
         <Button
           onClick={() => setFiles([])}
@@ -288,7 +266,6 @@ export default function UploadFiles() {
           Clear All Files
         </Button>
       )}
-
       {selectedFiles.length > 0 && (
         <Box
           mt={4}
