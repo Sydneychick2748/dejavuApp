@@ -5,6 +5,7 @@ import { ImageContext } from "@/contexts/ImageContext"; // ✅ Import the correc
 import { Box, Image, Text } from "@chakra-ui/react";
 
 export default function SearchFor() {
+
   const { selectedImage } = useContext(ImageContext); // ✅ Use the context
 
   return (
@@ -16,5 +17,6 @@ export default function SearchFor() {
         <Text>No image selected</Text>
       )}
     </Box>
+
   );
 }
