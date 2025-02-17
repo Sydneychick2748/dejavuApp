@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation"; 
+import { useRouter } from "next/navigation";
 import {
   Box,
   Heading,
@@ -12,10 +12,27 @@ import {
   Image,
   Input,
 } from "@chakra-ui/react";
-import { PasswordInput } from "@/components/ui/password-input"; 
+import { PasswordInput } from "@/components/ui/password-input";
+
+const styles = {
+  accountContainer: {
+    width: "100%",
+    minHeight: "85vh",
+    padding: "20px",
+    ml: "-20px",
+    backgroundImage: "url('/images/background/DejaVuBackground.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: "80px", // Reduce padding to move up
+  },
+};
 
 export default function CreateAccount() {
-  const router = useRouter(); 
+  const router = useRouter();
 
   const [formData, setFormData] = useState({
     firstName: "",
@@ -51,7 +68,8 @@ export default function CreateAccount() {
     if (name === "confirmPassword") {
       setErrors((prev) => ({
         ...prev,
-        passwordMatch: value !== formData.password ? "❌ Passwords do not match!" : "",
+        passwordMatch:
+          value !== formData.password ? "❌ Passwords do not match!" : "",
       }));
     }
 
@@ -59,15 +77,20 @@ export default function CreateAccount() {
       const phoneRegex = /^(\(\d{3}\)\d{3}-\d{4}|\d{3}-\d{3}-\d{4})$/;
       setErrors((prev) => ({
         ...prev,
-        phoneFormat: phoneRegex.test(value) ? "" : "❌ Invalid phone format! Use (XXX)XXX-XXXX or XXX-XXX-XXXX",
+        phoneFormat: phoneRegex.test(value)
+          ? ""
+          : "❌ Invalid phone format! Use (XXX)XXX-XXXX or XXX-XXX-XXXX",
       }));
     }
 
     if (name === "password") {
-      const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+      const passwordRegex =
+        /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
       setErrors((prev) => ({
         ...prev,
-        passwordStrength: passwordRegex.test(value) ? "" : "❌ Password must be at least 8 characters long and include uppercase, lowercase, a number, and a symbol.",
+        passwordStrength: passwordRegex.test(value)
+          ? ""
+          : "❌ Password must be at least 8 characters long and include uppercase, lowercase, a number, and a symbol.",
       }));
     }
   };
@@ -83,7 +106,10 @@ export default function CreateAccount() {
     }
 
     if (formData.password !== formData.confirmPassword) {
-      setErrors((prev) => ({ ...prev, passwordMatch: "❌ Passwords do not match!" }));
+      setErrors((prev) => ({
+        ...prev,
+        passwordMatch: "❌ Passwords do not match!",
+      }));
       return;
     }
 
@@ -108,7 +134,7 @@ export default function CreateAccount() {
       } else {
         console.log("Signup Success:", data);
         setMessage("✅ Account created successfully! Redirecting to login...");
-        
+
         // Redirect to login page after 2 seconds
         setTimeout(() => {
           router.push("/accounts/login");
@@ -121,37 +147,99 @@ export default function CreateAccount() {
   };
 
   return (
-    <Box
-      w="100%"
-      minH="100vh"
-      bg="gray.50"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Box style={styles.accountContainer}>
       <HStack
-        spacing={8}
-        w="90%"
-        maxW="800px"
-        p={8}
-        bg="white"
-        borderRadius="lg"
-        boxShadow="md"
+         spacing={{ base: 4, md: 8 }}
+         w="90%"
+         maxW="800px"
+         align="center"
+         wrap="nowrap" // Prevents unintended wrapping on larger screens
+         direction={{ base: "column", md: "row" }} // Form & image side by side on desktop, stacked on mobile
       >
-        <Box w="60%" p={6}>
-          <Heading as="h1" size="xl" color="blue.600" textAlign="center" mb={4}>
+        {/* Form Section */}
+        <Box
+          w={{ base: "100%", md: "60%" }} // Full width on mobile, 60% on larger screens
+          p={6}
+          textAlign="left"
+        >
+          <Heading
+            as="h1"
+            size="3xl"
+            color="black"
+            fontWeight="600"
+            textAlign="left"
+            mb={4}
+          >
             CREATE AN ACCOUNT
           </Heading>
 
-          {message && <Text color={message.startsWith("❌") ? "red.500" : "green.500"}>{message}</Text>}
+          <Text
+            color="red.500"
+            fontSize="md"
+            fontWeight="600"
+            textAlign="left"
+            mb={4}
+          >
+            PLEASE FILL OUT ALL FIELDS*
+          </Text>
+
+          {message && (
+            <Text color={message.startsWith("❌") ? "red.500" : "green.500"}>
+              {message}
+            </Text>
+          )}
 
           <form onSubmit={handleSubmit}>
-            <VStack spacing={4}>
-              <Input name="firstName" placeholder="First Name*" onChange={handleChange} required bg="white" color="black" />
-              <Input name="lastName" placeholder="Last Name*" onChange={handleChange} required bg="white" color="black" />
-              <Input name="email" type="email" placeholder="Email*" onChange={handleChange} required bg="white" color="black" />
-              <Input name="confirmEmail" type="email" placeholder="Confirm Email*" onChange={handleChange} required bg="white" color="black" />
-              {errors.emailMatch && <Text color="red.500">{errors.emailMatch}</Text>}
+            <VStack spacing={6} w="100%">
+              <Input
+                name="firstName"
+                placeholder="First Name*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+              />
+              <Input
+                name="lastName"
+                placeholder="Last Name*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+              />
+              <Input
+                name="email"
+                type="email"
+                placeholder="Email*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+              />
+              <Input
+                name="confirmEmail"
+                type="email"
+                placeholder="Confirm Email*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+              />
+              {errors.emailMatch && (
+                <Text color="red.500">{errors.emailMatch}</Text>
+              )}
 
               <Input
                 name="phone"
@@ -161,20 +249,82 @@ export default function CreateAccount() {
                 required
                 bg="white"
                 color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="tel"
               />
-              {errors.phoneFormat && <Text color="red.500">{errors.phoneFormat}</Text>}
+              {errors.phoneFormat && (
+                <Text color="red.500">{errors.phoneFormat}</Text>
+              )}
 
-              <PasswordInput name="password" placeholder="Password*" onChange={handleChange} required bg="white" color="black" autoComplete="new-password"  />
-              {errors.passwordStrength && <Text color="red.500">{errors.passwordStrength}</Text>}
-              <PasswordInput name="confirmPassword" placeholder="Confirm Password*" onChange={handleChange} required bg="white" color="black"  autoComplete="new-password" />
-              {errors.passwordMatch && <Text color="red.500">{errors.passwordMatch}</Text>}
+              <PasswordInput
+                name="password"
+                placeholder="Password*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+                autoComplete="new-password"
+              />
+              {errors.passwordStrength && (
+                <Text color="red.500">{errors.passwordStrength}</Text>
+              )}
+              <PasswordInput
+                name="confirmPassword"
+                placeholder="Confirm Password*"
+                onChange={handleChange}
+                required
+                bg="white"
+                color="black"
+                borderRadius="full" // Fully rounded borders
+                p={6} // Increased padding for better appearance
+                border="1px solid #0F60F9" // Subtle border
+                autoComplete="new-password"
+              />
+              {errors.passwordMatch && (
+                <Text color="red.500">{errors.passwordMatch}</Text>
+              )}
 
-              <Button type="submit" colorScheme="blue" w="100%">
-                Submit
+              <Button
+                type="submit"
+                bg="#4D89FF"
+                color="white"
+                w="50%"
+                fontWeight="600"
+                borderRadius="full"
+                alignSelf="center"
+                mt="150px" // Moves button further down
+                _hover={{ bg: "#3B6CD9" }}
+              >
+                <Image
+                  src="/images/logos/photon-icon.png"
+                  boxSize="20px"
+                  mr={2}
+                />
+                SUBMIT
               </Button>
             </VStack>
           </form>
+        </Box>
+
+        {/* Image Section */}
+        <Box
+          w={{ base: "100%", md: "40%" }} // Full width on mobile, 40% on larger screens
+          display="flex"
+          justifyContent={{ base: "center", md: "flex-end" }} // Centers on mobile, moves right on desktop
+          alignItems="center"
+          mt={{ base: 6, md: 0 }} // Adds space above image on mobile
+        >
+          <Image
+            src="/images/logos/dvai-icon.png"
+            alt="Company Logo"
+            maxW={{ base: "150px", md: "200px" }} // Scales properly across screen sizes
+            objectFit="contain"
+          />
         </Box>
       </HStack>
     </Box>
