@@ -2,6 +2,7 @@ import { useSearchParams } from "next/navigation";
 import { Box, Image, Text } from "@chakra-ui/react";
 
 export default function SearchFor() {
+
   const searchParams = useSearchParams();
   const imageUrl = searchParams.get("image");
 
@@ -18,5 +19,6 @@ export default function SearchFor() {
         <Text fontSize="lg" color="red.500">No image selected.</Text>
       )}
     </Box>
+
   );
 }
