@@ -47,7 +47,6 @@ export default function UploadFiles() {
     };
     loadDatabases();
   }, []);
-
   // Handle file drop
   const onDrop = (acceptedFiles) => {
     if (!databaseName.trim()) {
@@ -213,7 +212,6 @@ export default function UploadFiles() {
               onChange={() => handleSelectFile(file)}
               style={{ marginRight: "8px" }}
             />
-
             {file.type.startsWith("image/") ? (
              <Image
              src={URL.createObjectURL(file)}
@@ -237,7 +235,6 @@ export default function UploadFiles() {
                 {file.name}
               </Text>
             )}
-
             <Box flex="1" ml={2}>
               <Text fontWeight="bold" color="black">
                 {file.name}
@@ -249,7 +246,6 @@ export default function UploadFiles() {
                 Size: {(file.size / 1024 / 1024).toFixed(2)} MB
               </Text>
             </Box>
-
             <Button
               onClick={() => handleRemoveFile(file)}
               ml={2}
@@ -261,7 +257,6 @@ export default function UploadFiles() {
             </Button>
           </Box>
         ))}
-
       {files.length > 0 && (
         <Button
           onClick={() => setFiles([])}
@@ -271,7 +266,6 @@ export default function UploadFiles() {
           Clear All Files
         </Button>
       )}
-
       {selectedFiles.length > 0 && (
         <Box
           mt={4}
