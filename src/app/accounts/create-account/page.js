@@ -148,7 +148,7 @@ export default function CreateAccount() {
 
   return (
     <Box style={styles.accountContainer}>
-      <HStack
+      <VStack
          spacing={{ base: 4, md: 8 }}
          w="90%"
          maxW="800px"
@@ -326,7 +326,7 @@ export default function CreateAccount() {
             objectFit="contain"
           />
         </Box>
-      </HStack>
+      </VStack>
     </Box>
   );
 }
