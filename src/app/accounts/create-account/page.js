@@ -11,6 +11,7 @@ import {
   HStack,
   Image,
   Input,
+  Stack,
 } from "@chakra-ui/react";
 import { PasswordInput } from "@/components/ui/password-input";
 
@@ -18,7 +19,7 @@ const styles = {
   accountContainer: {
     width: "100%",
     minHeight: "85vh",
-    padding: "20px",
+    padding: "10px",
     ml: "-20px",
     backgroundImage: "url('/images/background/DejaVuBackground.png')",
     backgroundSize: "cover",
@@ -27,7 +28,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    paddingTop: "80px", // Reduce padding to move up
+    // paddingTop: "10px", // Reduce padding to move up
   },
 };
 
@@ -148,27 +149,28 @@ export default function CreateAccount() {
 
   return (
     <Box style={styles.accountContainer}>
-      <HStack
-         spacing={{ base: 4, md: 8 }}
-         w="90%"
-         maxW="800px"
-         align="center"
-         wrap="nowrap" // Prevents unintended wrapping on larger screens
-         direction={{ base: "column", md: "row" }} // Form & image side by side on desktop, stacked on mobile
+      <Stack
+        spacing={{ base: 4, md: 8 }}
+        w="90%"
+        maxW="800px"
+        align="center"
+        justifyContent="center"
+        //  wrap="nowrap" // Prevents unintended wrapping on larger screens
+        direction={{ base: "column", md: "row" }} // Stacks on mobile, row on desktop
       >
         {/* Form Section */}
         <Box
           w={{ base: "100%", md: "60%" }} // Full width on mobile, 60% on larger screens
-          p={6}
+          // p={0}
           textAlign="left"
         >
           <Heading
             as="h1"
-            size="3xl"
+            size="2xl"
             color="black"
-            fontWeight="600"
+            fontWeight="500"
             textAlign="left"
-            mb={4}
+            // mb={0}
           >
             CREATE AN ACCOUNT
           </Heading>
@@ -178,7 +180,7 @@ export default function CreateAccount() {
             fontSize="md"
             fontWeight="600"
             textAlign="left"
-            mb={4}
+            mb={2}
           >
             PLEASE FILL OUT ALL FIELDS*
           </Text>
@@ -190,7 +192,7 @@ export default function CreateAccount() {
           )}
 
           <form onSubmit={handleSubmit}>
-            <VStack spacing={6} w="100%">
+            <VStack spacing={4} w="100%">
               <Input
                 name="firstName"
                 placeholder="First Name*"
@@ -198,8 +200,9 @@ export default function CreateAccount() {
                 required
                 bg="white"
                 color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
               />
               <Input
@@ -210,7 +213,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
               />
               <Input
@@ -222,7 +226,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
               />
               <Input
@@ -234,7 +239,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
               />
               {errors.emailMatch && (
@@ -250,7 +256,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
                 autoComplete="tel"
               />
@@ -266,7 +273,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
                 autoComplete="new-password"
               />
@@ -281,7 +289,8 @@ export default function CreateAccount() {
                 bg="white"
                 color="black"
                 borderRadius="full" // Fully rounded borders
-                p={6} // Increased padding for better appearance
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
                 border="1px solid #0F60F9" // Subtle border
                 autoComplete="new-password"
               />
@@ -297,7 +306,8 @@ export default function CreateAccount() {
                 fontWeight="600"
                 borderRadius="full"
                 alignSelf="center"
-                mt="150px" // Moves button further down
+                // mt={{ base: 6, md: 14 }} // Adds space between button & fields
+                mb={{ base: 6, md: 0 }} // Adds space below the button on mobile
                 _hover={{ bg: "#3B6CD9" }}
               >
                 <Image
@@ -313,20 +323,21 @@ export default function CreateAccount() {
 
         {/* Image Section */}
         <Box
-          w={{ base: "100%", md: "40%" }} // Full width on mobile, 40% on larger screens
+          w={{ base: "100%", md: "40%" }}
           display="flex"
-          justifyContent={{ base: "center", md: "flex-end" }} // Centers on mobile, moves right on desktop
+          justifyContent="center"
           alignItems="center"
-          mt={{ base: 6, md: 0 }} // Adds space above image on mobile
+          order={{ base: 2, md: 1 }} // Keeps logo below button on mobile
+          // mt={{ base: 1, md: 0 }} // Slight margin to avoid too much separation
         >
           <Image
             src="/images/logos/dvai-icon.png"
             alt="Company Logo"
-            maxW={{ base: "150px", md: "200px" }} // Scales properly across screen sizes
+            maxW={{ base: "100px", md: "200px" }}
             objectFit="contain"
           />
         </Box>
-      </HStack>
+      </Stack>
     </Box>
   );
 }
