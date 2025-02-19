@@ -1,37 +1,66 @@
-'use client';
+"use client";
 
+import {
+  Box,
+  Button,
+  Heading,
+  Text,
+  VStack,
+  HStack,
+  Input,
+  Image,
+} from "@chakra-ui/react";
+import Avatar from "@/components/ui/avatar"; // Assuming you're using `@/` alias for `src/`
 
-import { Box, Button, Heading, Text, VStack, HStack,Input } from '@chakra-ui/react';
-import Avatar from '@/components/ui/avatar'; // Assuming you're using `@/` alias for `src/`
+const styles = {
+  profileContainer: {
+    width: "100%",
+    minHeight: "85vh",
+    padding: "10px",
+    ml: "-20px",
+    backgroundImage: "url('/images/background/DejaVuBackground.png')",
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    backgroundRepeat: "no-repeat",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    // paddingTop: "10px", // Reduce padding to move up
+  },
+};
 
 export default function Profile() {
   return (
-    <Box
-      w="100%"
-      minH="100vh"
-      bg="gray.50"
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-      p={6}
-    >
+    <Box style={styles.profileContainer}>
       <HStack
         spacing={8}
         w="90%"
         maxW="800px"
-        p={8}
-        bg="white"
-        borderRadius="lg"
-        boxShadow="md"
       >
-         
         {/* Form Section */}
-        <Box w="60%" p={6}>
+        <Box
+          w={{ base: "100%", md: "60%" }} // Full width on mobile, 60% on larger screens
+          // p={0}
+          textAlign="left"
+        >
           {/* Page Title */}
-          <Heading as="h1" size="xl" color="blue.600" textAlign="center" mb={4}>
+          <Heading
+            as="h1"
+            size="2xl"
+            color="black"
+            fontWeight="500"
+            textAlign="left"
+          >
             PROFILE
           </Heading>
-          <Text color="red.500" fontWeight="bold" textAlign="center" mb={6}>
+
+          <Text
+            color="red.500"
+            fontSize="md"
+            fontWeight="600"
+            textAlign="left"
+            mb={2}
+          >
             PLEASE FILL OUT ALL FIELDS*
           </Text>
 
@@ -44,7 +73,12 @@ export default function Profile() {
                 name="first-name"
                 placeholder="First Name*"
                 required
-                borderColor="gray.300"
+                bg="white"
+                color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
+                borderRadius="full" // Fully rounded borders
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="given-name"
               />
 
@@ -54,7 +88,12 @@ export default function Profile() {
                 name="last-name"
                 placeholder="Last Name*"
                 required
-                borderColor="gray.300"
+                bg="white"
+                color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
+                borderRadius="full" // Fully rounded borders
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="family-name"
               />
 
@@ -64,7 +103,12 @@ export default function Profile() {
                 name="email"
                 placeholder="Email*"
                 required
-                borderColor="gray.300"
+                bg="white"
+                color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
+                borderRadius="full" // Fully rounded borders
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="email"
               />
 
@@ -74,7 +118,12 @@ export default function Profile() {
                 name="phone"
                 placeholder="Phone*"
                 required
-                borderColor="gray.300"
+                bg="white"
+                color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
+                borderRadius="full" // Fully rounded borders
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="tel"
               />
 
@@ -84,13 +133,34 @@ export default function Profile() {
                 name="address"
                 placeholder="Address*"
                 required
-                borderColor="gray.300"
+                bg="white"
+                color="black"
+                mb={4} // Adds extra spacing below
+                p={4} // Increased padding for better appearance
+                borderRadius="full" // Fully rounded borders
+                border="1px solid #0F60F9" // Subtle border
                 autoComplete="street-address"
               />
 
               {/* Submit Button */}
-              <Button type="submit" colorScheme="blue" w="100%">
-                Submit
+              <Button
+                type="submit"
+                bg="#4D89FF"
+                color="white"
+                w="50%"
+                fontWeight="600"
+                borderRadius="full"
+                alignSelf="center"
+                // mt={{ base: 6, md: 14 }} // Adds space between button & fields
+                mb={{ base: 6, md: 0 }} // Adds space below the button on mobile
+                _hover={{ bg: "#3B6CD9" }}
+              >
+                <Image
+                  src="/images/logos/photon-icon.png"
+                  boxSize="20px"
+                  mr={2}
+                />
+                SUBMIT
               </Button>
             </VStack>
           </form>
@@ -98,8 +168,6 @@ export default function Profile() {
 
         {/* Avatar Section */}
         <Box w="40%" display="flex" flexDirection="column" alignItems="center">
-       
-       
           <Text mt={4} color="black" fontWeight="bold">
             + Add Photo
           </Text>
@@ -108,4 +176,3 @@ export default function Profile() {
     </Box>
   );
 }
-
