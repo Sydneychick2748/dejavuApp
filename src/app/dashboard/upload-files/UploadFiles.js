@@ -288,7 +288,6 @@ export default function UploadFiles() {
           ))}
         </Box>
       )}
-
       {/* // this is the image that once you click on it will go to the searchFor  */}
       {/* <Image src={URL.createObjectURL(file)} alt={file.name} boxSize="80px" borderRadius="md" mr={3} cursor="pointer" onClick={() => handleSelectSingleImage(file)} />
        */}
@@ -304,3 +303,9 @@ export default function UploadFiles() {
     </VStack>
   );
 }
+
+
+
+
+
+
