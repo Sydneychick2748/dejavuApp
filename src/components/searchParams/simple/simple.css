@@ -1,0 +1,19 @@
+.slider {
+    display: flex;
+    flex-direction: column;
+    color: black
+}
+
+.fastThoroughBoxes {
+    background-color: #125FEE;
+    color: white;
+    border-radius: 1rem;
+    margin-top: 30%;
+    margin-bottom: 30%;
+    padding: 10%
+}
+
+.fastThoroughSlider {
+    display: flex;
+    flex-direction: row;
+}
