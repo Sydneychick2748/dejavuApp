@@ -1,0 +1,43 @@
+.settings {
+    color: black;
+    display: flex;
+    flex-direction: column;
+}
+
+.headerBox {
+    background-color: #4888F0;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 4%
+}
+
+.searchParamsWording {
+    color: white
+}
+
+.infoBox {
+    background-color: white;
+    border-radius: 0.2rem;
+    padding: 4%;
+}
+
+.infoLetter {
+    color: #4888F0
+}
+
+.simple {
+    display: flex;
+    flex-direction: row;
+}
+
+.savedSettings {
+    display: flex;
+    flex-direction: row;
+}
+
+.advanced {
+    display: flex;
+    flex-direction: row;
+}
