@@ -1,0 +1,50 @@
+.resolutionSlider {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.advancedOptions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.optionsCheckboxes {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    width: 100%;
+}
+
+.titles {
+    color: black;
+}
+
+.chakra-slider__label {
+    color: black;
+}
+
+.chakra-checkbox__label {
+    color: black;
+}
+
+.chakra-checkbox__control {
+    border-color: #4A87FB;
+}
+
+.firstSetInner .chakra-checkbox__control {
+    border-radius: 9px;
+}
+
+.optionsCheckboxes .css-wuqtn7 {
+    stroke: #4A87FB;
+}
+
+.saveParametersText {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    color: #4A88EF;
+}
