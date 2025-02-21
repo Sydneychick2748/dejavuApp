@@ -1,3 +1,131 @@
+.headerBox {
+    background-color: #4A88EF;
+    border-radius: 0.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1%;
+}
+
+.searchParamsWording {
+    color: white;
+    font: bold;
+    font-size: 2rem;
+}
+
+.infoBox {
+    background-color: white;
+    border-radius: 0.2rem;
+    padding: 2%;
+    font-style: italic;
+}
+
+.infoLetter {
+    color: #4888F0
+}
+
+.container2 {
+    display: flex;
+    width: auto;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: #EEF5FE;
+}
+
+.sidebar {
+    width: 30%;
+    background: #EEF5FE;
+    padding: 15px;
+    border-right: 1px solid #ddd;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    transition: background 0.2s;
+    font-weight: bold;
+    /* Ensures text is visible */
+    color: #333;
+    display: block;
+}
+
+.sidebar li:hover {
+    background: #ddd;
+}
+
+.sidebar li.active {
+    background: #007bff;
+    color: white;
+}
+
+.content2 {
+    width: 70%;
+    padding: 5px;
+}
+
+
+
+/* BELOW IS EARLIER ATTEMPT */
+
+
+/* .container2 {
+    display: flex;
+    height: 100vh;
+    width: 100%;
+}
+
+.sidebar {
+    width: 25%;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.optionList {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.optionText {
+    font-size: 1rem;
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    text-align: right;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.active {
+    font-weight: bold;
+}
+
+.contentArea {
+    width: 75%;
+    padding: 40px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.contentBox {
+    padding: 20px;
+    border-radius: 8px;
+}
+
 .settings {
     color: black;
     display: flex;
@@ -27,17 +155,47 @@
     color: #4888F0
 }
 
+.fullBox {
+    display: flex;
+    flex-direction: row;
+}
+
+.tabs {
+    display: flex;
+    flex-direction: column;
+    width: 25%;
+    text-align: left;
+}
+
+.tabOptions {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+}
+
 .simple {
     display: flex;
     flex-direction: row;
+    width: 100%;
 }
 
 .savedSettings {
     display: flex;
     flex-direction: row;
+    width: 100%;
 }
 
 .advanced {
     display: flex;
     flex-direction: row;
+    width: 100%;
 }
+
+.tab {
+    width: 35%;
+    color: black;
+}
+
+.options {
+    flex-grow: 1;
+} */

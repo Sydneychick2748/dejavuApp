@@ -1,3 +1,9 @@
 .grey {
     background-color: grey;
+    padding-left: 1rem;
+}
+
+.white {
+    padding-left: 1rem;
+    color: black;
 }

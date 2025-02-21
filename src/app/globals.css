@@ -9,6 +9,19 @@ body {
     background-color: white;
 }
 
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.main-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* Pushes the footer down */
+}
+
 
 .headerFooter1-gradient {
     background: linear-gradient(90deg, #162D5C, #4985FA);
@@ -21,9 +34,9 @@ body {
 }
 
 /* Optional: Add box shadow for depth */
-.headerFooter1-gradient {
+/* .headerFooter1-gradient {
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
-}
+} */
 
 /* .container {
     min-height: 100vh;
