@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState } from 'react';
 
 import { Box, Text, Button } from "@chakra-ui/react";
@@ -14,6 +15,8 @@ import styles from "./searchParams.css";
 export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState("Simple");
 
+
+
   return (
     <div className="settings">
       <Box className="headerBox">
@@ -26,6 +29,7 @@ export default function SettingsPanel() {
           </Text>
         </Box>
       </Box>
+
       <div className="container2">
       {/* Left Sidebar */}
         <div className="sidebar">
