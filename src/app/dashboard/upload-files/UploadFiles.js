@@ -1,7 +1,6 @@
 "use client";
 import { useState, useEffect, useContext } from "react"; // ✅ Add useContext
 
-
 import { useDropzone } from "react-dropzone";
 import {
   Box,
@@ -10,6 +9,7 @@ import {
   Text,
   Input,
   Image,
+  HStack,
   Link,
 } from "@chakra-ui/react";
 import { FaCloudUploadAlt } from "react-icons/fa";
@@ -122,13 +122,11 @@ export default function UploadFiles() {
 
   // Navigate to searchFor.js with the selected image
 
-
   // const handleSelectSingleImage = (file) => {
   //   console.log("Navigating to SearchFor with file:", file);
   //   const fileUrl = URL.createObjectURL(file);
   //   router.push(`/search-for?image=${encodeURIComponent(fileUrl)}`);
   // };
-
 
   // Handle selecting an image
   const handleSelectSingleImage = (file) => {
@@ -137,20 +135,95 @@ export default function UploadFiles() {
     setSelectedImage(fileUrl); // ✅ Update context with selected image
   };
 
-
-
   return (
-    <VStack spacing={6} align="start" w="full" p={4}>
-      <form>
-        <Text fontSize="lg" fontWeight="bold" color="black">
+    <VStack
+      spacing={6}
+      align="start"
+      w="full"
+      p={4}
+      borderRadius="lg"
+      bg="blue.100"
+      h="85vh"
+    >
+      <form style={{ width: "100%" }}>
+        {/* <Text fontSize="lg" fontWeight="bold" color="black">
           Database Name
-        </Text>
-        <Input
+        </Text> */}
+        {/* <Input
           color="black"
           placeholder="Enter a name for your database"
           value={databaseName}
           onChange={handleDatabaseNameChange}
+        /> */}
+        <Input
+          color="white.600"
+          placeholder="Search Within"
+          value={databaseName}
+          onChange={handleDatabaseNameChange}
+          borderRadius="2xl"
+          border="none"
+          bg="#3083F9"
+          boxShadow="sm"
+          // w="full"
+          _placeholder={{ color: "white" }} // Sets placeholder text color
         />
+
+        {/* Placeholder Buttons */}
+        {/* <HStack w="full" spacing={4}>
+          <Button
+            w="40%"
+            colorScheme="gray"
+            variant="outline"
+            bg={"white"}
+            mt={8}
+            borderRadius={"2xl"}
+            border="none"
+            color={"black"}
+          >
+            Saved Database
+          </Button>
+
+          <Button
+            w="50%"
+            variant="ghost" // Makes background transparent
+            border="none"
+            mt={4}
+            fontSize="4xl" // Makes the "+" larger
+            color="#3083F9" // Sets text color
+            ml="-100px" // Adjust this value to move it further left
+            
+          >
+            +
+          </Button>
+        </HStack> */}
+        <HStack w="full" spacing={4} flexWrap="nowrap" justify="start">
+          <Button
+            maxW="250px" // Prevents button from being too large
+            colorScheme="gray"
+            variant="outline"
+            bg="white"
+            mt={8}
+            borderRadius="2xl"
+            border="none"
+            color="black"
+            // ml={["0", "-20px", "-100px"]}
+          >
+            Saved Database
+          </Button>
+
+          <Button
+            w={["100%", "80%", "50%"]} // Adjusts width responsively
+            variant="ghost"
+            border="none"
+            mt={4}
+            fontSize={["2xl", "3xl", "4xl"]} // Scales size for different screens
+            color="#3083F9"
+            ml={["0", "-20px", "-100px"]} // Adjusts left margin responsively
+          >
+            +
+          </Button>
+        </HStack>
+
         {errorMessage && (
           <Text color="red.500" fontSize="sm" mt={2}>
             {errorMessage}
@@ -161,9 +234,11 @@ export default function UploadFiles() {
         {...getRootProps()}
         p={4}
         w="full"
-        border="2px dashed"
-        borderColor="gray.400"
+        mt={-5}
+        border="none"
+        borderColor="blue.400"
         borderRadius="md"
+        bg="white"
         textAlign="center"
         cursor="pointer"
         display="flex"
@@ -202,9 +277,11 @@ export default function UploadFiles() {
             w="full"
             p={2}
             border="1px solid"
-            borderColor="gray.200"
-            borderRadius="md"
+            borderColor="gray.300"
+            borderRadius="lg"
             mb={2}
+            boxShadow="sm"
+            bg="white"
           >
             <input
               type="checkbox"
@@ -213,15 +290,15 @@ export default function UploadFiles() {
               style={{ marginRight: "8px" }}
             />
             {file.type.startsWith("image/") ? (
-             <Image
-             src={URL.createObjectURL(file)}
-             alt={file.name}
-             boxSize="80px"
-             borderRadius="md"
-             mr={3}
-             cursor="pointer"
-             onClick={() => handleSelectSingleImage(file)}
-           />
+              <Image
+                src={URL.createObjectURL(file)}
+                alt={file.name}
+                boxSize="80px"
+                borderRadius="md"
+                mr={3}
+                cursor="pointer"
+                onClick={() => handleSelectSingleImage(file)}
+              />
             ) : file.type.startsWith("video/") ? (
               <video
                 src={URL.createObjectURL(file)}
@@ -252,6 +329,7 @@ export default function UploadFiles() {
               size="sm"
               variant="outline"
               colorScheme="red"
+              color={"black"}
             >
               Remove
             </Button>
@@ -262,6 +340,7 @@ export default function UploadFiles() {
           onClick={() => setFiles([])}
           colorScheme="red"
           variant="outline"
+          color={"black"}
         >
           Clear All Files
         </Button>
@@ -293,7 +372,7 @@ export default function UploadFiles() {
        */}
 
       <Button
-        colorScheme="teal"
+        colorScheme="blue"
         variant="solid"
         onClick={handleSaveDatabase}
         disabled={!databaseName.trim() || selectedFiles.length === 0}
@@ -303,9 +382,3 @@ export default function UploadFiles() {
     </VStack>
   );
 }
-
-
-
-
-
-
