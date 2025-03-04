@@ -42,3 +42,13 @@ next-env.d.ts
 
 # merge conflicts
 package-lock.json
+
+
+# Ignore Python virtual environment
+backend-venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+temp_*
+uploads/
