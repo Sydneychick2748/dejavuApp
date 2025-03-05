@@ -94,7 +94,7 @@ export default function SearchFor() {
       />
       {selectedFile && <p>Selected file: {selectedFile.name}</p>}
       <button onClick={handleUpload} style={{ color: "black" }}>
-        Upload to FastAPI
+       Isolate subject
       </button>
       {response && <p>FastAPI Response: {response}</p>}
       {imageUrl && (
