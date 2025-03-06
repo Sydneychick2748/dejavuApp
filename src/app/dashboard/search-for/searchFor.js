@@ -193,6 +193,7 @@ export default function SearchFor() {
             ref={canvasRef}
             brushColor="rgba(255, 0, 0, 1)"
             brushRadius={3}
+            lazyRadius={0}   
             canvasWidth={500}
             canvasHeight={500}
             hideGrid={true}
