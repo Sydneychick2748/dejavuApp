@@ -95,21 +95,42 @@ def fill_mask(mask):
     return thresh
 
 def remove_masked_area(image_path: str, mask_path: str, output_path: str) -> str:
+    """
+    Reads an image and a mask, fills in the mask if needed,
+    applies a morphological closing operation to smooth the mask edges,
+    and then sets the area indicated by the cleaned mask to white.
+    """
+    # Load the image (preserving alpha if it exists).
     image = cv2.imread(image_path, cv2.IMREAD_UNCHANGED)
     if image is None:
         raise ValueError("Could not load image")
+    
+    # Load the mask in grayscale.
     mask = cv2.imread(mask_path, cv2.IMREAD_GRAYSCALE)
     if mask is None:
         raise ValueError("Could not load mask")
+    
+    # Resize the mask if its dimensions don't match the image.
     if mask.shape != image.shape[:2]:
         mask = cv2.resize(mask, (image.shape[1], image.shape[0]))
+    
+    # Fill the mask if it only has an outline.
     mask_filled = fill_mask(mask)
+    
+    # Apply morphological closing to smooth edges and remove thin artifacts.
+    kernel = np.ones((3, 3), np.uint8)
+    mask_clean = cv2.morphologyEx(mask_filled, cv2.MORPH_CLOSE, kernel)
+    
+    # Ensure the image has an alpha channel (convert to BGRA if needed).
     if image.shape[2] == 3:
         image = cv2.cvtColor(image, cv2.COLOR_BGR2BGRA)
-    # For white fill, set the entire pixel to white.
-    image[mask_filled == 255] = [255, 255, 255, 255]
+    
+    # Instead of leaving transparency, fill the masked area with white.
+    image[mask_clean == 255] = [255, 255, 255, 255]
+    
     cv2.imwrite(output_path, image)
     return output_path
+
 
 @app.post("/remove-area")
 async def remove_area(
