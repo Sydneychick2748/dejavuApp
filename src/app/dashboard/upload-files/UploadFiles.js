@@ -3,9 +3,9 @@
 
 "use client";
 import React, { useState } from "react";
-import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
-import ImportMediaModal from "../modals/create-new-database/importMediaModal";
-import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
+import CreateNewDataBaseModal from "./modals/create-new-database/createNewDataBaseModal";
+import ImportMediaModal from "./modals/create-new-database/importMediaModal";
+import DisplayDataBaseModal from "./modals/create-new-database/displayDataBaseModal";
 
 export default function UploadFiles() {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
