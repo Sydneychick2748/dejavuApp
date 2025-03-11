@@ -3,6 +3,7 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
+import { FaPlus } from "react-icons/fa"; // Importing the plus icon
 import "./SearchFor.css";
 
 // Composite the image onto a white background at 500×500.
@@ -72,6 +73,9 @@ export default function SearchFor() {
   // Control whether the full-size mask editor modal is open.
   const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
   const canvasRef = useRef(null);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
 
   // When selectedImage changes, load it and composite it onto a 500×500 white canvas.
   useEffect(() => {
@@ -178,139 +182,186 @@ export default function SearchFor() {
     }
   };
 
+  // Function to handle opening the modal
+  const handlePlusClick = () => {
+    if (uploadedFiles.length > 0) {
+      setIsModalOpen(true);
+    }
+  };
+// Selecting an image from the modal
+const handleModalImageClick = (file) => {
+  const imageUrl = URL.createObjectURL(file);
+  setSelectedImage(imageUrl);
+  setIsModalOpen(false); // Close modal after selection
+};
+
+  
+
   return (
     <div style={{ padding: "20px", color: "black" }}>
       {/* Top Bar */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
         <h1>Search For</h1>
-        <button
-          style={{
-            backgroundColor: "#3083F9",
-            color: "#fff",
-            border: "none",
-            padding: "8px 16px",
-            borderRadius: "4px",
-            cursor: "pointer",
-          }}
-        >
-          +
-        </button>
       </div>
-
-      {!selectedImage || imageUrl === "" ? (
-        <p>No image selected. Please choose an image from the Upload Files page.</p>
-      ) : (
-        <div style={{ display: "flex", gap: "20px" }}>
-          {/* Left Column: Smaller preview (a quarter of the main mask area, e.g. 250×250) */}
-          <div style={{ width: "250px", height: "250px", backgroundColor: "white", border: "1px solid #ccc" }}>
-            <img
-              src={imageUrl}
-              alt="Selected"
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "contain",
-              }}
-            />
+  
+      {/* Ternary: Show + Box & Buttons Until Image is Selected */}
+      {!selectedImage ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+          {/* + Box */}
+          <div
+            style={{
+              width: "250px",
+              height: "250px",
+              backgroundColor: "#f3f3f3",
+              border: "2px dashed #999",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <FaPlus size={50} color="#999" />
           </div>
-
-          {/* Right Column: Info & Action Buttons */}
-          <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
-            <h2>Image Info</h2>
-            <p>
-              <strong>{selectedFileInfo?.name || "UnknownFile.jpg"}</strong>
-              <br />
-              {imgWidth} × {imgHeight}
-              <br />
-              {fileSizeMB}
-            </p>
-            <button onClick={handleIsolateSubject} style={{ width: "150px", padding: "8px", color: "black" }}>
-              Isolate Subject
-            </button>
-            <button onClick={openMaskEditor} style={{ width: "150px", padding: "8px", color: "black" }}>
-              Manual Mask
-            </button>
-            <button style={{ width: "150px", padding: "8px", color: "black" }}>
-              Create New Object
-            </button>
-            <button style={{ width: "150px", padding: "8px", color: "black" }}>
-              Add to Object Family
-            </button>
-            {response && (
-              <p style={{ marginTop: "20px", color: "black" }}>
-                FastAPI Response: {response}
-              </p>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Manual Mask Editor Modal */}
-      {isMaskEditorOpen && (
-        <div
-          style={{
-            position: "fixed",
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            backgroundColor: "rgba(0,0,0,0.5)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            zIndex: 1000,
-          }}
-        >
-          <div style={{ backgroundColor: "white", padding: "20px" }}>
-            <h2>Manual Mask Editor</h2>
-            <div
+  
+          {/* Buttons Outside the Box (to the right) */}
+          <div style={{ marginLeft: "20px", display: "flex", flexDirection: "column", gap: "10px" }}>
+            <button
               style={{
-                position: "relative",
-                width: "500px",
-                height: "500px",
-                backgroundColor: "white",
+                backgroundColor: "#3083F9",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                cursor: "pointer",
               }}
             >
-              <img
-                src={imageUrl}
-                alt="For Masking"
-                style={{
-                  position: "absolute",
-                  width: "500px",
-                  height: "500px",
-                  objectFit: "contain",
-                  border: "1px solid #ccc",
-                  zIndex: 1,
-                }}
-              />
-              <CanvasDraw
-                ref={canvasRef}
-                brushColor="rgba(255, 0, 0, 1)"
-                brushRadius={3}
-                lazyRadius={0}
-                canvasWidth={500}
-                canvasHeight={500}
-                hideGrid={true}
-                style={{
-                  position: "absolute",
-                  top: 0,
-                  left: 0,
-                  zIndex: 2,
-                  backgroundColor: "transparent",
-                }}
-              />
+              Select Image
+            </button>
+            <button
+              style={{
+                backgroundColor: "#3083F9",
+                color: "white",
+                border: "none",
+                padding: "10px 20px",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Select Object
+            </button>
+          </div>
+        </div>
+  
+      ) : (
+        <>
+          <div style={{ display: "flex", gap: "20px" }}>
+            {/* Left Column: Selected Image */}
+            <div style={{ width: "250px", height: "250px", border: "1px solid #ccc" }}>
+            {imageUrl ? (
+  <img
+    src={imageUrl}
+    alt="Selected"
+    style={{
+      width: "100%",
+      height: "100%",
+      objectFit: "contain",
+    }}
+  />
+) : null}
+
             </div>
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-              <button onClick={handleManualMask} style={{ width: "150px", padding: "8px", color: "black" }}>
-                Apply Mask
+  
+            {/* Right Column: Info & Action Buttons */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column", gap: "10px" }}>
+              <p>
+                <strong>{selectedFileInfo?.name || "UnknownFile.jpg"}</strong>
+                <br />
+                {imgWidth} × {imgHeight}
+                <br />
+                {fileSizeMB}
+              </p>
+              <button onClick={handleIsolateSubject} style={{ width: "150px", padding: "8px", color: "black" }}>
+                Isolate Subject
               </button>
-              <button onClick={() => setIsMaskEditorOpen(false)} style={{ width: "150px", padding: "8px", color: "black" }}>
-                Close Editor
+              <button onClick={openMaskEditor} style={{ width: "150px", padding: "8px", color: "black" }}>
+                Manual Mask
+              </button>
+              <button style={{ width: "150px", padding: "8px", color: "black" }}>
+                Create New Object
+              </button>
+              <button style={{ width: "150px", padding: "8px", color: "black" }}>
+                Add to Object Family
               </button>
             </div>
           </div>
-        </div>
+  
+          {/* Manual Mask Editor Modal */}
+          {isMaskEditorOpen && (
+            <div
+              style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundColor: "rgba(0,0,0,0.5)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                zIndex: 1000,
+              }}
+            >
+              <div style={{ backgroundColor: "white", padding: "20px" }}>
+                <h2>Manual Mask Editor</h2>
+                <div
+                  style={{
+                    position: "relative",
+                    width: "500px",
+                    height: "500px",
+                    backgroundColor: "white",
+                  }}
+                >
+                  <img
+                    src={imageUrl}
+                    alt="For Masking"
+                    style={{
+                      position: "absolute",
+                      width: "500px",
+                      height: "500px",
+                      objectFit: "contain",
+                      border: "1px solid #ccc",
+                      zIndex: 1,
+                    }}
+                  />
+                  <CanvasDraw
+                    ref={canvasRef}
+                    brushColor="rgba(255, 0, 0, 1)"
+                    brushRadius={3}
+                    lazyRadius={0}
+                    canvasWidth={500}
+                    canvasHeight={500}
+                    hideGrid={true}
+                    style={{
+                      position: "absolute",
+                      top: 0,
+                      left: 0,
+                      zIndex: 2,
+                      backgroundColor: "transparent",
+                    }}
+                  />
+                </div>
+                <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
+                  <button onClick={handleManualMask} style={{ width: "150px", padding: "8px", color: "black" }}>
+                    Apply Mask
+                  </button>
+                  <button onClick={() => setIsMaskEditorOpen(false)} style={{ width: "150px", padding: "8px", color: "black" }}>
+                    Close Editor
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       )}
     </div>
   );
-}
+                  }

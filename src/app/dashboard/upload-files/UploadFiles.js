@@ -6,8 +6,10 @@ import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
 import { ImageContext } from "@/contexts/ImageContext";
 
+
 export default function UploadFiles() {
   // Modal chain states
+  // const { setUploadedFiles } = useImageContext();
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
@@ -24,7 +26,11 @@ export default function UploadFiles() {
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
   // Get the setter for the selected image from your ImageContext
-  const { setSelectedImage } = useContext(ImageContext);
+   const { setSelectedImage } = useContext(ImageContext);
+  // Your existing state
+  const { setUploadedFiles } = useContext(ImageContext);
+  
+
 
   const handleOpenCreateDatabase = () => {
     setShowCreateDbModal(true);
@@ -34,7 +40,9 @@ export default function UploadFiles() {
   const handleImageClick = (file) => {
     const imageUrl = URL.createObjectURL(file);
     setSelectedImage(imageUrl);
-  };
+   
+};
+  
 
   // Handler for when Media Info is clicked
   const handleMediaInfoClick = (file) => {
@@ -42,9 +50,19 @@ export default function UploadFiles() {
     setShowMediaInfoModal(true);
   };
 
+
+
+  
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setUploadedFiles(files); // Store images in context
+  };
+  
+
   return (
     <div style={{ padding: "20px", color: "black" }}>
-      <h2>Upload Files</h2>
+     
+    
       <button
         style={{
           padding: "10px 20px",
@@ -114,11 +132,12 @@ export default function UploadFiles() {
             }}
             onClick={() => handleImageClick(file)} // Handle click for selection
           >
+    
             {/* Left: Numbering */}
             <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
               {index + 1} of {arr.length}
             </div>
-
+           
             {/* Thumbnail */}
             <div>
               <img
