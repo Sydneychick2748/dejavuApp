@@ -452,39 +452,287 @@
 
 
 
-"use client";
-import React from "react";
 
-const DisplayDataBaseModal = ({ onClose, onNext }) => {
+
+// export default DisplayDataBaseModal;
+// "use client";
+// import React from "react";
+// import { FaFolder } from "react-icons/fa";
+
+// const DisplayDataBaseModal = ({ onClose, onNext, selectedFolder }) => {
+//   return (
+//     <div className="modal" style={modalStyle}>
+//       <h3>Display Database</h3>
+//       {selectedFolder ? (
+//         <>
+//           <div style={{ display: "flex", alignItems: "center", marginBottom: "10px" }}>
+//             <FaFolder size={32} style={{ marginRight: "8px" }} />
+//             <div>
+//               <div>
+//                 <strong>{selectedFolder.folderName}</strong>
+//               </div>
+//               <div style={{ fontSize: "0.9rem", color: "#555" }}>
+//                 {selectedFolder.files.length} file{selectedFolder.files.length !== 1 ? "s" : ""}
+//               </div>
+//             </div>
+//           </div>
+//           <p>Folder details are shown above.</p>
+//         </>
+//       ) : (
+//         <p>No folder selected.</p>
+//       )}
+//       <div style={{ marginTop: "20px" }}>
+//         <button onClick={onClose} style={buttonStyle}>
+//           Close
+//         </button>
+//         <button onClick={onNext} style={buttonStyle}>
+//           Finish
+//         </button>
+//       </div>
+//     </div>
+//   );
+// };
+
+// const modalStyle = {
+//   position: "fixed",
+//   top: "50%",
+//   left: "50%",
+//   transform: "translate(-50%, -50%)",
+//   padding: "20px",
+//   backgroundColor: "white",
+//   border: "1px solid #ccc",
+//   borderRadius: "8px",
+//   zIndex: 1000,
+// };
+
+// const buttonStyle = {
+//   padding: "8px 16px",
+//   marginRight: "10px",
+// };
+
+// export default DisplayDataBaseModal;
+"use client";
+import React, { useState } from "react";
+import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt } from "react-icons/fa";
+
+const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
+  // State to track folder selections (all folders initially checked)
+  const [folderSelections, setFolderSelections] = useState(
+    selectedFolders.reduce((acc, _, index) => {
+      acc[index] = true; // All folders start checked
+      return acc;
+    }, {})
+  );
+
+  // State to track selected files per folder
+  const [fileSelections, setFileSelections] = useState(
+    selectedFolders.reduce((acc, folder, folderIndex) => {
+      acc[folderIndex] = folder.files.reduce((fileAcc, _, fileIndex) => {
+        fileAcc[fileIndex] = true; // All files start checked
+        return fileAcc;
+      }, {});
+      return acc;
+    }, {})
+  );
+
+  // State for media info modal
+  const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
+  const [mediaInfoFile, setMediaInfoFile] = useState(null);
+
+  // Toggles a folder selection and its files
+  const toggleFolderSelection = (folderIndex) => {
+    const isChecked = !folderSelections[folderIndex];
+
+    setFolderSelections((prev) => ({
+      ...prev,
+      [folderIndex]: isChecked,
+    }));
+
+    setFileSelections((prev) => ({
+      ...prev,
+      [folderIndex]: selectedFolders[folderIndex].files.reduce((fileAcc, _, fileIndex) => {
+        fileAcc[fileIndex] = isChecked;
+        return fileAcc;
+      }, {}),
+    }));
+  };
+
+  // Toggles an individual file selection inside a folder
+  const toggleFileSelection = (folderIndex, fileIndex) => {
+    setFileSelections((prev) => ({
+      ...prev,
+      [folderIndex]: {
+        ...prev[folderIndex],
+        [fileIndex]: !prev[folderIndex][fileIndex],
+      },
+    }));
+  };
+
+  // Expands the folders to show files
+  const [expanded, setExpanded] = useState({});
+
+  const toggleExpanded = (folderIndex) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [folderIndex]: !prev[folderIndex],
+    }));
+  };
+
+  // Opens Media Info Modal
+  const handleMediaInfoClick = (file) => {
+    setMediaInfoFile(file);
+    setShowMediaInfoModal(true);
+  };
+
+  // Function to collect selected files and send them back
+  const handleFinish = () => {
+    const selectedFiles = selectedFolders.flatMap((folder, folderIndex) => {
+      return folder.files.filter((_, fileIndex) => fileSelections[folderIndex][fileIndex]);
+    });
+
+    onNext(selectedFiles); // Send selected images to parent
+  };
+
+  // Helper function to get an icon based on file type
+  const getFileIcon = (file) => {
+    if (file.type.startsWith("image/")) return <FaFileImage />;
+    if (file.type.startsWith("video/")) return <FaFileVideo />;
+    return <FaFileAlt />;
+  };
+
   return (
     <div className="modal" style={modalStyle}>
       <h3>Display Database</h3>
-      <p>This is the Display Database modal content.</p>
+      {selectedFolders && selectedFolders.length > 0 ? (
+        selectedFolders.map((folder, folderIndex) => (
+          <div key={folderIndex} style={{ marginBottom: "20px" }}>
+            <div style={headerStyle}>
+              {/* Checkbox to select/deselect the folder */}
+              <input
+                type="checkbox"
+                checked={folderSelections[folderIndex]}
+                onChange={() => toggleFolderSelection(folderIndex)}
+                style={{ marginRight: "8px" }}
+              />
+              <FaFolder size={32} style={{ marginRight: "8px" }} />
+              <div>
+                <div>
+                  <strong>{folder.folderName}</strong>
+                </div>
+                <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                  {folder.files.length} file
+                  {folder.files.length !== 1 ? "s" : ""}
+                </div>
+              </div>
+            </div>
+            <button onClick={() => toggleExpanded(folderIndex)} style={toggleButtonStyle}>
+              {expanded[folderIndex] ? "Hide Files" : "Show Files"}
+            </button>
+            {expanded[folderIndex] && (
+              <div style={filesContainerStyle}>
+                {folder.files.map((file, fileIndex) => (
+                  <div
+                    key={fileIndex}
+                    style={{
+                      ...fileItemStyle,
+                      opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
+                    }}
+                  >
+                    {/* Checkbox to select individual files */}
+                    <input
+                      type="checkbox"
+                      checked={fileSelections[folderIndex][fileIndex]}
+                      onChange={() => toggleFileSelection(folderIndex, fileIndex)}
+                      style={{ marginRight: "8px" }}
+                    />
+                    {file.type.startsWith("image/") ? (
+                      <img
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        style={{
+                          maxWidth: "100px",
+                          maxHeight: "100px",
+                          marginRight: "8px",
+                        }}
+                      />
+                    ) : (
+                      <span style={{ marginRight: "8px" }}>{getFileIcon(file)}</span>
+                    )}
+                    <span style={{ fontSize: "0.8rem" }}>{file.name}</span>
+                    {/* Media Info Text - Clickable */}
+                    <span
+                      style={{ marginLeft: "10px", color: "blue", cursor: "pointer" }}
+                      onClick={() => handleMediaInfoClick(file)}
+                    >
+                      Media Info
+                    </span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        ))
+      ) : (
+        <p>No folders selected.</p>
+      )}
       <div style={{ marginTop: "20px" }}>
-        <button 
-          onClick={onClose} 
-          style={{ padding: "8px 16px", marginRight: "10px" }}
-        >
+        <button onClick={onClose} style={buttonStyle}>
           Close
         </button>
-        <button onClick={onNext} style={{ padding: "8px 16px" }}>
+        <button onClick={handleFinish} style={buttonStyle}>
           Finish
         </button>
       </div>
+
+      {/* Media Info Modal */}
+      {showMediaInfoModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+        >
+          <h3>Media Info</h3>
+          <p>
+            {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
+          </p>
+          <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
+        </div>
+      )}
     </div>
   );
 };
 
+// Styles
 const modalStyle = {
   position: "fixed",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   padding: "20px",
-  backgroundColor: "white",
+  backgroundColor: "#fff",
   border: "1px solid #ccc",
   borderRadius: "8px",
   zIndex: 1000,
 };
+const headerStyle = { display: "flex", alignItems: "center", marginBottom: "10px" };
+const toggleButtonStyle = { padding: "6px 12px", marginBottom: "10px" };
+const filesContainerStyle = {
+  maxHeight: "300px",
+  overflowY: "auto",
+  border: "1px solid #ddd",
+  padding: "10px",
+  borderRadius: "4px",
+  marginBottom: "10px",
+};
+const fileItemStyle = { display: "flex", alignItems: "center", marginBottom: "8px" };
+const buttonStyle = { padding: "8px 16px", marginRight: "10px" };
 
 export default DisplayDataBaseModal;
