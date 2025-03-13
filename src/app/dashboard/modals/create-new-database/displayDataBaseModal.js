@@ -600,6 +600,12 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
     return <FaFileAlt />;
   };
 
+
+// State to track selected image for preview
+const [selectedImage, setSelectedImage] = useState(null);
+
+
+
   return (
     <div className="modal" style={modalStyle}>
       <h3>Display Database</h3>
