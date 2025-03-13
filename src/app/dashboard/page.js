@@ -22,22 +22,23 @@ export default function Dashboard() {
       >
         {/* Left Section (Upload Files) */}
         <Box 
-          flex="1"
+          flex="0 0 40%"
           bg="white"
           p={4}
           borderRadius="lg"
           shadow="md"
-          w={{ base: "100%", lg: "50%" }} // Full width on mobile/tablet, 50% on desktop
+          // w={{ base: "100%", lg: "30%" }} // Full width on mobile/tablet, 50% on desktop
         >
+          
           <UploadFiles />
         </Box>
 
         {/* Right Section (Search & Parameters) */}
         <Flex
           direction="column"
-          flex="1"
+          flex="0 0 60%"
           gap={4}
-          w={{ base: "100%", lg: "50%" }} // Full width on mobile/tablet, 50% on desktop
+          // w={{ base: "100%", lg: "70%" }} // Full width on mobile/tablet, 50% on desktop
         >
           {/* Top Right (Search for Image) */}
           <Box bg="white" p={4} borderRadius="lg" shadow="md">
