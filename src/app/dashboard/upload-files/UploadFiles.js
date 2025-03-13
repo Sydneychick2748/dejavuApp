@@ -1,6 +1,6 @@
 
 "use client";
-import React, { useState, useContext } from "react";
+import React, { useState, useContext,useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
@@ -19,7 +19,7 @@ export default function UploadFiles() {
   // State for the selected folders from ImportMediaModal
   const [selectedFolders, setSelectedFolders] = useState([]);
   // State to hold only the checked images from the modal
-  const [finalSelectedImages, setFinalSelectedImages] = useState([]);
+  // const [finalSelectedImages, setFinalSelectedImages] = useState([]);
 
   // State for Media Info Modal
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
@@ -29,7 +29,15 @@ export default function UploadFiles() {
    const { setSelectedImage } = useContext(ImageContext);
   // Your existing state
   const { setUploadedFiles } = useContext(ImageContext);
-  
+   
+  const { finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext); // ✅ Get from context
+  const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]); // ✅ Keep local state for usage
+
+  // Sync local state with context when it updates
+  useEffect(() => {
+    setFinalSelectedImages(localFinalSelectedImages); // ✅ Ensure it's always up to date
+  }, [localFinalSelectedImages, setFinalSelectedImages]);
+
 
 
   const handleOpenCreateDatabase = () => {
