@@ -606,116 +606,124 @@ const [selectedImage, setSelectedImage] = useState(null);
 
 
 
-  return (
-    <div className="modal" style={modalStyle}>
-      <h3>Display Database</h3>
-      {selectedFolders && selectedFolders.length > 0 ? (
-        selectedFolders.map((folder, folderIndex) => (
-          <div key={folderIndex} style={{ marginBottom: "20px" }}>
-            <div style={headerStyle}>
-              {/* Checkbox to select/deselect the folder */}
-              <input
-                type="checkbox"
-                checked={folderSelections[folderIndex]}
-                onChange={() => toggleFolderSelection(folderIndex)}
-                style={{ marginRight: "8px" }}
-              />
-              <FaFolder size={32} style={{ marginRight: "8px" }} />
-              <div>
+return (
+  <div className="modal" style={modalStyle}>
+    <h3>Display Database</h3>
+
+    <div style={{ display: "flex", width: "100%", height: "300px" }}>
+      {/* Left Side - Folders and Images */}
+      <div style={leftPanelStyle}>
+        {selectedFolders && selectedFolders.length > 0 ? (
+          selectedFolders.map((folder, folderIndex) => (
+            <div key={folderIndex} style={{ marginBottom: "10px" }}>
+              <div style={headerStyle}>
+                <input
+                  type="checkbox"
+                  checked={folderSelections[folderIndex]}
+                  onChange={() => toggleFolderSelection(folderIndex)}
+                  style={{ marginRight: "8px" }}
+                />
+                <FaFolder size={32} style={{ marginRight: "8px" }} />
                 <div>
                   <strong>{folder.folderName}</strong>
-                </div>
-                <div style={{ fontSize: "0.9rem", color: "#555" }}>
-                  {folder.files.length} file
-                  {folder.files.length !== 1 ? "s" : ""}
-                </div>
-              </div>
-            </div>
-            <button onClick={() => toggleExpanded(folderIndex)} style={toggleButtonStyle}>
-              {expanded[folderIndex] ? "Hide Files" : "Show Files"}
-            </button>
-            {expanded[folderIndex] && (
-              <div style={filesContainerStyle}>
-                {folder.files.map((file, fileIndex) => (
-                  <div
-                    key={fileIndex}
-                    style={{
-                      ...fileItemStyle,
-                      opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
-                    }}
-                  >
-                    {/* Checkbox to select individual files */}
-                    <input
-                      type="checkbox"
-                      checked={fileSelections[folderIndex][fileIndex]}
-                      onChange={() => toggleFileSelection(folderIndex, fileIndex)}
-                      style={{ marginRight: "8px" }}
-                    />
-                    {file.type.startsWith("image/") ? (
-                      <img
-                        src={URL.createObjectURL(file)}
-                        alt={file.name}
-                        style={{
-                          maxWidth: "100px",
-                          maxHeight: "100px",
-                          marginRight: "8px",
-                        }}
-                      />
-                    ) : (
-                      <span style={{ marginRight: "8px" }}>{getFileIcon(file)}</span>
-                    )}
-                    <span style={{ fontSize: "0.8rem" }}>{file.name}</span>
-                    {/* Media Info Text - Clickable */}
-                    <span
-                      style={{ marginLeft: "10px", color: "blue", cursor: "pointer" }}
-                      onClick={() => handleMediaInfoClick(file)}
-                    >
-                      Media Info
-                    </span>
+                  <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                    {folder.files.length} file{folder.files.length !== 1 ? "s" : ""}
                   </div>
-                ))}
+                </div>
               </div>
-            )}
-          </div>
-        ))
-      ) : (
-        <p>No folders selected.</p>
-      )}
-      <div style={{ marginTop: "20px" }}>
-        <button onClick={onClose} style={buttonStyle}>
-          Close
-        </button>
-        <button onClick={handleFinish} style={buttonStyle}>
-          Finish
-        </button>
+
+              <button onClick={() => toggleExpanded(folderIndex)} style={toggleButtonStyle}>
+                {expanded[folderIndex] ? "Hide Files" : "Show Files"}
+              </button>
+
+              {expanded[folderIndex] && (
+                <div style={filesContainerStyle}>
+                  {folder.files.map((file, fileIndex) => {
+                    const imageUrl = URL.createObjectURL(file);
+                    return (
+                      <div
+                        key={fileIndex}
+                        style={{
+                          ...fileItemStyle,
+                          opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
+                        }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={fileSelections[folderIndex][fileIndex]}
+                          onChange={() => toggleFileSelection(folderIndex, fileIndex)}
+                          style={{ marginRight: "8px" }}
+                        />
+                        {file.type.startsWith("image/") ? (
+                          <img
+                            src={imageUrl}
+                            alt={file.name}
+                            style={{
+                              maxWidth: "100px",
+                              maxHeight: "100px",
+                              marginRight: "8px",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => setSelectedImage(imageUrl)} // ✅ Show clicked image on right
+                          />
+                        ) : (
+                          <span style={{ marginRight: "8px" }}>{getFileIcon(file)}</span>
+                        )}
+                        <span
+                          style={{
+                            fontSize: "0.8rem",
+                            cursor: "pointer",
+                            color: selectedImage === imageUrl ? "blue" : "black",
+                            fontWeight: selectedImage === imageUrl ? "bold" : "normal",
+                          }}
+                          onClick={() => setSelectedImage(imageUrl)} // ✅ Click name to preview image
+                        >
+                          {file.name}
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          ))
+        ) : (
+          <p>No folders selected.</p>
+        )}
       </div>
 
-      {/* Media Info Modal */}
-      {showMediaInfoModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#fff",
-            padding: "20px",
-            border: "1px solid #ccc",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-            zIndex: 1000,
-          }}
-        >
-          <h3>Media Info</h3>
-          <p>
-            {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
-          </p>
-          <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
-        </div>
-      )}
+      {/* Right Side - Image Preview */}
+      <div style={rightPanelStyle}>
+        {selectedImage ? (
+          <img
+            src={selectedImage}
+            alt="Selected Preview"
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              border: "1px solid #ccc",
+              borderRadius: "5px",
+            }}
+          />
+        ) : (
+          <p style={{ fontSize: "14px", color: "#666" }}>Click an image to preview</p>
+        )}
+      </div>
     </div>
-  );
-};
 
+    {/* Modal Buttons */}
+    <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
+      <button onClick={onClose} style={buttonStyle}>
+        Close
+      </button>
+      <button onClick={handleFinish} style={buttonStyle}>
+        Finish
+      </button>
+    </div>
+  </div>
+);
+};
 // Styles
 const modalStyle = {
   position: "fixed",
@@ -737,6 +745,22 @@ const filesContainerStyle = {
   padding: "10px",
   borderRadius: "4px",
   marginBottom: "10px",
+};
+
+const leftPanelStyle = {
+  flex: 1,
+  padding: "10px",
+  borderRight: "1px solid #ddd",
+  overflowY: "auto",
+};
+
+const rightPanelStyle = {
+  flex: 1,
+  padding: "10px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#f9f9f9",
 };
 const fileItemStyle = { display: "flex", alignItems: "center", marginBottom: "8px" };
 const buttonStyle = { padding: "8px 16px", marginRight: "10px" };
