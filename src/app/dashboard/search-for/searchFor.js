@@ -345,6 +345,8 @@ return (
    
 
         {/* Buttons Outside the Box (to the right) */}
+
+
         <div
           style={{
             marginLeft: "20px",
@@ -354,17 +356,109 @@ return (
           }}
         >
           <button
-            style={{
-              backgroundColor: "#3083F9",
-              color: "white",
-              border: "none",
-              padding: "10px 20px",
-              borderRadius: "5px",
-              cursor: "pointer",
-            }}
-          >
-            Select Image
-          </button>
+  style={{
+    backgroundColor: "#3083F9",
+    color: "white",
+    border: "none",
+    padding: "10px 20px",
+    borderRadius: "5px",
+    cursor: "pointer",
+  }}
+  onClick={handleOpenModal} // ✅ SAME FUNCTION AS +
+>
+  Select Image
+</button>
+{/* The Modal */}
+{isModalOpen && (
+  <div
+    style={{
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      background: "#fff",
+      padding: "20px",
+      border: "1px solid #ccc",
+      boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+      zIndex: 1000,
+      display: "flex",
+      width: "500px",
+      height: "300px",
+    }}
+  >
+    {/* Left Side: Image Names */}
+    <div style={{ flex: 1, padding: "10px", borderRight: "1px solid #ddd", overflowY: "auto" }}>
+      <h3>Select an Image</h3>
+      {finalSelectedImages.length > 0 ? (
+        finalSelectedImages.map((file, index) => {
+          const imageUrl = URL.createObjectURL(file);
+          return (
+            <p
+              key={index}
+              style={{
+                fontSize: "16px",
+                marginBottom: "5px",
+                fontWeight: "bold",
+                cursor: "pointer",
+                color: selectedModalImage === imageUrl ? "blue" : "black",
+              }}
+              onClick={() => setSelectedModalImage(imageUrl)}
+            >
+              {file.name}
+            </p>
+          );
+        })
+      ) : (
+        <p>No images uploaded yet.</p>
+      )}
+    </div>
+
+    {/* Right Side: Selected Image Preview */}
+    <div
+      style={{
+        flex: 1,
+        padding: "10px",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+      }}
+    >
+      {selectedModalImage ? (
+        <img
+          src={selectedModalImage}
+          alt="Selected Preview"
+          style={{
+            width: "150px",
+            height: "150px",
+            objectFit: "contain",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
+          }}
+        />
+      ) : (
+        <p style={{ fontSize: "14px", color: "#666" }}>Click a name to preview</p>
+      )}
+    </div>
+
+    {/* Open Button */}
+    <button
+      onClick={handleCloseModal}
+      style={{
+        position: "absolute",
+        top: "10px",
+        right: "10px",
+        padding: "5px 10px",
+        background: "red",
+        color: "white",
+        border: "none",
+        cursor: "pointer",
+      }}
+    >
+      Open
+    </button>
+  </div>
+)}
+
           <button
             style={{
               backgroundColor: "#3083F9",
