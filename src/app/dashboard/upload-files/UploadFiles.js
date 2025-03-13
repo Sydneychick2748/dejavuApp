@@ -1,201 +1,333 @@
 
 "use client";
-import React, { useState, useContext } from "react";
+import React, { useState } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
-import { ImageContext } from "@/contexts/ImageContext";
 
+// Reusable button styles
+const buttonStyle = (bgColor, textColor) => ({
+  padding: "2px 2px",
+  fontSize: "12px",
+  cursor: "pointer",
+  backgroundColor: bgColor,
+  border: "none",
+  borderRadius: "20px",
+  color: textColor,
+  width: "200px",
+  margin: "5px 0",
+  transition: "background 0.3s ease",
+  textAlign: "center",
+  display: "flex", // Ensures button content is centered
+  justifyContent: "center", // Centers text inside button
+  alignItems: "center",
+  // marginTop: "50px",  // Added spacing below search bar
+  // padding: "40px",  // Increased padding for better spacing
+});
 
 export default function UploadFiles() {
-  // Modal chain states
-  // const { setUploadedFiles } = useImageContext();
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isAscending, setIsAscending] = useState(true);
+  const [items, setItems] = useState(["Banana", "Apple", "Cherry", "Date"]);
+  const [isGridView, setIsGridView] = useState(false);
 
-  // State for folder selections from CreateNewDataBaseModal
-  const [folderSelections, setFolderSelections] = useState([]);
-  // State for the selected folders from ImportMediaModal
-  const [selectedFolders, setSelectedFolders] = useState([]);
-  // State to hold only the checked images from the modal
-  const [finalSelectedImages, setFinalSelectedImages] = useState([]);
+  const handleButtonClick = () => {
+    setIsButtonClicked(true); // Update state when any button is clicked
+  };
 
-  // State for Media Info Modal
-  const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
-  const [mediaInfoFile, setMediaInfoFile] = useState(null);
+  // Sorting Function
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+  };
 
-  // Get the setter for the selected image from your ImageContext
-   const { setSelectedImage } = useContext(ImageContext);
-  // Your existing state
-  const { setUploadedFiles } = useContext(ImageContext);
-  
+  const toggleView = () => {
+    setIsGridView(!isGridView);
+  };
 
+  const handleCombinedClick = () => {
+    handleButtonClick(); // Changes search bar background
+    handleOpenCreateDatabase(); // Opens the modal
+  };
 
   const handleOpenCreateDatabase = () => {
+    console.log("Create New Database button clicked");
     setShowCreateDbModal(true);
   };
 
-  // When an image row is clicked, update the context with the image URL.
-  const handleImageClick = (file) => {
-    const imageUrl = URL.createObjectURL(file);
-    setSelectedImage(imageUrl);
-   
-};
-  
-
-  // Handler for when Media Info is clicked
-  const handleMediaInfoClick = (file) => {
-    setMediaInfoFile(file);
-    setShowMediaInfoModal(true);
-  };
-
-
-
-  
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setUploadedFiles(files); // Store images in context
-  };
-  
-
   return (
-    <div style={{ padding: "20px", color: "black" }}>
-     
-    
-      <button
+    <>
+      {/* Search Within Parent Container */}
+      {/* <div
+      style={{
+        padding: "20px",
+        color: "black",
+        width: "100%",
+        backgroundColor: "#f4f4f4",
+      }}
+    > */}
+      {/* Search Within Parent Container */}
+      <div
         style={{
+          width: "100%",
+          backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
           padding: "10px 20px",
           fontSize: "16px",
-          cursor: "pointer",
+          fontWeight: "600",
+          color: "white",
+          transition: "background 0.3s ease",
+          borderTopRightRadius: "10px", // Rounds only the top-right corner
         }}
-        onClick={handleOpenCreateDatabase}
       >
-        Create New Database
-      </button>
+        Search within...
+      </div>
 
-      {/* STEP 1: Create New Database Modal */}
-      {showCreateDbModal && (
-        <CreateNewDataBaseModal
-          onClose={() => setShowCreateDbModal(false)}
-          onNext={(folders) => {
-            setFolderSelections(folders);
-            setShowCreateDbModal(false);
-            setShowImportMediaModal(true);
-          }}
-        />
-      )}
-
-      {/* STEP 2: Import Media Modal */}
-      {showImportMediaModal && (
-        <ImportMediaModal
-          folderSelections={folderSelections}
-          onClose={() => setShowImportMediaModal(false)}
-          onNext={(folders) => {
-            setSelectedFolders(folders);
-            setShowImportMediaModal(false);
-            setShowDisplayDbModal(true);
-          }}
-        />
-      )}
-
-      {/* STEP 3: Display Database Modal */}
-      {showDisplayDbModal && (
-        <DisplayDataBaseModal
-          onClose={() => setShowDisplayDbModal(false)}
-          onNext={(selectedFiles) => {
-            // Store only checked images
-            setFinalSelectedImages(selectedFiles);
-            setShowDisplayDbModal(false);
-          }}
-          selectedFolders={selectedFolders}
-        />
-      )}
-
-     {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
-{finalSelectedImages.length > 0 && !showDisplayDbModal && (
-  <div style={{ marginTop: "30px" }}>
-    <h3>Final Gallery</h3>
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      {finalSelectedImages.map((file, index, arr) => {
-        const imageUrl = URL.createObjectURL(file); // Generate URL once
-
-        return (
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+          height: "600px",
+          backgroundColor: "white",
+          borderRadius: "10px",
+          boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
+          padding: "20px",
+          flexWrap: "nowrap", // Prevent wrapping
+          paddingBottom: "40px",
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Search Input, + Button */}
           <div
-            key={index}
+            style={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "flex-start",
+              paddingTop: "0px",
+              marginBottom: "0px",
+              position: "relative",
+              width: "100%",
+            }}
+          >
+            <button
+              style={{
+                width: "35px",
+                height: "35px",
+                width: "30px", // ✅ Smaller background
+                height: "30px", // ✅ Smaller background
+                fontSize: "24px", // ✅ Bigger "+"
+                fontWeight: "bold",
+                borderRadius: "10px",
+                border: "none",
+                backgroundColor: "#d6d6d6",
+                color: "white",
+                fontSize: "20px",
+                cursor: "pointer",
+                marginRight: "10px",
+                marginTop: "-210px",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              +
+            </button>
+            <input
+              type="text"
+              placeholder="Search..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onFocus={() => setIsExpanded(true)}
+              onBlur={() => setIsExpanded(false)}
+              style={{
+                width: isExpanded ? "70%" : "30%",
+                padding: "8px",
+                transition: "width 0.3s ease",
+                height: "30px", // ✅ Smaller background
+                borderRadius: "5px",
+                borderRadius: "10px",
+                border: "none",
+                backgroundColor: "#d6d6d6",
+                // backgroundImage: 'url("/images/logos/searchIcon.png")',
+                marginTop: "-210px", // Ensures it stays at the top
+                outline: "none", // Removes default browser focus outline
+                boxShadow: "none",
+              }}
+            />
+          </div>
+
+          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <button
+              style={{
+                width: "30px",
+                height: "30px",
+                borderRadius: "50%",
+                border: "none",
+                backgroundColor: "#d6d6d6",
+                backgroundImage: `url('/images/logos/DB Info.png')`, // Replace with the correct path
+                backgroundSize: "cover", // Ensures the image covers the button
+                backgroundPosition: "center", // Centers the image
+                cursor: "pointer",
+                marginTop: "-170px",
+                marginLeft: "auto",
+                marginTop: "-390px",
+              }}
+            ></button>
+
+            {/* A-Z Sorting Button */}
+            <button
+              onClick={handleSort}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "5px",
+                padding: "5px 10px",
+                borderRadius: "5px",
+                border: "1px solid #ccc",
+                backgroundColor: "#f4f4f4",
+                cursor: "pointer",
+                marginLeft: "10px",
+                marginTop: "-390px",
+              }}
+            >
+              {isAscending ? " 🔼" : " 🔽"}
+            </button>
+          </div>
+
+          {/* Grid/List Toggle Button */}
+          <button
+            onClick={toggleView}
             style={{
               display: "flex",
               alignItems: "center",
-              borderBottom: "1px solid #ddd",
-              padding: "10px 0",
+              gap: "5px",
+              padding: "5px 10px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+              backgroundColor: "#f4f4f4",
               cursor: "pointer",
+              marginBottom: "10px",
+              marginTop: "-380px",
             }}
-            onClick={() => handleImageClick(file)} // Handle click for selection
           >
-    
-            {/* Left: Numbering */}
-            <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
-              {index + 1} of {arr.length}
-            </div>
-           
-            {/* Thumbnail */}
-            <div>
-              <img
-                src={imageUrl} // Use stored imageUrl
-                alt={file.name}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  borderRadius: "4px",
-                  marginRight: "10px",
-                }}
-              />
-            </div>
+            {isGridView ? "🔳" : "📄"}
+          </button>
 
-            {/* Description */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: "bold" }}>{file.name}</div>
+          {/* Items Container */}
+          <div
+            style={{
+              display: isGridView ? "grid" : "block",
+              gridTemplateColumns: isGridView ? "repeat(2, 1fr)" : "none",
+              gap: "10px",
+              marginTop: "20px",
+            }}
+          >
+            {[...Array(4)].map((_, index) => (
               <div
-                style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer" }}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering handleImageClick
-                  handleMediaInfoClick(file);
+                key={index}
+                style={{
+                  width: "100%",
+                  height: "50px",
+                  backgroundColor: "#e8e8e8",
+                  borderRadius: "5px",
                 }}
-              >
-                Media Info
-              </div>
-            </div>
+              ></div>
+            ))}
           </div>
-        );
-      })}
-    </div>
-  </div>
-)}
-
-
-      {/* Media Info Modal */}
-      {showMediaInfoModal && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            background: "#fff",
-            padding: "20px",
-            border: "1px solid #ccc",
-            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-            zIndex: 1000,
-          }}
-        >
-          <h3>Media Info</h3>
-          <p>
-            {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
-          </p>
-          <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
         </div>
-      )}
-    </div>
+
+        {/* Buttons */}
+        <button
+          style={buttonStyle("#4a88ff", "white")}
+          onClick={handleButtonClick}
+          onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+          onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+        >
+          Open a database
+        </button>
+
+        <button
+          style={buttonStyle("#4a88ff", "white")}
+          onClick={handleButtonClick}
+          onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+          onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+        >
+          Connect to ES database
+        </button>
+
+        <button
+          style={buttonStyle("#4a88ff", "white")}
+          onClick={handleButtonClick}
+          disabled
+        >
+          Connect to live video
+        </button>
+
+        <button
+          style={buttonStyle("#a9d096", "white")}
+          onMouseOver={(e) => (e.currentTarget.style.background = "#7fa763")}
+          onMouseOut={(e) => (e.currentTarget.style.background = "#a9d096")}
+          onClick={handleCombinedClick} // Both functions run properly
+        >
+          Create new database
+        </button>
+
+        {/* 1. Create New Database Modal */}
+        {showCreateDbModal && (
+          <CreateNewDataBaseModal
+            onClose={() => {
+              console.log("Closing CreateNewDataBaseModal");
+              setShowCreateDbModal(false);
+            }}
+            onNext={() => {
+              console.log(
+                "Proceeding from CreateNewDataBaseModal to ImportMediaModal"
+              );
+              setShowCreateDbModal(false);
+              setShowImportMediaModal(true);
+            }}
+          />
+        )}
+
+        {/* 2. Import Media Modal */}
+        {showImportMediaModal && (
+          <ImportMediaModal
+            onClose={() => {
+              console.log("Closing ImportMediaModal");
+              setShowImportMediaModal(false);
+            }}
+            onNext={() => {
+              console.log(
+                "Proceeding from ImportMediaModal to DisplayDataBaseModal"
+              );
+              setShowImportMediaModal(false);
+              setShowDisplayDbModal(true);
+            }}
+          />
+        )}
+
+        {/* 3. Display Database Modal (FINAL STEP) */}
+        {showDisplayDbModal && (
+          <DisplayDataBaseModal
+            onClose={() => {
+              console.log("Closing DisplayDataBaseModal");
+              setShowDisplayDbModal(false);
+            }}
+            onNext={() => {
+              console.log(
+                "Finishing DisplayDataBaseModal and returning to UploadFiles UI"
+              );
+              setShowDisplayDbModal(false);
+            }}
+          />
+        )}
+        {/* </div> */}
+      </div>
+    </>
   );
 }
