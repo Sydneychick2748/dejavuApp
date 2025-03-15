@@ -1,4 +1,3 @@
-
 "use client";
 import React, { useState } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
@@ -25,19 +24,21 @@ const buttonStyle = (bgColor, textColor) => ({
   // padding: "40px",  // Increased padding for better spacing
 });
 
-export default function UploadFiles() {
+export default function UploadFiles({ setIsButtonClicked }) {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isButtonClicked, setIsButtonClicked] = useState(false);
+  // const [isButtonClicked, setIsButtonClicked] = useState(false);
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAscending, setIsAscending] = useState(true);
   const [items, setItems] = useState(["Banana", "Apple", "Cherry", "Date"]);
   const [isGridView, setIsGridView] = useState(false);
+  const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
 
   const handleButtonClick = () => {
     setIsButtonClicked(true); // Update state when any button is clicked
+    setBgColor("#e7eaee"); // Change background on click
   };
 
   // Sorting Function
@@ -61,187 +62,202 @@ export default function UploadFiles() {
 
   return (
     <>
-      {/* Search Within Parent Container */}
-      {/* <div
-      style={{
-        padding: "20px",
-        color: "black",
-        width: "100%",
-        backgroundColor: "#f4f4f4",
-      }}
-    > */}
-      {/* Search Within Parent Container */}
       <div
-        style={{
-          width: "100%",
-          backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
-          padding: "10px 20px",
-          fontSize: "16px",
-          fontWeight: "600",
-          color: "white",
-          transition: "background 0.3s ease",
-          borderTopRightRadius: "10px", // Rounds only the top-right corner
-        }}
-      >
-        Search within...
-      </div>
-
-      <div
+        className="databaseLeftContainer"
         style={{
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          width: "100%",
-          height: "600px",
+          alignItems: "center", // This centers items horizontally
+          justifyContent: "flex-start", // Change this from 'center' to 'flex-start' to push content down
+          width: "90%",
+          height: "650px",
           backgroundColor: "white",
           borderRadius: "10px",
           boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
-          padding: "20px",
+          // padding: "10px",
           flexWrap: "nowrap", // Prevent wrapping
           paddingBottom: "40px",
+          marginTop: "30px", // This will add space at the top to push content downward
+          marginLeft: "30px",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {/* Search Input, + Button */}
+        {/* Top Navigation: Search and Controls */}
+        <div
+          className="buttonRowContainer"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between", // ✅ Push left and right sides apart
+            width: "100%", // Ensures full row width
+            padding: "10px 10px", // Optional padding for spacing
+          }}
+        >
+          {/* Left side: Search Input & + Button */}
           <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              paddingTop: "0px",
-              marginBottom: "0px",
-              position: "relative",
-              width: "100%",
-            }}
+            className="leftSideButtonContainer"
+            style={{ display: "flex", alignItems: "center", gap: "10px" }}
           >
             <button
+              onClick={handleButtonClick}
               style={{
-                width: "35px",
-                height: "35px",
-                width: "30px", // ✅ Smaller background
-                height: "30px", // ✅ Smaller background
-                fontSize: "24px", // ✅ Bigger "+"
-                fontWeight: "bold",
+                width: "30px",
+                height: "30px",
+                fontSize: "40px",
+                fontWeight: "300",
                 borderRadius: "10px",
                 border: "none",
                 backgroundColor: "#d6d6d6",
                 color: "white",
-                fontSize: "20px",
                 cursor: "pointer",
-                marginRight: "10px",
-                marginTop: "-210px",
+                display: "flex",
                 alignItems: "center",
                 justifyContent: "center",
+                lineHeight: "2",
+                paddingBottom: "5px",
               }}
             >
               +
             </button>
+
             <input
               type="text"
-              placeholder="Search..."
               value={searchQuery}
+              onClick={handleButtonClick}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsExpanded(true)}
               onBlur={() => setIsExpanded(false)}
               style={{
-                width: isExpanded ? "70%" : "30%",
-                padding: "8px",
+                width: isExpanded ? "200px" : "120px",
+                padding: "8px 8px 8px 30px",
                 transition: "width 0.3s ease",
-                height: "30px", // ✅ Smaller background
-                borderRadius: "5px",
-                borderRadius: "10px",
+                height: "30px",
+                borderRadius: "20px",
                 border: "none",
                 backgroundColor: "#d6d6d6",
-                // backgroundImage: 'url("/images/logos/searchIcon.png")',
-                marginTop: "-210px", // Ensures it stays at the top
-                outline: "none", // Removes default browser focus outline
+                outline: "none",
                 boxShadow: "none",
+                backgroundImage: "url('/images/logos/searchIcon.png')",
+                backgroundSize: "20px 20px",
+                backgroundPosition: "10px center",
+                backgroundRepeat: "no-repeat",
               }}
             />
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {/* Right side: Info, Sort, Grid/List Buttons */}
+          <div
+            className="rightSideButtonContainer"
+            style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}
+          >
             <button
+              onClick={handleButtonClick}
               style={{
                 width: "30px",
                 height: "30px",
                 borderRadius: "50%",
                 border: "none",
                 backgroundColor: "#d6d6d6",
-                backgroundImage: `url('/images/logos/DB Info.png')`, // Replace with the correct path
-                backgroundSize: "cover", // Ensures the image covers the button
-                backgroundPosition: "center", // Centers the image
+                backgroundImage: `url('/images/logos/DB Info.png')`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
                 cursor: "pointer",
-                marginTop: "-170px",
-                marginLeft: "auto",
-                marginTop: "-390px",
               }}
             ></button>
 
-            {/* A-Z Sorting Button */}
             <button
-              onClick={handleSort}
+              onClick={(e) => {
+                handleSort();
+                handleButtonClick();
+              }}
+              style={{
+                width: "70px", // Keeps the button size fixed
+                height: "30px",
+                display: "flex",
+                flexDirection: "column", // Stack icons vertically
+                alignItems: "center",
+                justifyContent: "center",
+                borderRadius: "7px",
+                backgroundColor: "#f4f4f4",
+                cursor: "pointer",
+                paddingRight: "30px", // ✅ Extends button to the right
+                paddingLeft: "0px", // ✅ Extends button to the left
+                paddingTop: "0px",
+                gap: "3px", // ✅ Keeps spacing consistent
+              }}
+            >
+              {/* Ascending Icon (Bigger) */}
+              <img
+                src="/images/logos/upCaretIcon.png"
+                alt="Up Arrow"
+                style={{
+                  width: "12px", // ✅ Slightly larger
+                  height: "12px",
+                  objectFit: "contain",
+                  transform: "scale(1)", // ✅ Enlarges without changing button size
+                  flexShrink: 0, // ✅ Prevents shrinking inside flexbox
+                }}
+              />
+
+              {/* Descending Icon (Bigger) */}
+              <img
+                src="/images/logos/downCareticon.png"
+                alt="Down Arrow"
+                style={{
+                  width: "12px", // ✅ Slightly larger
+                  height: "12px",
+                  objectFit: "contain",
+                  transform: "scale(1)", // ✅ Enlarges without affecting layout
+                  flexShrink: 0, // ✅ Keeps size stable
+                }}
+              />
+            </button>
+
+            <button
+              onClick={(e) => {
+                toggleView();
+                handleButtonClick();
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
+                justifyContent: "center",
                 gap: "5px",
-                padding: "5px 10px",
+                padding: "px 10px",
                 borderRadius: "5px",
-                border: "1px solid #ccc",
-                backgroundColor: "#f4f4f4",
+                width: "45px", // Adjust size as needed
+                  height: "30px",
+                // border: "1px solid #ccc",
+                // backgroundColor: "#f4f4f4",
                 cursor: "pointer",
-                marginLeft: "10px",
-                marginTop: "-390px",
               }}
             >
-              {isAscending ? " 🔼" : " 🔽"}
-            </button>
-          </div>
-
-          {/* Grid/List Toggle Button */}
-          <button
-            onClick={toggleView}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "5px",
-              padding: "5px 10px",
-              borderRadius: "5px",
-              border: "1px solid #ccc",
-              backgroundColor: "#f4f4f4",
-              cursor: "pointer",
-              marginBottom: "10px",
-              marginTop: "-380px",
-            }}
-          >
-            {isGridView ? "🔳" : "📄"}
-          </button>
-
-          {/* Items Container */}
-          <div
-            style={{
-              display: isGridView ? "grid" : "block",
-              gridTemplateColumns: isGridView ? "repeat(2, 1fr)" : "none",
-              gap: "10px",
-              marginTop: "20px",
-            }}
-          >
-            {[...Array(4)].map((_, index) => (
-              <div
-                key={index}
+              <img
+                src={
+                  isGridView
+                    ? "/images/logos/Toggle Grid.png" // Replace with actual grid view image path
+                    : "/images/logos/toggle list.png" // Replace with actual list view image path
+                }
+                alt={isGridView ? "Grid View" : "List View"}
                 style={{
-                  width: "100%",
-                  height: "50px",
-                  backgroundColor: "#e8e8e8",
-                  borderRadius: "5px",
+                  width: "25px", // Adjust size as needed
+                  height: "25px",
+                  objectFit: "contain",
                 }}
-              ></div>
-            ))}
+              />
+            </button>
           </div>
         </div>
 
         {/* Buttons */}
+        <div
+        style={{
+          display: "flex",
+          flexDirection: "column", // ✅ Stack buttons vertically
+          alignItems: "center", // ✅ Keep them centered
+          gap: "5px", // ✅ Adds spacing between buttons
+          marginTop: "180px", // ✅ Moves all buttons down
+        }}
+        >
         <button
           style={buttonStyle("#4a88ff", "white")}
           onClick={handleButtonClick}
@@ -326,7 +342,7 @@ export default function UploadFiles() {
             }}
           />
         )}
-        {/* </div> */}
+        </div>
       </div>
     </>
   );
