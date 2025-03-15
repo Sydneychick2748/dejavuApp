@@ -3,6 +3,7 @@ import React, { useState, useContext,useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
+import { ImageContext } from "@/contexts/ImageContext";
 
 // Reusable button styles
 const buttonStyle = (bgColor, textColor) => ({
@@ -53,6 +54,33 @@ export default function UploadFiles({ setIsButtonClicked }) {
     setFinalSelectedImages(localFinalSelectedImages); // ✅ Ensure it's always up to date
   }, [localFinalSelectedImages, setFinalSelectedImages]);
 
+
+  const [searchQuery, setSearchQuery] = useState("");
+  // const [isButtonClicked, setIsButtonClicked] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [isAscending, setIsAscending] = useState(true);
+  const [items, setItems] = useState(["Banana", "Apple", "Cherry", "Date"]);
+  const [isGridView, setIsGridView] = useState(false);
+  const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
+
+  const handleButtonClick = () => {
+    setIsButtonClicked(true); // Update state when any button is clicked
+    setBgColor("#e7eaee"); // Change background on click
+  };
+
+  // Sorting Function
+  const handleSort = () => {
+    setIsAscending(!isAscending);
+  };
+
+  const toggleView = () => {
+    setIsGridView(!isGridView);
+  };
+
+  const handleCombinedClick = () => {
+    handleButtonClick(); // Changes search bar background
+    handleOpenCreateDatabase(); // Opens the modal
+  };
 
 
   const handleOpenCreateDatabase = () => {
