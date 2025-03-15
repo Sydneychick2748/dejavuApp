@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useContext,useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
@@ -28,32 +28,32 @@ export default function UploadFiles({ setIsButtonClicked }) {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  // const [isButtonClicked, setIsButtonClicked] = useState(false);
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [isAscending, setIsAscending] = useState(true);
-  const [items, setItems] = useState(["Banana", "Apple", "Cherry", "Date"]);
-  const [isGridView, setIsGridView] = useState(false);
-  const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
 
-  const handleButtonClick = () => {
-    setIsButtonClicked(true); // Update state when any button is clicked
-    setBgColor("#e7eaee"); // Change background on click
-  };
+  // State for folder selections from CreateNewDataBaseModal
+  const [folderSelections, setFolderSelections] = useState([]);
+  // State for the selected folders from ImportMediaModal
+  const [selectedFolders, setSelectedFolders] = useState([]);
+  // State to hold only the checked images from the modal
+  // const [finalSelectedImages, setFinalSelectedImages] = useState([]);
 
-  // Sorting Function
-  const handleSort = () => {
-    setIsAscending(!isAscending);
-  };
+  // State for Media Info Modal
+  const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
+  const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
-  const toggleView = () => {
-    setIsGridView(!isGridView);
-  };
+  // Get the setter for the selected image from your ImageContext
+   const { setSelectedImage } = useContext(ImageContext);
+  // Your existing state
+  const { setUploadedFiles } = useContext(ImageContext);
+   
+  const { finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext); // ✅ Get from context
+  const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]); // ✅ Keep local state for usage
 
-  const handleCombinedClick = () => {
-    handleButtonClick(); // Changes search bar background
-    handleOpenCreateDatabase(); // Opens the modal
-  };
+  // Sync local state with context when it updates
+  useEffect(() => {
+    setFinalSelectedImages(localFinalSelectedImages); // ✅ Ensure it's always up to date
+  }, [localFinalSelectedImages, setFinalSelectedImages]);
+
+
 
   const handleOpenCreateDatabase = () => {
     console.log("Create New Database button clicked");
