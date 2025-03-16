@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useContext,useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
@@ -32,8 +32,10 @@ export default function UploadFiles({ setIsButtonClicked }) {
 
   // State for folder selections from CreateNewDataBaseModal
   const [folderSelections, setFolderSelections] = useState([]);
+
   // State for the selected folders from ImportMediaModal
   const [selectedFolders, setSelectedFolders] = useState([]);
+
   // State to hold only the checked images from the modal
   // const [finalSelectedImages, setFinalSelectedImages] = useState([]);
 
@@ -42,18 +44,19 @@ export default function UploadFiles({ setIsButtonClicked }) {
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
   // Get the setter for the selected image from your ImageContext
-   const { setSelectedImage } = useContext(ImageContext);
+  const { setSelectedImage } = useContext(ImageContext);
+
   // Your existing state
   const { setUploadedFiles } = useContext(ImageContext);
-   
-  const { finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext); // ✅ Get from context
+
+  const { finalSelectedImages, setFinalSelectedImages } =
+    useContext(ImageContext); // ✅ Get from context
   const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]); // ✅ Keep local state for usage
 
   // Sync local state with context when it updates
   useEffect(() => {
     setFinalSelectedImages(localFinalSelectedImages); // ✅ Ensure it's always up to date
   }, [localFinalSelectedImages, setFinalSelectedImages]);
-
 
   const [searchQuery, setSearchQuery] = useState("");
   // const [isButtonClicked, setIsButtonClicked] = useState(false);
@@ -82,10 +85,26 @@ export default function UploadFiles({ setIsButtonClicked }) {
     handleOpenCreateDatabase(); // Opens the modal
   };
 
-
   const handleOpenCreateDatabase = () => {
     console.log("Create New Database button clicked");
     setShowCreateDbModal(true);
+  };
+
+  // When an image row is clicked, update the context with the image URL.
+  const handleImageClick = (file) => {
+    const imageUrl = URL.createObjectURL(file);
+    setSelectedImage(imageUrl);
+  };
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setUploadedFiles(files); // Store images in context
+  };
+
+  // Handler for when Media Info is clicked
+  const handleMediaInfoClick = (file) => {
+    setMediaInfoFile(file);
+    setShowMediaInfoModal(true);
   };
 
   return (
@@ -98,7 +117,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
           alignItems: "center", // This centers items horizontally
           justifyContent: "flex-start", // Change this from 'center' to 'flex-start' to push content down
           width: "90%",
-          height: "650px",
+          height: "700px",
           backgroundColor: "white",
           borderRadius: "10px",
           boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
@@ -205,7 +224,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
                 alignItems: "center",
                 justifyContent: "center",
                 borderRadius: "7px",
-                backgroundColor: "#f4f4f4",
+                backgroundColor: "#d6d6d6",
                 cursor: "pointer",
                 paddingRight: "30px", // ✅ Extends button to the right
                 paddingLeft: "0px", // ✅ Extends button to the left
@@ -253,7 +272,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
                 padding: "px 10px",
                 borderRadius: "5px",
                 width: "45px", // Adjust size as needed
-                  height: "30px",
+                height: "30px",
                 // border: "1px solid #ccc",
                 // backgroundColor: "#f4f4f4",
                 cursor: "pointer",
@@ -276,100 +295,169 @@ export default function UploadFiles({ setIsButtonClicked }) {
           </div>
         </div>
 
-        {/* Buttons */}
+        {/* Center Buttons for Database */}
         <div
-        style={{
-          display: "flex",
-          flexDirection: "column", // ✅ Stack buttons vertically
-          alignItems: "center", // ✅ Keep them centered
-          gap: "5px", // ✅ Adds spacing between buttons
-          marginTop: "180px", // ✅ Moves all buttons down
-        }}
+          style={{
+            display: "flex",
+            flexDirection: "column", // ✅ Stack buttons vertically
+            alignItems: "center", // ✅ Keep them centered
+            gap: "5px", // ✅ Adds spacing between buttons
+            marginTop: "250px", // ✅ Moves all buttons down
+          }}
         >
-        <button
-          style={buttonStyle("#4a88ff", "white")}
-          onClick={handleButtonClick}
-          onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
-          onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
-        >
-          Open a database
-        </button>
+          <button
+            style={buttonStyle("#4a88ff", "white")}
+            onClick={handleButtonClick}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+          >
+            Open a database
+          </button>
 
-        <button
-          style={buttonStyle("#4a88ff", "white")}
-          onClick={handleButtonClick}
-          onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
-          onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
-        >
-          Connect to ES database
-        </button>
+          <button
+            style={buttonStyle("#4a88ff", "white")}
+            onClick={handleButtonClick}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+          >
+            Connect to ES database
+          </button>
 
-        <button
-          style={buttonStyle("#4a88ff", "white")}
-          onClick={handleButtonClick}
-          disabled
-        >
-          Connect to live video
-        </button>
+          <button
+            style={buttonStyle("#4a88ff", "white")}
+            onClick={handleButtonClick}
+            disabled
+          >
+            Connect to live video
+          </button>
 
-        <button
-          style={buttonStyle("#a9d096", "white")}
-          onMouseOver={(e) => (e.currentTarget.style.background = "#7fa763")}
-          onMouseOut={(e) => (e.currentTarget.style.background = "#a9d096")}
-          onClick={handleCombinedClick} // Both functions run properly
-        >
-          Create new database
-        </button>
+          <button
+            style={buttonStyle("#a9d096", "white")}
+            onMouseOver={(e) => (e.currentTarget.style.background = "#7fa763")}
+            onMouseOut={(e) => (e.currentTarget.style.background = "#a9d096")}
+            onClick={handleCombinedClick} // Both functions run properly
+          >
+            Create new database
+          </button>
 
-        {/* 1. Create New Database Modal */}
-        {showCreateDbModal && (
-          <CreateNewDataBaseModal
-            onClose={() => {
-              console.log("Closing CreateNewDataBaseModal");
-              setShowCreateDbModal(false);
-            }}
-            onNext={() => {
-              console.log(
-                "Proceeding from CreateNewDataBaseModal to ImportMediaModal"
-              );
-              setShowCreateDbModal(false);
-              setShowImportMediaModal(true);
-            }}
-          />
-        )}
+          {/* 1. Create New Database Modal */}
+          {showCreateDbModal && (
+            <CreateNewDataBaseModal
+              onClose={() => setShowCreateDbModal(false)}
+              onNext={(folders) => {
+                setFolderSelections(folders);
+                setShowCreateDbModal(false);
+                setShowImportMediaModal(true);
+              }}
+            />
+          )}
 
-        {/* 2. Import Media Modal */}
-        {showImportMediaModal && (
-          <ImportMediaModal
-            onClose={() => {
-              console.log("Closing ImportMediaModal");
-              setShowImportMediaModal(false);
-            }}
-            onNext={() => {
-              console.log(
-                "Proceeding from ImportMediaModal to DisplayDataBaseModal"
-              );
+          {/* 2. Import Media Modal */}
+          {showImportMediaModal && (
+            <ImportMediaModal
+            folderSelections={folderSelections}
+            onClose={() => setShowImportMediaModal(false)}
+            onNext={(folders) => {
+              setSelectedFolders(folders);
               setShowImportMediaModal(false);
               setShowDisplayDbModal(true);
             }}
           />
-        )}
+          )}
 
-        {/* 3. Display Database Modal (FINAL STEP) */}
-        {showDisplayDbModal && (
-          <DisplayDataBaseModal
-            onClose={() => {
-              console.log("Closing DisplayDataBaseModal");
-              setShowDisplayDbModal(false);
+          {/* 3. Display Database Modal (FINAL STEP) */}
+          {showDisplayDbModal && (
+            <DisplayDataBaseModal
+              onClose={() => setShowDisplayDbModal(false)}
+              onNext={(selectedFiles) => {
+                // Store only checked images
+                setFinalSelectedImages(selectedFiles);
+                setShowDisplayDbModal(false);
+              }}
+              selectedFolders={selectedFolders}
+            />
+          )}
+
+          {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
+              {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
+{finalSelectedImages.length > 0 && !showDisplayDbModal && (
+  <div style={{ marginTop: "30px" }}>
+    <h3>Final Gallery</h3>
+    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+      {finalSelectedImages.map((file, index, arr) => {
+        const imageUrl = URL.createObjectURL(file); // Generate URL once
+        return (
+          <div
+            key={index}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              borderBottom: "1px solid #ddd",
+              padding: "10px 0",
+              cursor: "pointer",
             }}
-            onNext={() => {
-              console.log(
-                "Finishing DisplayDataBaseModal and returning to UploadFiles UI"
-              );
-              setShowDisplayDbModal(false);
-            }}
-          />
-        )}
+            onClick={() => handleImageClick(file)} // Handle click for selection
+          >
+            {/* Left: Numbering */}
+            <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
+              {index + 1} of {arr.length}
+            </div>
+            {/* Thumbnail */}
+            <div>
+              <img
+                src={imageUrl} // Use stored imageUrl
+                alt={file.name}
+                style={{
+                  width: "100px",
+                  height: "100px",
+                  objectFit: "cover",
+                  borderRadius: "4px",
+                  marginRight: "10px",
+                }}
+              />
+            </div>
+            {/* Description */}
+            <div style={{ flex: 1 }}>
+              <div style={{ fontWeight: "bold" }}>{file.name}</div>
+              <div
+                style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer" }}
+                onClick={(e) => {
+                  e.stopPropagation(); // Prevent triggering handleImageClick
+                  handleMediaInfoClick(file);
+                }}
+              >
+                Media Info
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  </div>
+)}
+      {/* Media Info Modal */}
+      {showMediaInfoModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+        >
+          <h3>Media Info</h3>
+          <p>
+            {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
+          </p>
+          <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
+        </div>
+      )}
+    
         </div>
       </div>
     </>

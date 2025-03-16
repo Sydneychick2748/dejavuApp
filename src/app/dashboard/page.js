@@ -43,13 +43,13 @@ export default function Dashboard() {
               color: "white",
               transition: "background 0.3s ease",
               borderTopRightRadius: "10px", // Rounds only the top-right corner
-              mt: "-20px"
+              mt: "-20px",
             }}
           >
             Search within...
           </div>
-
-          <UploadFiles setIsButtonClicked={setIsButtonClicked} /> {/* Pass the function to Update State */}
+          <UploadFiles setIsButtonClicked={setIsButtonClicked} />{" "}
+          {/* Pass the function to Update State */}
         </Box>
 
         {/* Right Section (Search & Parameters) */}
@@ -60,9 +60,66 @@ export default function Dashboard() {
           // w={{ base: "100%", lg: "70%" }} // Full width on mobile/tablet, 50% on desktop
         >
           {/* Top Right (Search for Image) */}
-          <Box bg="white" p={4} borderRadius="lg" shadow="md">
+          {/* <Box
+            style={{
+              width: "100%",
+              backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
+              padding: "10px 20px",
+              fontSize: "16px",
+              fontWeight: "600",
+              color: "white",
+              transition: "background 0.3s ease",
+              borderTopRightRadius: "10px", // Rounds only the top-right corner
+              mt: "-20px",
+            }}
+          >
+            {/* Top Bar */}
+            {/* <div
+              style={{
+                width: "100%",
+                backgroundColor: "#0b2856", // Change background on click
+                padding: "10px 20px",
+                fontSize: "16px",
+                fontWeight: "600",
+                color: "white",
+                transition: "background 0.3s ease",
+                borderTopRightRadius: "10px", // Rounds only the top-right corner
+                mt: "0px",
+                marginLeft: "-20px", // Adjusted to align with the parent container
+              }}
+            >
+              <h1>Search For</h1>
+            </div>
             <SearchFor />
-          </Box>
+          </Box>  */}
+
+          <Box
+          flex="0 0 40%"
+          bg={isButtonClicked ? "#e7eaee" : "#f1f1f1"}
+          // p={4}
+          borderRadius="lg"
+          shadow="md"
+          // w={{ base: "100%", lg: "30%" }} // Full width on mobile/tablet, 50% on desktop
+        >
+          {/* Search Within Parent Container */}
+          <div
+            style={{
+              width: "100%",
+              backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
+              padding: "10px 20px",
+              fontSize: "16px",
+              fontWeight: "600",
+              color: "white",
+              transition: "background 0.3s ease",
+              borderTopRightRadius: "10px", // Rounds only the top-right corner
+              mt: "-20px",
+            }}
+          >
+            Search For
+          </div>
+          <SearchFor  />{" "}
+          {/* Pass the function to Update State */}
+        </Box>
 
           {/* Bottom Right (Search Parameters) */}
           <Box bg="white" p={4} borderRadius="lg" shadow="md">
