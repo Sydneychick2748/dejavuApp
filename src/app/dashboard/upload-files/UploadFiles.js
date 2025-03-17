@@ -64,12 +64,12 @@ export default function UploadFiles({ setIsButtonClicked }) {
   const [isAscending, setIsAscending] = useState(true);
   const [items, setItems] = useState(["Banana", "Apple", "Cherry", "Date"]);
   const [isGridView, setIsGridView] = useState(false);
-  const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
+  // const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
 
-  const handleButtonClick = () => {
-    setIsButtonClicked(true); // Update state when any button is clicked
-    setBgColor("#e7eaee"); // Change background on click
-  };
+  // const handleButtonClick = () => {
+  //   setIsButtonClicked(true); // Update state when any button is clicked
+  //   setBgColor("#e7eaee"); // Change background on click
+  // };
 
   // Sorting Function
   const handleSort = () => {
@@ -145,7 +145,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
             style={{ display: "flex", alignItems: "center", gap: "10px" }}
           >
             <button
-              onClick={handleButtonClick}
+              // onClick={handleButtonClick}
               style={{
                 width: "30px",
                 height: "30px",
@@ -169,7 +169,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
             <input
               type="text"
               value={searchQuery}
-              onClick={handleButtonClick}
+              // onClick={handleButtonClick}
               onChange={(e) => setSearchQuery(e.target.value)}
               onFocus={() => setIsExpanded(true)}
               onBlur={() => setIsExpanded(false)}
@@ -197,7 +197,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
             style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}
           >
             <button
-              onClick={handleButtonClick}
+              // onClick={handleButtonClick}
               style={{
                 width: "30px",
                 height: "30px",
@@ -307,7 +307,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
         >
           <button
             style={buttonStyle("#4a88ff", "white")}
-            onClick={handleButtonClick}
+            // onClick={handleButtonClick}
             onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
             onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
           >
@@ -316,7 +316,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
 
           <button
             style={buttonStyle("#4a88ff", "white")}
-            onClick={handleButtonClick}
+            // onClick={handleButtonClick}
             onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
             onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
           >
@@ -325,7 +325,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
 
           <button
             style={buttonStyle("#4a88ff", "white")}
-            onClick={handleButtonClick}
+            // onClick={handleButtonClick}
             disabled
           >
             Connect to live video
@@ -335,7 +335,7 @@ export default function UploadFiles({ setIsButtonClicked }) {
             style={buttonStyle("#a9d096", "white")}
             onMouseOver={(e) => (e.currentTarget.style.background = "#7fa763")}
             onMouseOut={(e) => (e.currentTarget.style.background = "#a9d096")}
-            onClick={handleCombinedClick} // Both functions run properly
+            // onClick={handleCombinedClick} // Both functions run properly
           >
             Create new database
           </button>

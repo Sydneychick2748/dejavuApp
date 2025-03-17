@@ -10,8 +10,7 @@ import "./dashboard.css";
 import "../globals.css";
 
 export default function Dashboard() {
-  const [isButtonClicked, setIsButtonClicked] = useState(false);
-  const [bgColor, setBgColor] = useState("#f1f1f1"); // Default color
+  const [activeBox, setActiveBox] = useState(null);
 
   return (
     <ImageProvider>
@@ -24,102 +23,62 @@ export default function Dashboard() {
         gap={4}
       >
         {/* Left Section (Upload Files) */}
-        <Box
+        <Box 
+          className="uploadFilesBox"
           flex="0 0 40%"
-          bg={isButtonClicked ? "#e7eaee" : "#f1f1f1"}
-          // p={4}
-          borderRadius="lg"
+          bg={activeBox === "upload" ? "#e7eaee" : "#f1f1f1"} // Keep hover color if active          borderRadius="lg"
           shadow="md"
-          // w={{ base: "100%", lg: "30%" }} // Full width on mobile/tablet, 50% on desktop
+          transition="background 0.3s ease"
+          onMouseEnter={() => setActiveBox("upload")}
+          onMouseLeave={() => setActiveBox(null)} // Reset when leaving
         >
           {/* Search Within Parent Container */}
-          <div
-            style={{
-              width: "100%",
-              backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "600",
-              color: "white",
-              transition: "background 0.3s ease",
-              borderTopRightRadius: "10px", // Rounds only the top-right corner
-              mt: "-20px",
-            }}
+          <Box 
+            className="uploadSearchWithin"
+            width="100%"
+            bg={activeBox === "upload" ? "#0b2856" : "#d6d6d6"} // Keep header hover color if active
+            p="10px 20px"
+            fontSize="16px"
+            fontWeight="600"
+            color="white"
+            borderTopRightRadius="10px"
+            transition="background 0.3s ease"
           >
             Search within...
-          </div>
-          <UploadFiles setIsButtonClicked={setIsButtonClicked} />{" "}
-          {/* Pass the function to Update State */}
+          </Box>
+          <UploadFiles />
         </Box>
 
         {/* Right Section (Search & Parameters) */}
-        <Flex
-          direction="column"
-          flex="0 0 60%"
-          gap={4}
-          // w={{ base: "100%", lg: "70%" }} // Full width on mobile/tablet, 50% on desktop
-        >
+        <Flex direction="column" flex="0 0 60%" gap={4}>
           {/* Top Right (Search for Image) */}
-          {/* <Box
-            style={{
-              width: "100%",
-              backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "600",
-              color: "white",
-              transition: "background 0.3s ease",
-              borderTopRightRadius: "10px", // Rounds only the top-right corner
-              mt: "-20px",
-            }}
-          >
-            {/* Top Bar */}
-            {/* <div
-              style={{
-                width: "100%",
-                backgroundColor: "#0b2856", // Change background on click
-                padding: "10px 20px",
-                fontSize: "16px",
-                fontWeight: "600",
-                color: "white",
-                transition: "background 0.3s ease",
-                borderTopRightRadius: "10px", // Rounds only the top-right corner
-                mt: "0px",
-                marginLeft: "-20px", // Adjusted to align with the parent container
-              }}
-            >
-              <h1>Search For</h1>
-            </div>
-            <SearchFor />
-          </Box>  */}
 
           <Box
+          className="searcForBox"
           flex="0 0 40%"
-          bg={isButtonClicked ? "#e7eaee" : "#f1f1f1"}
-          // p={4}
+          bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"} // Keep hover color if active
           borderRadius="lg"
           shadow="md"
-          // w={{ base: "100%", lg: "30%" }} // Full width on mobile/tablet, 50% on desktop
-        >
-          {/* Search Within Parent Container */}
-          <div
-            style={{
-              width: "100%",
-              backgroundColor: isButtonClicked ? "#0b2856" : "#d6d6d6", // Change background on click
-              padding: "10px 20px",
-              fontSize: "16px",
-              fontWeight: "600",
-              color: "white",
-              transition: "background 0.3s ease",
-              borderTopRightRadius: "10px", // Rounds only the top-right corner
-              mt: "-20px",
-            }}
+          transition="background 0.3s ease"
+          onMouseEnter={() => setActiveBox("searchFor")}
+          onMouseLeave={() => setActiveBox(null)} // Reset when leaving
+            
           >
-            Search For
-          </div>
-          <SearchFor  />{" "}
-          {/* Pass the function to Update State */}
-        </Box>
+            {/* Search Within Parent Container */}
+            <Box className="uploadSearchFor"
+              width="100%"
+              bg={activeBox === "searchFor" ? "#0b2856" : "#d6d6d6"} // Keep header hover color if active
+              p="10px 20px"
+              fontSize="16px"
+              fontWeight="600"
+              color="white"
+              borderTopRightRadius="10px"
+              transition="background 0.3s ease"       
+            >
+              Search For
+            </Box>
+            <SearchFor />
+          </Box>
 
           {/* Bottom Right (Search Parameters) */}
           <Box bg="white" p={4} borderRadius="lg" shadow="md">

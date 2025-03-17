@@ -514,7 +514,6 @@
 "use client";
 import React, { useState } from "react";
 import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt } from "react-icons/fa";
-
 const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   // State to track folder selections (all folders initially checked)
   const [folderSelections, setFolderSelections] = useState(
@@ -523,7 +522,6 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
       return acc;
     }, {})
   );
-
   // State to track selected files per folder
   const [fileSelections, setFileSelections] = useState(
     selectedFolders.reduce((acc, folder, folderIndex) => {
@@ -534,20 +532,16 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
       return acc;
     }, {})
   );
-
   // State for media info modal
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
-
   // Toggles a folder selection and its files
   const toggleFolderSelection = (folderIndex) => {
     const isChecked = !folderSelections[folderIndex];
-
     setFolderSelections((prev) => ({
       ...prev,
       [folderIndex]: isChecked,
     }));
-
     setFileSelections((prev) => ({
       ...prev,
       [folderIndex]: selectedFolders[folderIndex].files.reduce((fileAcc, _, fileIndex) => {
@@ -556,7 +550,6 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
       }, {}),
     }));
   };
-
   // Toggles an individual file selection inside a folder
   const toggleFileSelection = (folderIndex, fileIndex) => {
     setFileSelections((prev) => ({
@@ -567,49 +560,37 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
       },
     }));
   };
-
   // Expands the folders to show files
   const [expanded, setExpanded] = useState({});
-
   const toggleExpanded = (folderIndex) => {
     setExpanded((prev) => ({
       ...prev,
       [folderIndex]: !prev[folderIndex],
     }));
   };
-
   // Opens Media Info Modal
   const handleMediaInfoClick = (file) => {
     setMediaInfoFile(file);
     setShowMediaInfoModal(true);
   };
-
   // Function to collect selected files and send them back
   const handleFinish = () => {
     const selectedFiles = selectedFolders.flatMap((folder, folderIndex) => {
       return folder.files.filter((_, fileIndex) => fileSelections[folderIndex][fileIndex]);
     });
-
     onNext(selectedFiles); // Send selected images to parent
   };
-
   // Helper function to get an icon based on file type
   const getFileIcon = (file) => {
     if (file.type.startsWith("image/")) return <FaFileImage />;
     if (file.type.startsWith("video/")) return <FaFileVideo />;
     return <FaFileAlt />;
   };
-
-
 // State to track selected image for preview
 const [selectedImage, setSelectedImage] = useState(null);
-
-
-
 return (
   <div className="modal" style={modalStyle}>
     <h3>Display Database</h3>
-
     <div style={{ display: "flex", width: "100%", height: "300px" }}>
       {/* Left Side - Folders and Images */}
       <div style={leftPanelStyle}>
@@ -631,11 +612,9 @@ return (
                   </div>
                 </div>
               </div>
-
               <button onClick={() => toggleExpanded(folderIndex)} style={toggleButtonStyle}>
                 {expanded[folderIndex] ? "Hide Files" : "Show Files"}
               </button>
-
               {expanded[folderIndex] && (
                 <div style={filesContainerStyle}>
                   {folder.files.map((file, fileIndex) => {
@@ -691,7 +670,6 @@ return (
           <p>No folders selected.</p>
         )}
       </div>
-
       {/* Right Side - Image Preview */}
       <div style={rightPanelStyle}>
         {selectedImage ? (
@@ -711,7 +689,6 @@ return (
         )}
       </div>
     </div>
-
     {/* Modal Buttons */}
     <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
       <button onClick={onClose} style={buttonStyle}>
@@ -735,6 +712,8 @@ const modalStyle = {
   border: "1px solid #ccc",
   borderRadius: "8px",
   zIndex: 1000,
+  color: "black", // Ensure text color is visible
+
 };
 const headerStyle = { display: "flex", alignItems: "center", marginBottom: "10px" };
 const toggleButtonStyle = { padding: "6px 12px", marginBottom: "10px" };
@@ -746,23 +725,37 @@ const filesContainerStyle = {
   borderRadius: "4px",
   marginBottom: "10px",
 };
-
 const leftPanelStyle = {
   flex: 1,
   padding: "10px",
   borderRight: "1px solid #ddd",
   overflowY: "auto",
 };
-
 const rightPanelStyle = {
   flex: 1,
   padding: "10px",
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#f9f9f9",
+  backgroundColor: "#F9F9F9",
 };
 const fileItemStyle = { display: "flex", alignItems: "center", marginBottom: "8px" };
 const buttonStyle = { padding: "8px 16px", marginRight: "10px" };
-
 export default DisplayDataBaseModal;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

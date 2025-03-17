@@ -1,18 +1,14 @@
-
 "use client";
 import React, { useState } from "react";
 import { FaFolder } from "react-icons/fa";
-
 const ImportMediaModal = ({ folderSelections, onClose, onNext }) => {
   const [selectedIndices, setSelectedIndices] = useState([]);
-
   const handleFolderClick = (index, folder) => {
     console.log("Folder clicked:", folder);
     setSelectedIndices((prev) =>
       prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]
     );
   };
-
   const handleNextClick = () => {
     if (selectedIndices.length > 0) {
       const selectedFolders = selectedIndices.map((index) => folderSelections[index]);
@@ -20,7 +16,6 @@ const ImportMediaModal = ({ folderSelections, onClose, onNext }) => {
       onNext(selectedFolders);
     }
   };
-
   return (
     <div className="modal" style={modalStyle}>
       <h3>Import Media</h3>
@@ -78,7 +73,6 @@ const ImportMediaModal = ({ folderSelections, onClose, onNext }) => {
     </div>
   );
 };
-
 const modalStyle = {
   position: "fixed",
   top: "50%",
@@ -89,8 +83,29 @@ const modalStyle = {
   border: "1px solid #ccc",
   borderRadius: "8px",
   zIndex: 1000,
+  color: "black", // Ensure text color is visible
+
 };
-
 const buttonStyle = { padding: "8px 16px", marginRight: "10px" };
-
 export default ImportMediaModal;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
