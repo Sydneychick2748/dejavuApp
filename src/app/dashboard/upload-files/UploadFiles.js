@@ -1,15 +1,13 @@
 
 "use client";
-import React, { useState, useContext,useEffect } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
 import { ImageContext } from "@/contexts/ImageContext";
 
-
 export default function UploadFiles() {
   // Modal chain states
-  // const { setUploadedFiles } = useImageContext();
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
@@ -18,27 +16,19 @@ export default function UploadFiles() {
   const [folderSelections, setFolderSelections] = useState([]);
   // State for the selected folders from ImportMediaModal
   const [selectedFolders, setSelectedFolders] = useState([]);
-  // State to hold only the checked images from the modal
-  // const [finalSelectedImages, setFinalSelectedImages] = useState([]);
 
   // State for Media Info Modal
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
-  // Get the setter for the selected image from your ImageContext
-   const { setSelectedImage } = useContext(ImageContext);
-  // Your existing state
-  const { setUploadedFiles } = useContext(ImageContext);
-   
-  const { finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext); // ✅ Get from context
-  const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]); // ✅ Keep local state for usage
+  // Get the setters and state from ImageContext
+  const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext);
+  const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]);
 
   // Sync local state with context when it updates
   useEffect(() => {
-    setFinalSelectedImages(localFinalSelectedImages); // ✅ Ensure it's always up to date
+    setFinalSelectedImages(localFinalSelectedImages);
   }, [localFinalSelectedImages, setFinalSelectedImages]);
-
-
 
   const handleOpenCreateDatabase = () => {
     setShowCreateDbModal(true);
@@ -48,9 +38,7 @@ export default function UploadFiles() {
   const handleImageClick = (file) => {
     const imageUrl = URL.createObjectURL(file);
     setSelectedImage(imageUrl);
-   
-};
-  
+  };
 
   // Handler for when Media Info is clicked
   const handleMediaInfoClick = (file) => {
@@ -58,29 +46,26 @@ export default function UploadFiles() {
     setShowMediaInfoModal(true);
   };
 
-
-
-  
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     setUploadedFiles(files); // Store images in context
   };
-  
 
   return (
     <div style={{ padding: "20px", color: "black" }}>
-     
-    
-      <button
-        style={{
-          padding: "10px 20px",
-          fontSize: "16px",
-          cursor: "pointer",
-        }}
-        onClick={handleOpenCreateDatabase}
-      >
-        Create New Database
-      </button>
+      {/* Conditionally render the "Create New Database" button */}
+      {!(finalSelectedImages.length > 0 && !showDisplayDbModal) && (
+        <button
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            cursor: "pointer",
+          }}
+          onClick={handleOpenCreateDatabase}
+        >
+          Create New Database
+        </button>
+      )}
 
       {/* STEP 1: Create New Database Modal */}
       {showCreateDbModal && (
@@ -120,67 +105,65 @@ export default function UploadFiles() {
         />
       )}
 
-     {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
-{finalSelectedImages.length > 0 && !showDisplayDbModal && (
-  <div style={{ marginTop: "30px" }}>
-    <h3>Final Gallery</h3>
-    <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-      {finalSelectedImages.map((file, index, arr) => {
-        const imageUrl = URL.createObjectURL(file); // Generate URL once
+      {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
+      {finalSelectedImages.length > 0 && !showDisplayDbModal && (
+        <div style={{ marginTop: "30px" }}>
+          <h3>Final Gallery</h3>
+          <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+            {finalSelectedImages.map((file, index, arr) => {
+              const imageUrl = URL.createObjectURL(file); // Generate URL once
 
-        return (
-          <div
-            key={index}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              borderBottom: "1px solid #ddd",
-              padding: "10px 0",
-              cursor: "pointer",
-            }}
-            onClick={() => handleImageClick(file)} // Handle click for selection
-          >
-    
-            {/* Left: Numbering */}
-            <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
-              {index + 1} of {arr.length}
-            </div>
-           
-            {/* Thumbnail */}
-            <div>
-              <img
-                src={imageUrl} // Use stored imageUrl
-                alt={file.name}
-                style={{
-                  width: "100px",
-                  height: "100px",
-                  objectFit: "cover",
-                  borderRadius: "4px",
-                  marginRight: "10px",
-                }}
-              />
-            </div>
+              return (
+                <div
+                  key={index}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    borderBottom: "1px solid #ddd",
+                    padding: "10px 0",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => handleImageClick(file)} // Handle click for selection
+                >
+                  {/* Left: Numbering */}
+                  <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
+                    {index + 1} of {arr.length}
+                  </div>
 
-            {/* Description */}
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: "bold" }}>{file.name}</div>
-              <div
-                style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer" }}
-                onClick={(e) => {
-                  e.stopPropagation(); // Prevent triggering handleImageClick
-                  handleMediaInfoClick(file);
-                }}
-              >
-                Media Info
-              </div>
-            </div>
+                  {/* Thumbnail */}
+                  <div>
+                    <img
+                      src={imageUrl} // Use stored imageUrl
+                      alt={file.name}
+                      style={{
+                        width: "100px",
+                        height: "100px",
+                        objectFit: "cover",
+                        borderRadius: "4px",
+                        marginRight: "10px",
+                      }}
+                    />
+                  </div>
+
+                  {/* Description */}
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: "bold" }}>{file.name}</div>
+                    <div
+                      style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer" }}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering handleImageClick
+                        handleMediaInfoClick(file);
+                      }}
+                    >
+                      Media Info
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
-        );
-      })}
-    </div>
-  </div>
-)}
-
+        </div>
+      )}
 
       {/* Media Info Modal */}
       {showMediaInfoModal && (
