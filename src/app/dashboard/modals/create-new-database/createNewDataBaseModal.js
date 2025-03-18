@@ -26,10 +26,10 @@ const CreateNewDataBaseModal = ({ onClose, onNext }) => {
   };
   return (
     <div className="modal" style={modalStyle}>
-      <h3>Create New Database</h3>
-      <p>Select one or more folders that will be used for the new database.</p>
+      <h3>Select New Database Location</h3>
+      {/* <p>Select one or more folders that will be used for the new database.</p> */}
       <div style={{ margin: "10px 0" }}>
-        <label>Select a folder:</label>
+        <label>Select A folder:</label>
         <br />
         <input
           type="file"

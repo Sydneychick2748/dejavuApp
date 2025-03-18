@@ -19,24 +19,24 @@ export default function Dashboard() {
         w="full"
         p={4}
         bg="gray.100"
-        direction={{ base: "column", md: "column", lg: "row" }} // Stack on mobile & tablet, row on desktop
+        direction={{ base: "column", md: "column", lg: "row" }}
         gap={4}
       >
         {/* Left Section (Upload Files) */}
-        <Box 
+        <Box
           className="uploadFilesBox"
           flex="0 0 40%"
-          bg={activeBox === "upload" ? "#e7eaee" : "#f1f1f1"} // Keep hover color if active          borderRadius="lg"
+          bg={activeBox === "upload" ? "#e7eaee" : "#f1f1f1"}
+          borderRadius="lg"
           shadow="md"
           transition="background 0.3s ease"
           onMouseEnter={() => setActiveBox("upload")}
-          onMouseLeave={() => setActiveBox(null)} // Reset when leaving
+          onMouseLeave={() => setActiveBox(null)}
         >
-          {/* Search Within Parent Container */}
-          <Box 
+          <Box
             className="uploadSearchWithin"
             width="100%"
-            bg={activeBox === "upload" ? "#0b2856" : "#d6d6d6"} // Keep header hover color if active
+            bg={activeBox === "upload" ? "#0b2856" : "#d6d6d6"}
             p="10px 20px"
             fontSize="16px"
             fontWeight="600"
@@ -44,7 +44,7 @@ export default function Dashboard() {
             borderTopRightRadius="10px"
             transition="background 0.3s ease"
           >
-            Search within...
+            Search Within...
           </Box>
           <UploadFiles />
         </Box>
@@ -52,31 +52,64 @@ export default function Dashboard() {
         {/* Right Section (Search & Parameters) */}
         <Flex direction="column" flex="0 0 60%" gap={4}>
           {/* Top Right (Search for Image) */}
-
           <Box
-          className="searcForBox"
-          flex="0 0 40%"
-          bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"} // Keep hover color if active
-          borderRadius="lg"
-          shadow="md"
-          transition="background 0.3s ease"
-          onMouseEnter={() => setActiveBox("searchFor")}
-          onMouseLeave={() => setActiveBox(null)} // Reset when leaving
-            
+            className="searchForBox"
+            flex="0 0 40%"
+            bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
+            borderRadius="lg"
+            shadow="md"
+            transition="background 0.3s ease"
+            onMouseEnter={() => setActiveBox("searchFor")}
+            onMouseLeave={() => setActiveBox(null)}
           >
-            {/* Search Within Parent Container */}
-            <Box className="uploadSearchFor"
-              width="100%"
-              bg={activeBox === "searchFor" ? "#0b2856" : "#d6d6d6"} // Keep header hover color if active
+            {/* Header with Buttons */}
+            <Flex
+              align="center"
+              justify="space-between"
+              bg={activeBox === "searchFor" ? "#0b2856" : "#d6d6d6"}
               p="10px 20px"
               fontSize="16px"
               fontWeight="600"
               color="white"
               borderTopRightRadius="10px"
-              transition="background 0.3s ease"       
+              transition="background 0.3s ease"
             >
-              Search For
-            </Box>
+              <Box>Search For...</Box>
+              <Flex gap={2}>
+                <Box
+                  as="button"
+                  bg="white"
+                  fontWeight={300}
+                  color={activeBox === "searchFor" ? "#0B2856" : "#808080"} // Dark blue when active, grey otherwise
+                  border="1px solid white"
+                  borderRadius="8px"
+                  p="4px 8px"
+                  _hover={{
+                    bg: "white",
+                    color: "#FF4444", // Red on hover
+                  }}
+                  onClick={() => console.log("Remove All clicked")}
+                >
+                  Remove All
+                </Box>
+                <Box
+                  as="button"
+                  bg="white"
+                  fontWeight={300}
+                  color={activeBox === "searchFor" ? "#0B2856" : "#808080"} // Dark blue when active, grey otherwise
+                  border="1px solid white"
+                  borderRadius="8px"
+                  p="4px 8px"
+                  _hover={{
+                    bg: "white",
+                    color: activeBox === "searchFor" ? "#4a88ff" : "#0B2856", // Lighter blue on hover when active, dark blue otherwise
+                  }}
+                  onClick={() => console.log("Object Library clicked")}
+                >
+                  Object Library
+                </Box>
+              </Flex>
+            </Flex>
             <SearchFor />
           </Box>
 
