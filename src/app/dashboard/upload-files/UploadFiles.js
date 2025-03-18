@@ -1,25 +1,40 @@
 
+
+
+
 "use client";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
 import { ImageContext } from "@/contexts/ImageContext";
+import { FaPlus, FaChevronDown, FaChevronUp } from "react-icons/fa"; // Importing + and arrow icons
 
 export default function UploadFiles() {
   // Modal chain states
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
+  const [showPlusModal, setShowPlusModal] = useState(false); // State for the + icon modal
 
   // State for folder selections from CreateNewDataBaseModal
   const [folderSelections, setFolderSelections] = useState([]);
   // State for the selected folders from ImportMediaModal
   const [selectedFolders, setSelectedFolders] = useState([]);
 
+  // State for multiple databases
+  const [databases, setDatabases] = useState([]);
+  const [selectedDatabaseIndex, setSelectedDatabaseIndex] = useState(null);
+
   // State for Media Info Modal
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
+
+  // State for frame expansion and extracted frames
+  const [isFramesExpanded, setIsFramesExpanded] = useState(false);
+  const [frames, setFrames] = useState([]);
+  const videoRef = useRef(null); // Ref for the hidden video element
+  const canvasRef = useRef(null); // Ref for the canvas element
 
   // Get the setters and state from ImageContext
   const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext);
@@ -32,12 +47,18 @@ export default function UploadFiles() {
 
   const handleOpenCreateDatabase = () => {
     setShowCreateDbModal(true);
+    setShowPlusModal(false); // Close the + modal when creating a new database
   };
 
-  // When an image row is clicked, update the context with the image URL.
+  // When an image or video row is clicked, update the context with the file URL.
   const handleImageClick = (file) => {
-    const imageUrl = URL.createObjectURL(file);
-    setSelectedImage(imageUrl);
+    const fileUrl = URL.createObjectURL(file);
+    setSelectedImage(fileUrl);
+  };
+
+  const handleImageUpload = (event) => {
+    const files = Array.from(event.target.files);
+    setUploadedFiles(files); // Store files in context
   };
 
   // Handler for when Media Info is clicked
@@ -46,25 +67,180 @@ export default function UploadFiles() {
     setShowMediaInfoModal(true);
   };
 
-  const handleImageUpload = (event) => {
-    const files = Array.from(event.target.files);
-    setUploadedFiles(files); // Store images in context
+  // Handle the result from DisplayDataBaseModal
+  const handleDisplayDbNext = (data) => {
+    const newDatabase = { name: data.databaseName, files: data.files };
+    setDatabases((prev) => [...prev, newDatabase]);
+    setLocalFinalSelectedImages(data.files); // Update local state with selected files
+    setSelectedDatabaseIndex(databases.length); // Select the new database
+    setShowDisplayDbModal(false);
+  };
+
+  // Handle delete database
+  const handleDeleteDatabase = (index) => {
+    setDatabases((prev) => prev.filter((_, i) => i !== index));
+    if (selectedDatabaseIndex === index) {
+      setSelectedDatabaseIndex(null);
+      setLocalFinalSelectedImages([]);
+    } else if (selectedDatabaseIndex > index) {
+      setSelectedDatabaseIndex(selectedDatabaseIndex - 1);
+    }
+    console.log("Database deleted, returning to initial state");
+  };
+
+  // Function to extract frames from a video file
+  const extractFrames = (file) => {
+    return new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      const context = canvas.getContext("2d");
+      const frameList = [];
+
+      video.src = url;
+      video.load();
+
+      video.onloadedmetadata = () => {
+        const duration = video.duration;
+        const frameRate = 30; // Assuming 30 FPS; adjust based on video metadata if needed
+        const totalFrames = Math.floor(duration * frameRate);
+        const interval = duration / totalFrames;
+
+        let currentTime = 0;
+        const captureFrame = () => {
+          if (currentTime <= duration) {
+            video.currentTime = currentTime;
+            video.onseeked = () => {
+              context.drawImage(video, 0, 0, canvas.width, canvas.height);
+              frameList.push(canvas.toDataURL("image/jpeg"));
+              currentTime += interval;
+              video.onseeked = captureFrame; // Schedule next frame
+            };
+          } else {
+            video.onseeked = null;
+            URL.revokeObjectURL(url); // Clean up
+            resolve(frameList);
+          }
+        };
+
+        captureFrame();
+      };
+    });
+  };
+
+  // Handle frame expansion click
+  const handleExpandFrames = async (file) => {
+    if (file.type.startsWith("video/")) {
+      const extractedFrames = await extractFrames(file);
+      setFrames(extractedFrames);
+      setIsFramesExpanded(true);
+    } else {
+      setFrames([]);
+      setIsFramesExpanded(false); // Reset for non-video files
+    }
   };
 
   return (
     <div style={{ padding: "20px", color: "black" }}>
-      {/* Conditionally render the "Create New Database" button */}
-      {!(finalSelectedImages.length > 0 && !showDisplayDbModal) && (
-        <button
+      {/* Conditionally render the "Create New Database" button only if no database exists */}
+      {!databases.length &&
+        !showCreateDbModal &&
+        !showImportMediaModal &&
+        !showDisplayDbModal &&
+        !showPlusModal && (
+          <button
+            style={{
+              padding: "10px 20px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+            onClick={handleOpenCreateDatabase}
+          >
+            Create New Database
+          </button>
+        )}
+
+      {/* Display the current database name, delete button, and + icon if databases exist */}
+      {databases.length > 0 && (
+        <div style={{ marginTop: "10px" }}>
+          {databases.map((db, index) => (
+            <div key={index} style={{ display: "flex", alignItems: "center", gap: "10px", marginBottom: "5px" }}>
+              <p
+                style={{
+                  fontWeight: "bold",
+                  cursor: "pointer",
+                  color: selectedDatabaseIndex === index ? "blue" : "black",
+                }}
+                onClick={() => {
+                  setSelectedDatabaseIndex(index);
+                  setLocalFinalSelectedImages(db.files);
+                }}
+              >
+                {db.name}
+              </p>
+              <button
+                style={{
+                  padding: "5px 10px",
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  background: "#ff4444",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "4px",
+                }}
+                onClick={() => handleDeleteDatabase(index)}
+              >
+                Delete
+              </button>
+            </div>
+          ))}
+          <button
+            style={{
+              marginLeft: "10px",
+              padding: "5px",
+              fontSize: "20px",
+              cursor: "pointer",
+              background: "none",
+              border: "none",
+            }}
+            onClick={() => setShowPlusModal(true)}
+          >
+            <FaPlus />
+          </button>
+        </div>
+      )}
+
+      {/* + Icon Modal (without Close button) */}
+      {showPlusModal && (
+        <div
           style={{
-            padding: "10px 20px",
-            fontSize: "16px",
-            cursor: "pointer",
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
           }}
-          onClick={handleOpenCreateDatabase}
         >
-          Create New Database
-        </button>
+          <h3>Create New Database</h3>
+          <button
+            style={{
+              marginTop: "20px",
+              padding: "10px 20px",
+              fontSize: "16px",
+              cursor: "pointer",
+            }}
+            onClick={handleOpenCreateDatabase}
+          >
+            Create New Database
+          </button>
+        </div>
       )}
 
       {/* STEP 1: Create New Database Modal */}
@@ -96,23 +272,18 @@ export default function UploadFiles() {
       {showDisplayDbModal && (
         <DisplayDataBaseModal
           onClose={() => setShowDisplayDbModal(false)}
-          onNext={(selectedFiles) => {
-            // Store only checked images
-            setFinalSelectedImages(selectedFiles);
-            setShowDisplayDbModal(false);
-          }}
+          onNext={handleDisplayDbNext}
           selectedFolders={selectedFolders}
         />
       )}
 
-      {/* Final Gallery Display on Main Page (ONLY CHECKED IMAGES) */}
-      {finalSelectedImages.length > 0 && !showDisplayDbModal && (
+      {/* Final Gallery Display on Main Page */}
+      {selectedDatabaseIndex !== null && !showDisplayDbModal && (
         <div style={{ marginTop: "30px" }}>
           <h3>Final Gallery</h3>
           <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-            {finalSelectedImages.map((file, index, arr) => {
-              const imageUrl = URL.createObjectURL(file); // Generate URL once
-
+            {databases[selectedDatabaseIndex].files.map((file, index, arr) => {
+              const fileUrl = URL.createObjectURL(file); // Generate URL for both images and videos
               return (
                 <div
                   key={index}
@@ -130,19 +301,36 @@ export default function UploadFiles() {
                     {index + 1} of {arr.length}
                   </div>
 
-                  {/* Thumbnail */}
+                  {/* Thumbnail/Preview */}
                   <div>
-                    <img
-                      src={imageUrl} // Use stored imageUrl
-                      alt={file.name}
-                      style={{
-                        width: "100px",
-                        height: "100px",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                        marginRight: "10px",
-                      }}
-                    />
+                    {file.type.startsWith("image/") ? (
+                      <img
+                        src={fileUrl}
+                        alt={file.name}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                          marginRight: "10px",
+                        }}
+                      />
+                    ) : file.type.startsWith("video/") ? (
+                      <video
+                        src={fileUrl}
+                        style={{
+                          width: "100px",
+                          height: "100px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                          marginRight: "10px",
+                        }}
+                        muted
+                        loop
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                    ) : null}
                   </div>
 
                   {/* Description */}
@@ -157,6 +345,31 @@ export default function UploadFiles() {
                     >
                       Media Info
                     </div>
+                    <div
+                      style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer", marginTop: "5px" }}
+                      onClick={() => handleExpandFrames(file)}
+                    >
+                      Expand Frames {isFramesExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                    </div>
+                    {isFramesExpanded && frames.length > 0 && (
+                      <div style={{ marginTop: "5px", padding: "5px", background: "#f9f9f9" }}>
+                        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                          {frames.map((frame, frameIndex) => (
+                            <img
+                              key={frameIndex}
+                              src={frame}
+                              alt={`Frame ${frameIndex + 1}`}
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                objectFit: "cover",
+                                borderRadius: "4px",
+                              }}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               );
@@ -181,12 +394,14 @@ export default function UploadFiles() {
           }}
         >
           <h3>Media Info</h3>
-          <p>
-            {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
-          </p>
+          <p>{mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}</p>
           <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
         </div>
       )}
+
+      {/* Hidden video and canvas elements for frame extraction */}
+      <video ref={videoRef} style={{ display: "none" }} />
+      <canvas ref={canvasRef} style={{ display: "none" }} width="100" height="100" />
     </div>
   );
 }

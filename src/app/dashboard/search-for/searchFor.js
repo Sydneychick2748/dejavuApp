@@ -1,12 +1,11 @@
 
-
 "use client";
 import React, { useContext, useState, useRef, useEffect } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
-import { FaPlus } from "react-icons/fa"; // Importing the plus icon
+import { FaPlus, FaTimes } from "react-icons/fa"; // Importing plus and times icons
 import "./SearchFor.css";
-import ImageSelectModal from "../modals/image-select-modal/imageSelectModal";
+// import ImageSelectModal from "../modals/image-select-modal/imageSelectModal";
 
 // Composite the image onto a white background at 500×500.
 async function compositeImageOnWhite(imageUrl) {
@@ -66,21 +65,24 @@ async function convertRedMaskToBinary(maskDataUrl) {
 }
 
 export default function SearchFor() {
-  const { selectedImage, setSelectedImage, uploadedFiles, selectedFileInfo, finalSelectedImages } = useContext(ImageContext);
+  const { finalSelectedImages } = useContext(ImageContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedModalImage, setSelectedModalImage] = useState(null); // Temporary state for modal selection
+  const [selectedFile, setSelectedFile] = useState(null); // Store the selected file object
   const [boxes, setBoxes] = useState([
-    { id: 1, selectedImage: null, imageUrl: null, baseImageUrl: null, imgWidth: 0, imgHeight: 0 },
+    { id: Date.now(), selectedImage: null, imageUrl: null, baseImageUrl: null, imgWidth: 0, imgHeight: 0, fileName: "", fileSize: 0 },
   ]);
   const [response, setResponse] = useState("");
   const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
   const [currentBoxId, setCurrentBoxId] = useState(null); // Track which box is being edited
   const canvasRef = useRef(null);
+  const [showFileInfoModal, setShowFileInfoModal] = useState(false); // State for File Info Modal
+  const [showOpenFileModal, setShowOpenFileModal] = useState(false); // State for Open File Modal
 
   // Log boxes state changes for debugging
   useEffect(() => {
-    console.log("Boxes state changed:", boxes);
+    console.log("Boxes state changed:", boxes.map(box => ({ id: box.id, selectedImage: box.selectedImage, fileName: box.fileName })));
   }, [boxes]);
 
   // Composite each box's image when selected
@@ -139,8 +141,8 @@ export default function SearchFor() {
   };
 
   const handleCloseModal = (boxId) => {
-    if (selectedModalImage) {
-      // Update the specific box with the selected image
+    if (selectedModalImage && selectedFile) {
+      // Update the specific box with the selected image and file metadata
       setBoxes((prevBoxes) => {
         const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
         const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
@@ -148,31 +150,30 @@ export default function SearchFor() {
           newBoxes[boxIndex] = {
             ...newBoxes[boxIndex],
             selectedImage: selectedModalImage,
+            fileName: selectedFile.name,
+            fileSize: selectedFile.size,
           };
         }
         console.log(`Setting selectedImage for box ${boxId} to: ${selectedModalImage}`);
-        console.log(`Selected image for box ${boxId}: ${selectedModalImage}`);
+        console.log(`Selected file for box ${boxId}: ${selectedFile.name}, ${selectedFile.size} bytes`);
         return newBoxes;
       });
       // Composite the image onto a white background
       handleImageComposite(selectedModalImage, boxId);
-      // Add a new box after closing the modal
+      // Add a new box with a unique ID
       setBoxes((prevBoxes) => {
         const newBoxes = [
           ...JSON.parse(JSON.stringify(prevBoxes)), // Deep copy
-          { id: prevBoxes.length + 1, selectedImage: null, imageUrl: null, baseImageUrl: null, imgWidth: 0, imgHeight: 0 },
+          { id: Date.now(), selectedImage: null, imageUrl: null, baseImageUrl: null, imgWidth: 0, imgHeight: 0, fileName: "", fileSize: 0 },
         ];
-        console.log(`Closed modal for box ${boxId}, new box added. Current boxes:`, newBoxes);
+        console.log(`Closed modal for box ${boxId}, new box added with ID ${Date.now()}. Current boxes:`, newBoxes);
         return newBoxes;
       });
     }
     setIsModalOpen(false);
     setSelectedModalImage(null); // Reset modal image
+    setSelectedFile(null); // Reset selected file
   };
-
-  const fileSizeMB = selectedFileInfo?.size
-    ? `${(selectedFileInfo.size / (1024 * 1024)).toFixed(2)} MB`
-    : "0 MB";
 
   // "Isolate Subject": Send the current base image to FastAPI for background removal.
   const handleIsolateSubject = async (boxId) => {
@@ -301,6 +302,15 @@ export default function SearchFor() {
     }
   };
 
+  // Remove a box
+  const handleRemoveBox = (boxId) => {
+    setBoxes((prevBoxes) => {
+      const newBoxes = prevBoxes.filter((box) => box.id !== boxId);
+      console.log(`Removed box with ID ${boxId}. Remaining boxes:`, newBoxes);
+      return newBoxes;
+    });
+  };
+
   return (
     <div style={{ padding: "20px", color: "black" }}>
       {/* Top Bar */}
@@ -322,63 +332,25 @@ export default function SearchFor() {
             <div key={box.id} style={{ display: "flex", alignItems: "center", gap: "20px" }}>
               {/* Show + Box and Buttons if No Image Selected */}
               {!box.selectedImage ? (
-                <>
-                  <div
-                    style={{
-                      width: "250px",
-                      height: "250px",
-                      backgroundColor: "#f3f3f3",
-                      border: "2px dashed #999",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
-                      opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
-                    }}
-                    onClick={handleOpenModal}
-                  >
-                    <FaPlus size={50} color="#999" />
-                  </div>
-
-                  {/* Buttons Outside the Box (to the right) */}
-                  <div
-                    style={{
-                      marginLeft: "20px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
-                    <button
-                      style={{
-                        backgroundColor: "#3083F9",
-                        color: "white",
-                        border: "none",
-                        padding: "10px 20px",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                      }}
-                      onClick={handleOpenModal}
-                    >
-                      Select Image
-                    </button>
-                    <button
-                      style={{
-                        backgroundColor: "#3083F9",
-                        color: "white",
-                        border: "none",
-                        padding: "10px 20px",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                      }}
-                    >
-                      Select Object
-                    </button>
-                  </div>
-                </>
+                <div
+                  style={{
+                    width: "250px",
+                    height: "250px",
+                    backgroundColor: "#f3f3f3",
+                    border: "2px dashed #999",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
+                    opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
+                  }}
+                  onClick={handleOpenModal}
+                >
+                  <FaPlus size={50} color="#999" />
+                </div>
               ) : (
                 // Show Image and Editing Buttons After Selection
-                <div style={{ display: "flex", gap: "20px" }}>
+                <div style={{ display: "flex", gap: "20px", position: "relative" }}>
                   {/* Left Column: Selected Image */}
                   <div
                     style={{
@@ -400,7 +372,7 @@ export default function SearchFor() {
                     ) : null}
                   </div>
 
-                  {/* Right Column: Info & Action Buttons */}
+                  {/* Right Column: Info, Action Buttons, and Close Button */}
                   <div
                     style={{
                       flex: 1,
@@ -410,8 +382,21 @@ export default function SearchFor() {
                     }}
                   >
                     <p>
-                      <strong>{selectedFileInfo?.name || "UnknownFile.jpg"}</strong>
-                      {fileSizeMB}
+                      <strong>{box.fileName || "UnknownFile.jpg"}</strong>
+                      <br />
+                      {box.fileSize ? `${(box.fileSize / (1024 * 1024)).toFixed(2)} MB` : "0 MB"}
+                    </p>
+                    <p
+                      style={{ color: "#3083F9", cursor: "pointer" }}
+                      onClick={() => setShowFileInfoModal(true)}
+                    >
+                      File Info
+                    </p>
+                    <p
+                      style={{ color: "#3083F9", cursor: "pointer" }}
+                      onClick={() => setShowOpenFileModal(true)}
+                    >
+                      Open File
                     </p>
                     <button
                       onClick={() => handleIsolateSubject(box.id)}
@@ -435,7 +420,65 @@ export default function SearchFor() {
                     >
                       Add to Object Family
                     </button>
+                    <button
+                      onClick={() => handleRemoveBox(box.id)}
+                      style={{
+                        position: "absolute",
+                        top: "-10px",
+                        right: "-10px",
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "50%",
+                        width: "20px",
+                        height: "20px",
+                        cursor: "pointer",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaTimes size={12} />
+                    </button>
                   </div>
+                </div>
+              )}
+
+              {/* Buttons Outside the Box (to the right) if no image selected */}
+              {!box.selectedImage && (
+                <div
+                  style={{
+                    marginLeft: "20px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "10px",
+                  }}
+                >
+                  <button
+                    style={{
+                      backgroundColor: "#3083F9",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 20px",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                    onClick={handleOpenModal}
+                  >
+                    Select Image
+                  </button>
+                  <button
+                    style={{
+                      backgroundColor: "#3083F9",
+                      color: "white",
+                      border: "none",
+                      padding: "10px 20px",
+                      borderRadius: "5px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Select Object
+                  </button>
                 </div>
               )}
 
@@ -480,7 +523,10 @@ export default function SearchFor() {
                               cursor: "pointer",
                               color: selectedModalImage === imageUrl ? "blue" : "black",
                             }}
-                            onClick={() => setSelectedModalImage(imageUrl)}
+                            onClick={() => {
+                              setSelectedModalImage(imageUrl);
+                              setSelectedFile(file); // Store the file object
+                            }}
                           >
                             {file.name}
                           </p>
@@ -514,7 +560,7 @@ export default function SearchFor() {
                         }}
                       />
                     ) : (
-                      <p style={{ fontSize: "14px", color: "666" }}>Click a name to preview</p>
+                      <p style={{ fontSize: "14px", color: "#666" }}>Click a name to preview</p>
                     )}
                   </div>
 
@@ -540,6 +586,48 @@ export default function SearchFor() {
           ))}
         </div>
       </div>
+
+      {/* File Info Modal */}
+      {showFileInfoModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+        >
+          <h3>File Info</h3>
+          <p>I am a modal for file info</p>
+          <button onClick={() => setShowFileInfoModal(false)}>Close</button>
+        </div>
+      )}
+
+      {/* Open File Modal */}
+      {showOpenFileModal && (
+        <div
+          style={{
+            position: "fixed",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            background: "#fff",
+            padding: "20px",
+            border: "1px solid #ccc",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+            zIndex: 1000,
+          }}
+        >
+          <h3>Open File</h3>
+          <p>I am a modal for open files</p>
+          <button onClick={() => setShowOpenFileModal(false)}>Close</button>
+        </div>
+      )}
 
       {/* Manual Mask Editor Modal */}
       {isMaskEditorOpen && (
@@ -622,3 +710,5 @@ export default function SearchFor() {
     </div>
   );
 }
+
+
