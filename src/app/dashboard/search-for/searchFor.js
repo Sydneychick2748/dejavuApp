@@ -3,9 +3,8 @@
 import React, { useContext, useState, useRef, useEffect } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
-import { FaPlus, FaTimes } from "react-icons/fa"; // Importing plus and times icons
+import { FaPlus, FaTimes } from "react-icons/fa";
 import "./SearchFor.css";
-// import ImageSelectModal from "../modals/image-select-modal/imageSelectModal";
 
 // Composite the image onto a white background at 500×500.
 async function compositeImageOnWhite(imageUrl) {
@@ -19,7 +18,6 @@ async function compositeImageOnWhite(imageUrl) {
       const ctx = canvas.getContext("2d");
       ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-      // Draw the image scaled to 500×500.
       ctx.drawImage(img, 0, 0, 500, 500);
       resolve(canvas.toDataURL("image/png"));
     };
@@ -64,8 +62,22 @@ async function convertRedMaskToBinary(maskDataUrl) {
   });
 }
 
+// Helper function to convert a data URL to a File object
+function dataURLtoFile(dataUrl, filename) {
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
+
 export default function SearchFor() {
-  const { finalSelectedImages } = useContext(ImageContext);
+  // Access finalSelectedImages and fileFrames from ImageContext
+  const { finalSelectedImages, fileFrames } = useContext(ImageContext);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedModalImage, setSelectedModalImage] = useState(null); // Temporary state for modal selection
@@ -85,6 +97,11 @@ export default function SearchFor() {
     console.log("Boxes state changed:", boxes.map(box => ({ id: box.id, selectedImage: box.selectedImage, fileName: box.fileName })));
   }, [boxes]);
 
+  // Log fileFrames to verify its contents
+  useEffect(() => {
+    console.log("fileFrames from ImageContext:", fileFrames);
+  }, [fileFrames]);
+
   // Composite each box's image when selected
   const handleImageComposite = (imageUrl, boxId) => {
     console.log(`Starting image composite for box ${boxId} with image: ${imageUrl}`);
@@ -93,7 +110,7 @@ export default function SearchFor() {
       compositeImageOnWhite(imageUrl)
         .then((compositedUrl) => {
           setBoxes((prevBoxes) => {
-            const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+            const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
             const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
             if (boxIndex !== -1) {
               newBoxes[boxIndex] = {
@@ -112,7 +129,7 @@ export default function SearchFor() {
         .catch((error) => {
           console.error("Error compositing image on white:", error);
           setBoxes((prevBoxes) => {
-            const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+            const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
             const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
             if (boxIndex !== -1) {
               newBoxes[boxIndex] = {
@@ -132,19 +149,27 @@ export default function SearchFor() {
     tempImg.src = imageUrl;
   };
 
-  const handleOpenModal = () => {
+  // Open the modal and store the boxId
+  const handleOpenModal = (boxId) => {
     if (finalSelectedImages.length > 0) {
+      setCurrentBoxId(boxId); // Store the boxId
       setIsModalOpen(true);
+      console.log(`Opening modal for box ${boxId}`);
     } else {
       alert("You must complete the upload process before clicking!");
     }
   };
 
+  // Close the modal and apply the selected image or frame to the box
   const handleCloseModal = (boxId) => {
+    console.log("handleCloseModal called with boxId:", boxId);
+    console.log("selectedModalImage:", selectedModalImage);
+    console.log("selectedFile:", selectedFile);
+    console.log("Current boxes:", boxes);
+
     if (selectedModalImage && selectedFile) {
-      // Update the specific box with the selected image and file metadata
       setBoxes((prevBoxes) => {
-        const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+        const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
         const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
         if (boxIndex !== -1) {
           newBoxes[boxIndex] = {
@@ -153,29 +178,30 @@ export default function SearchFor() {
             fileName: selectedFile.name,
             fileSize: selectedFile.size,
           };
+        } else {
+          console.error(`Box with ID ${boxId} not found in boxes!`);
         }
         console.log(`Setting selectedImage for box ${boxId} to: ${selectedModalImage}`);
         console.log(`Selected file for box ${boxId}: ${selectedFile.name}, ${selectedFile.size} bytes`);
         return newBoxes;
       });
-      // Composite the image onto a white background
       handleImageComposite(selectedModalImage, boxId);
-      // Add a new box with a unique ID
       setBoxes((prevBoxes) => {
         const newBoxes = [
-          ...JSON.parse(JSON.stringify(prevBoxes)), // Deep copy
+          ...JSON.parse(JSON.stringify(prevBoxes)),
           { id: Date.now(), selectedImage: null, imageUrl: null, baseImageUrl: null, imgWidth: 0, imgHeight: 0, fileName: "", fileSize: 0 },
         ];
         console.log(`Closed modal for box ${boxId}, new box added with ID ${Date.now()}. Current boxes:`, newBoxes);
         return newBoxes;
       });
+    } else {
+      console.warn("No image or frame selected! selectedModalImage or selectedFile is null.");
     }
     setIsModalOpen(false);
-    setSelectedModalImage(null); // Reset modal image
-    setSelectedFile(null); // Reset selected file
+    setSelectedModalImage(null);
+    setSelectedFile(null);
   };
 
-  // "Isolate Subject": Send the current base image to FastAPI for background removal.
   const handleIsolateSubject = async (boxId) => {
     console.log(`Isolating subject for box ${boxId}`);
     const box = boxes.find((box) => box.id === boxId);
@@ -189,7 +215,7 @@ export default function SearchFor() {
       alert("No image selected!");
       return;
     }
-    console.log(`Sending baseImageUrl for box ${boxId}: ${box.baseImageUrl}`); // Added log
+    console.log(`Sending baseImageUrl for box ${boxId}: ${box.baseImageUrl}`);
     try {
       const imageRes = await fetch(box.baseImageUrl);
       const imageBlob = await imageRes.blob();
@@ -209,7 +235,7 @@ export default function SearchFor() {
           data.filename
         )}`;
         setBoxes((prevBoxes) => {
-          const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+          const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
           const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
           if (boxIndex !== -1) {
             newBoxes[boxIndex] = {
@@ -229,14 +255,12 @@ export default function SearchFor() {
     }
   };
 
-  // Open the mask editor modal.
   const openMaskEditor = (boxId) => {
     setCurrentBoxId(boxId);
     setIsMaskEditorOpen(true);
     console.log(`Opening mask editor for box ${boxId}, currentBoxId set to: ${boxId}`);
   };
 
-  // "Manual Mask": Applies the drawn mask using FastAPI, then updates the image.
   const handleManualMask = async () => {
     console.log(`Applying mask for box ${currentBoxId}`);
     const box = boxes.find((box) => box.id === currentBoxId);
@@ -250,7 +274,7 @@ export default function SearchFor() {
       console.error(`No baseImageUrl for box ${currentBoxId}:`, box);
       return;
     }
-    console.log(`Sending baseImageUrl for box ${currentBoxId}: ${box.baseImageUrl}`); // Added log
+    console.log(`Sending baseImageUrl for box ${currentBoxId}: ${box.baseImageUrl}`);
     if (!canvasRef.current) {
       alert("Drawing canvas not ready.");
       console.error("Canvas ref not ready:", canvasRef.current);
@@ -258,7 +282,6 @@ export default function SearchFor() {
     }
     const rawMaskDataUrl = canvasRef.current.getDataURL("png");
     const processedMaskDataUrl = await convertRedMaskToBinary(rawMaskDataUrl);
-    // Clear the canvas for the next drawing round.
     canvasRef.current.clear();
     try {
       const imageRes = await fetch(box.baseImageUrl);
@@ -282,7 +305,7 @@ export default function SearchFor() {
           data.filename
         )}`;
         setBoxes((prevBoxes) => {
-          const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+          const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
           const boxIndex = newBoxes.findIndex((box) => box.id === currentBoxId);
           if (boxIndex !== -1) {
             newBoxes[boxIndex] = {
@@ -302,7 +325,6 @@ export default function SearchFor() {
     }
   };
 
-  // Remove a box
   const handleRemoveBox = (boxId) => {
     setBoxes((prevBoxes) => {
       const newBoxes = prevBoxes.filter((box) => box.id !== boxId);
@@ -313,7 +335,6 @@ export default function SearchFor() {
 
   return (
     <div style={{ padding: "20px", color: "black" }}>
-      {/* Top Bar */}
       <div
         style={{
           display: "flex",
@@ -325,12 +346,10 @@ export default function SearchFor() {
         <h1>Search For</h1>
       </div>
 
-      {/* Render all boxes dynamically */}
       <div style={{ padding: "20px", color: "black" }}>
         <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "20px" }}>
           {boxes.map((box) => (
             <div key={box.id} style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              {/* Show + Box and Buttons if No Image Selected */}
               {!box.selectedImage ? (
                 <div
                   style={{
@@ -344,14 +363,12 @@ export default function SearchFor() {
                     cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
                     opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
                   }}
-                  onClick={handleOpenModal}
+                  onClick={() => handleOpenModal(box.id)}
                 >
                   <FaPlus size={50} color="#999" />
                 </div>
               ) : (
-                // Show Image and Editing Buttons After Selection
                 <div style={{ display: "flex", gap: "20px", position: "relative" }}>
-                  {/* Left Column: Selected Image */}
                   <div
                     style={{
                       width: "250px",
@@ -372,7 +389,6 @@ export default function SearchFor() {
                     ) : null}
                   </div>
 
-                  {/* Right Column: Info, Action Buttons, and Close Button */}
                   <div
                     style={{
                       flex: 1,
@@ -444,7 +460,6 @@ export default function SearchFor() {
                 </div>
               )}
 
-              {/* Buttons Outside the Box (to the right) if no image selected */}
               {!box.selectedImage && (
                 <div
                   style={{
@@ -463,7 +478,7 @@ export default function SearchFor() {
                       borderRadius: "5px",
                       cursor: "pointer",
                     }}
-                    onClick={handleOpenModal}
+                    onClick={() => handleOpenModal(box.id)}
                   >
                     Select Image
                   </button>
@@ -482,7 +497,7 @@ export default function SearchFor() {
                 </div>
               )}
 
-              {/* Modal */}
+              {/* Modal for selecting images or frames */}
               {isModalOpen && (
                 <div
                   style={{
@@ -500,7 +515,7 @@ export default function SearchFor() {
                     height: "300px",
                   }}
                 >
-                  {/* Left Side: Image Names */}
+                  {/* Left Side: Image and Frame Names */}
                   <div
                     style={{
                       flex: 1,
@@ -509,35 +524,97 @@ export default function SearchFor() {
                       overflowY: "auto",
                     }}
                   >
-                    <h3>Select an Image</h3>
+                    <h3>Select an Image or Frame</h3>
                     {finalSelectedImages.length > 0 ? (
-                      finalSelectedImages.map((file, index) => {
-                        const imageUrl = URL.createObjectURL(file);
-                        return (
-                          <p
-                            key={index}
-                            style={{
-                              fontSize: "16px",
-                              marginBottom: "5px",
-                              fontWeight: "bold",
-                              cursor: "pointer",
-                              color: selectedModalImage === imageUrl ? "blue" : "black",
-                            }}
-                            onClick={() => {
-                              setSelectedModalImage(imageUrl);
-                              setSelectedFile(file); // Store the file object
-                            }}
-                          >
-                            {file.name}
-                          </p>
-                        );
+                      finalSelectedImages.flatMap((file, index) => {
+                        // Generate a unique file ID for videos
+                        const fileId = `${file.name}-${file.lastModified}`;
+                        console.log(`Processing file: ${file.name}, type: ${file.type}, fileId: ${fileId}`);
+
+                        // Check if the file is a video
+                        if (file.type.startsWith("video/")) {
+                          // Get the frames for this video from fileFrames
+                          const frames = fileFrames[fileId]?.frames || [];
+                          console.log(`Frames for ${file.name} (fileId: ${fileId}):`, frames);
+
+                          // If no frames are available, show a placeholder
+                          if (frames.length === 0) {
+                            return (
+                              <p
+                                key={`${fileId}-no-frames`}
+                                style={{
+                                  fontSize: "14px",
+                                  marginBottom: "5px",
+                                  color: "gray",
+                                }}
+                              >
+                                No frames available for {file.name}
+                              </p>
+                            );
+                          }
+
+                          // Map each frame to a selectable item
+                          return frames.map((frame, frameIndex) => {
+                            // Convert the frame data URL to a File object
+                            const frameFile = dataURLtoFile(
+                              frame,
+                              `${file.name}-frame-${frameIndex + 1}.jpg`
+                            );
+                            const frameUrl = URL.createObjectURL(frameFile);
+                            console.log(`Frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
+
+                            return (
+                              <p
+                                key={`${fileId}-frame-${frameIndex}`}
+                                style={{
+                                  fontSize: "16px",
+                                  marginBottom: "5px",
+                                  fontWeight: "bold",
+                                  cursor: "pointer",
+                                  color: selectedModalImage === frameUrl ? "blue" : "black",
+                                }}
+                                onClick={() => {
+                                  console.log(`Selected frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
+                                  setSelectedModalImage(frameUrl);
+                                  setSelectedFile(frameFile); // Store the frame as a File object
+                                }}
+                              >
+                                {`${file.name} - Frame ${frameIndex + 1}`}
+                              </p>
+                            );
+                          });
+                        } else {
+                          // Handle images (non-videos)
+                          const imageUrl = URL.createObjectURL(file);
+                          console.log(`Image: ${file.name}, URL: ${imageUrl}`);
+
+                          return (
+                            <p
+                              key={index}
+                              style={{
+                                fontSize: "16px",
+                                marginBottom: "5px",
+                                fontWeight: "bold",
+                                cursor: "pointer",
+                                color: selectedModalImage === imageUrl ? "blue" : "black",
+                              }}
+                              onClick={() => {
+                                console.log(`Selected image: ${file.name}, URL: ${imageUrl}`);
+                                setSelectedModalImage(imageUrl);
+                                setSelectedFile(file); // Store the file object
+                              }}
+                            >
+                              {file.name}
+                            </p>
+                          );
+                        }
                       })
                     ) : (
-                      <p>No images uploaded yet.</p>
+                      <p>No images or frames available.</p>
                     )}
                   </div>
 
-                  {/* Right Side: Selected Image Preview */}
+                  {/* Right Side: Selected Image/Frame Preview */}
                   <div
                     style={{
                       flex: 1,
@@ -566,7 +643,7 @@ export default function SearchFor() {
 
                   {/* Open Button */}
                   <button
-                    onClick={() => handleCloseModal(box.id)}
+                    onClick={() => handleCloseModal(currentBoxId)}
                     style={{
                       position: "absolute",
                       top: "10px",
@@ -587,7 +664,6 @@ export default function SearchFor() {
         </div>
       </div>
 
-      {/* File Info Modal */}
       {showFileInfoModal && (
         <div
           style={{
@@ -608,7 +684,6 @@ export default function SearchFor() {
         </div>
       )}
 
-      {/* Open File Modal */}
       {showOpenFileModal && (
         <div
           style={{
@@ -629,7 +704,6 @@ export default function SearchFor() {
         </div>
       )}
 
-      {/* Manual Mask Editor Modal */}
       {isMaskEditorOpen && (
         <div
           style={{
@@ -710,5 +784,3 @@ export default function SearchFor() {
     </div>
   );
 }
-
-
