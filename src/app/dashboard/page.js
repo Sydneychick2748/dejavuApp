@@ -141,27 +141,28 @@ export default function Dashboard() {
 
   return (
     <ImageProvider>
-      <Flex justify="flex-end" p={2} gap={2}>
-      <button
-        onClick={() => console.log("Info clicked")}
-        style={{
-          width: "30px",
-          height: "30px",
-          borderRadius: "50%",
-          border: "none",
-          backgroundColor: "#d6d6d6",
-          backgroundImage: `url('/images/logos/DB Info.png')`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          cursor: "pointer",
-        }}
-      ></button>
+      <Flex justify="flex-end" p={2} gap={2} w="100vw">
+        <button
+          onClick={() => console.log("Info clicked")}
+          style={{
+            width: "30px",
+            height: "30px",
+            borderRadius: "50%",
+            border: "none",
+            backgroundColor: "#d6d6d6",
+            backgroundImage: `url('/images/logos/DB Info.png')`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            cursor: "pointer",
+          }}
+        ></button>
       </Flex>
       <Flex
         h="100vh"
-        w="full"
+        // w="full"
+        maxW="100vw"
         p={4}
-        bg="gray.100"
+        bg="f1f1f1"
         direction={{ base: "column", md: "column", lg: "row" }}
         gap={4}
       >
@@ -196,7 +197,7 @@ export default function Dashboard() {
         {/* Right Section (Search & Parameters) */}
         <Flex direction="column" flex="0 0 60%" gap={4}>
           {/* Top Right (Search for Image) */}
-          <Box
+          {/* <Box
             className="searchForBox"
             flex="0 0 40%"
             bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
@@ -206,6 +207,19 @@ export default function Dashboard() {
             onMouseEnter={() => setActiveBox("searchFor")}
             onMouseLeave={() => setActiveBox(null)}
             // width={"98%"}
+          > */}
+          <Box
+            className="searchForBox"
+            flex={{ base: "0 0 100%", lg: "0 0 40%" }} // Height in column layout
+            w="100%" // Full width of its parent
+            maxW="100%" // Prevent exceeding parent
+            overflowX="auto" // Allow horizontal scrolling if content overflows
+            bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
+            borderRadius="lg"
+            shadow="md"
+            transition="background 0.3s ease"
+            onMouseEnter={() => setActiveBox("searchFor")}
+            onMouseLeave={() => setActiveBox(null)}
           >
             {/* Header with Buttons */}
             <Flex

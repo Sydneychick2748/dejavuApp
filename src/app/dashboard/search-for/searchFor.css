@@ -1,4 +1,13 @@
 .imageSolid {
     background-color: white;
   }
+
+  .plus-box {
+    /* Base styles are already defined in the inline style, but you can move them here if preferred */
+    transition: background-color 0.3s ease; /* Smooth transition for the hover effect */
+  }
+  
+  .plus-box:hover {
+    background-color: #b8c8e5; /* Change to the desired color on hover */
+  }
   

@@ -370,38 +370,50 @@ export default function SearchFor() {
             flexWrap: "wrap",
             gap: "20px",
             marginTop: "20px",
+            maxWidth: "100%", // Ensure it respects parent width
+            overflowX: "auto", // Scroll horizontally if needed
           }}
         >
           {boxes.map((box) => (
             <div
               key={box.id}
-              style={{ display: "flex", alignItems: "center", gap: "20px" }}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "20px",
+                flexShrink: 0, // Prevent shrinking smaller than content
+                maxWidth: "100%", // Ensure each box fits within parent
+              }}
             >
               {/* Show + Box and Buttons if No Image Selected */}
               {!box.selectedImage ? (
                 <div
-                  style={{
-                    width: "250px",
-                    height: "150px",
-                    backgroundColor: "#F3F3F3",
-                    border: "2px dashed #999",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor:
-                      finalSelectedImages.length > 0
-                        ? "pointer"
-                        : "not-allowed",
-                    opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
-                  }}
-                  onClick={handleOpenModal}
+                className="plus-box"
+                style={{
+                  width: "250px",
+                  height: "150px",
+                  backgroundColor: "#f1f1f1",
+                  border: "2px dashed #999",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
+                  opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
+                  flexShrink: 0, // Prevent shrinking
+                }}
+                onClick={handleOpenModal}
                 >
                   <FaPlus size={70} color="#ffffff" />
                 </div>
               ) : (
                 // Show Image and Editing Buttons After Selection
                 <div
-                  style={{ display: "flex", gap: "20px", position: "relative" }}
+                style={{
+                  display: "flex",
+                  gap: "20px",
+                  position: "relative",
+                  maxWidth: "100%",
+                }}
                 >
                   {/* Left Column: Selected Image */}
                   <div
@@ -409,6 +421,7 @@ export default function SearchFor() {
                       width: "250px",
                       height: "250px",
                       border: "1px solid #ccc",
+                      flexShrink: 0,
                     }}
                   >
                     {box.imageUrl ? (
@@ -430,6 +443,7 @@ export default function SearchFor() {
                       display: "flex",
                       flexDirection: "column",
                       gap: "10px",
+                      minWidth: "150px", // Ensure buttons don’t collapse too small
                     }}
                   >
                     <p>
@@ -504,6 +518,7 @@ export default function SearchFor() {
                     display: "flex",
                     flexDirection: "column",
                     gap: "10px",
+                    flexShrink: 0, // Prevent shrinking
                   }}
                 >
                   {/* <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}> */}
