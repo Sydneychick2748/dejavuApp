@@ -445,8 +445,8 @@
 
 
 "use client";
-import React, { useState, useEffect } from "react";
-import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt } from "react-icons/fa";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt, FaForward, FaBackward } from "react-icons/fa";
 
 const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   // State to track folder selections (all folders initially checked)
@@ -479,10 +479,38 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   const [selectedPreview, setSelectedPreview] = useState(null);
   const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Track selected file index
 
+  // State to track video duration and current time for the scrollbar
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const videoRef = useRef(null);
+
+  // State to store file URLs to prevent regeneration
+  const [fileUrls, setFileUrls] = useState({});
+
   // State to track database name sequence
   const [databaseCount, setDatabaseCount] = useState(() => {
     return parseInt(localStorage.getItem("databaseCount") || "1", 10);
   });
+
+  // Generate file URLs once and store them
+  useEffect(() => {
+    const newFileUrls = {};
+    selectedFolders.forEach((folder, folderIndex) => {
+      folder.files.forEach((file, fileIndex) => {
+        const fileId = `${folderIndex}-${fileIndex}`;
+        if (!fileUrls[fileId]) {
+          const url = URL.createObjectURL(file);
+          newFileUrls[fileId] = url;
+        }
+      });
+    });
+    setFileUrls((prev) => ({ ...prev, ...newFileUrls }));
+
+    // Cleanup URLs on unmount
+    return () => {
+      Object.values(newFileUrls).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedFolders]);
 
   // Update localStorage when databaseCount changes
   useEffect(() => {
@@ -562,6 +590,54 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
     return Object.values(fileSelections[folderIndex]).filter(Boolean).length;
   };
 
+  // Handle video metadata loading to get duration
+  const handleVideoLoadedMetadata = () => {
+    if (videoRef.current) {
+      setVideoDuration(videoRef.current.duration);
+    }
+  };
+
+  // Update current time as the video plays
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  // Handle scrollbar change to seek video
+  const handleSeek = (event) => {
+    const newTime = parseFloat(event.target.value);
+    setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Handle fast-forward (skip forward 5 seconds)
+  const handleFastForward = () => {
+    if (videoRef.current) {
+      const newTime = Math.min(videoRef.current.currentTime + 5, videoDuration);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Handle rewind (skip backward 5 seconds)
+  const handleRewind = () => {
+    if (videoRef.current) {
+      const newTime = Math.max(videoRef.current.currentTime - 5, 0);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Format time for display (MM:SS)
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
   return (
     <div className="modal" style={modalStyle}>
       <h3>Display Database</h3>
@@ -595,10 +671,11 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                 {expanded[folderIndex] && (
                   <div style={filesContainerStyle}>
                     {folder.files.map((file, fileIndex) => {
-                      const fileUrl = URL.createObjectURL(file); // Use fileUrl for both images and videos
+                      const fileId = `${folderIndex}-${fileIndex}`;
+                      const fileUrl = fileUrls[fileId] || ""; // Use stored URL
                       return (
                         <div
-                          key={fileIndex}
+                          key={fileId}
                           style={{
                             ...fileItemStyle,
                             opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
@@ -622,7 +699,11 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                               }}
                               onClick={() => {
                                 setSelectedPreview(fileUrl);
-                                setSelectedFileIndex(fileIndex);
+                                setSelectedFileIndex(
+                                  selectedFolders
+                                    .slice(0, folderIndex)
+                                    .reduce((acc, f) => acc + f.files.length, 0) + fileIndex
+                                );
                               }}
                             />
                           ) : file.type.startsWith("video/") ? (
@@ -650,7 +731,11 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                             }}
                             onClick={() => {
                               setSelectedPreview(fileUrl);
-                              setSelectedFileIndex(fileIndex);
+                              setSelectedFileIndex(
+                                selectedFolders
+                                  .slice(0, folderIndex)
+                                  .reduce((acc, f) => acc + f.files.length, 0) + fileIndex
+                              );
                             }}
                           >
                             {file.name}
@@ -680,19 +765,70 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
               {selectedFolders
                 .flatMap((folder) => folder.files)
                 .find((_, idx) => idx === selectedFileIndex)?.type.startsWith("video/") ? (
-                <video
-                  controls
-                  src={selectedPreview}
-                  style={{
-                    width: "100%",
-                    height: "70%",
-                    objectFit: "contain",
-                    border: "1px solid #ccc",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Your browser does not support the video tag.
-                </video>
+                <div style={{ width: "100%", height: "70%", position: "relative" }}>
+                  <video
+                    key={selectedPreview} // Ensure video element doesn't remount unnecessarily
+                    ref={videoRef}
+                    src={selectedPreview}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      border: "1px solid #ccc",
+                      borderRadius: "5px",
+                    }}
+                    muted // Mute to avoid autoplay sound
+                    onLoadedMetadata={handleVideoLoadedMetadata}
+                    onTimeUpdate={handleTimeUpdate}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  {/* Custom Scrollbar with Fast-Forward and Rewind Buttons */}
+                  <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <button
+                      onClick={handleRewind}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Rewind 5 seconds"
+                    >
+                      <FaBackward size={20} color="#555" />
+                    </button>
+                    <span>{formatTime(currentTime)}</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max={videoDuration || 0}
+                      step="0.1"
+                      value={currentTime}
+                      onChange={handleSeek}
+                      style={{
+                        flex: 1,
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>{formatTime(videoDuration)}</span>
+                    <button
+                      onClick={handleFastForward}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Fast-forward 5 seconds"
+                    >
+                      <FaForward size={20} color="#555" />
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <img
                   src={selectedPreview}
@@ -706,7 +842,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                   }}
                 />
               )}
-              <div style={{ marginTop: "10px", textAlign: "center" }}>
+              <div style={{ marginTop: "50px", textAlign: "center" }}>
                 <p>
                   <strong>Name:</strong>{" "}
                   {selectedFolders
@@ -738,7 +874,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
 
       {/* Modal Buttons */}
       <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
-        <button onClose={onClose} style={buttonStyle}>
+        <button onClick={onClose} style={buttonStyle}>
           Close
         </button>
         <button onClick={handleFinish} style={buttonStyle}>
@@ -844,17 +980,3 @@ const modalContentStyle = {
 };
 
 export default DisplayDataBaseModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
- 
