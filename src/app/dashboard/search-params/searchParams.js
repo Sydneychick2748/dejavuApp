@@ -20,7 +20,7 @@ export default function SettingsPanel() {
 
   return (
     <div className="settings">
-      <Box className="headerBox">
+      {/* <Box className="headerBox">
         <Text className="searchParamsWording">
           Search Parameters...
         </Text>
@@ -33,7 +33,7 @@ export default function SettingsPanel() {
 
       <div className="container2">
       {/* Left Sidebar */}
-        <div className="sidebar">
+        {/* <div className="sidebar">
           <ul>
             <li 
               className={activeTab === "Simple" ? "active" : ""}
@@ -52,17 +52,17 @@ export default function SettingsPanel() {
               onClick={() => setActiveTab("Advanced")}
             >
               Advanced
-            </li>
-          </ul>
+            </li> */}
+          {/* </ul>
         </div>
 
         {/* Right Content Box */}
-        <div className="content2">
+        {/* <div className="content2">
           {activeTab === "Simple" && <Simple />}
           {activeTab === "SavedSettings" && <SavedSettings />}
           {activeTab === "Advanced" && <Advanced />}
         </div>
-      </div>
+      </div>  */}
     </div>
   );
 }
