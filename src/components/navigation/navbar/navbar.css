@@ -1,3 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+  }
+
 .header-layout {
     display: flex !important;
     flex-direction: row !important;
@@ -15,10 +21,6 @@
     margin-right: 40px; /* Space between menu and profile */
 }
 
-/* .logo-div {
-    height: 2vh;
-    flex-grow: 1;
-} */
 
 .logo-div {
     height: 5vh;
@@ -36,6 +38,6 @@
 }
 
 .profile-layout {
-    flex-grow: 0; /* Prevents expansion */
+    /* flex-grow: 0; Prevents expansion */
     align-self: center;
 }

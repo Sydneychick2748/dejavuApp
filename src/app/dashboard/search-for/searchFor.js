@@ -517,7 +517,8 @@ export default function SearchFor() {
                       cursor: "pointer",
                       fontSize: "14px",
                       fontWeight: "bold",
-                      width: "200px",
+                      width: "300px",
+                      
                     }}
                     onClick={handleOpenModal}
                   >
@@ -533,7 +534,7 @@ export default function SearchFor() {
                       cursor: "pointer",
                       fontSize: "14px",
                       fontWeight: "bold",
-                      width: "200px",
+                      width: "300px",
                     }}
                   >
                     Select Object

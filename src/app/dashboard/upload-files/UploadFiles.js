@@ -134,13 +134,14 @@ export default function UploadFiles() {
         flexDirection: "column",
         alignItems: "center",
         width: "90%",
-        height: "700px",
+        height: "650px",
         backgroundColor: "white",
         borderRadius: "10px",
         boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
         paddingBottom: "40px",
         marginTop: "30px",
         marginLeft: "30px",
+        
       }}
     >
       {/* Top Navigation: Search and Controls */}
@@ -290,28 +291,50 @@ export default function UploadFiles() {
           !showImportMediaModal &&
           !showDisplayDbModal &&
           !showPlusModal && (
-            <button
-            style={{
-              ...buttonStyle("#a9d096", "white"), // Base style
-              background: isCreateButtonClicked
-                ? "linear-gradient(to bottom, #2E7D32, #81C784)" // Gradient when clicked
-                : "#a9d096", // Default background
-              transition: "background 0.3s ease", // Smooth transition
-            }}
-            onMouseOver={(e) => {
-              if (!isCreateButtonClicked) {
-                e.currentTarget.style.background = "#7fa763";
-              }
-            }}
-            onMouseOut={(e) => {
-              if (!isCreateButtonClicked) {
-                e.currentTarget.style.background = "#a9d096";
-              }
-            }}
-            onClick={handleOpenCreateDatabase}
-          >
-            Create New Database
-          </button>         
+            <>
+              <button
+                style={buttonStyle("#4a88ff", "white")}
+                onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+                onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+              >
+                Open a Database
+              </button>
+              <button
+                style={buttonStyle("#4a88ff", "white")}
+                onMouseOver={(e) => (e.currentTarget.style.background = "#2a6cd3")}
+                onMouseOut={(e) => (e.currentTarget.style.background = "#4a88ff")}
+              >
+                Connect to ES Database
+              </button>
+              <button 
+                style={buttonStyle("#4a88ff", "white")} 
+                disabled
+              >
+                Connect to Live Video
+              </button>
+              <button
+                style={{
+                  ...buttonStyle("#a9d096", "white"),
+                  background: isCreateButtonClicked
+                    ? "linear-gradient(to bottom, #2E7D32, #81C784)"
+                    : "#a9d096",
+                  transition: "background 0.3s ease",
+                }}
+                onMouseOver={(e) => {
+                  if (!isCreateButtonClicked) {
+                    e.currentTarget.style.background = "#7fa763";
+                  }
+                }}
+                onMouseOut={(e) => {
+                  if (!isCreateButtonClicked) {
+                    e.currentTarget.style.background = "#a9d096";
+                  }
+                }}
+                onClick={handleOpenCreateDatabase}
+              >
+                Create New Database
+              </button>
+            </>        
             
           )}
         {databases.length > 0 && (
