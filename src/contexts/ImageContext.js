@@ -9,6 +9,9 @@ export const ImageProvider = ({ children }) => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
   const [selectedFileInfo, setSelectedFileInfo] = useState(null);
   const [finalSelectedImages, setFinalSelectedImages] = useState([]); // ✅ Added this
+  const [fileFrames, setFileFrames] = useState({}); // Initialize as an empty object
+
+
 
   return (
     <ImageContext.Provider
@@ -21,6 +24,8 @@ export const ImageProvider = ({ children }) => {
         setSelectedFileInfo,
         finalSelectedImages, // ✅ Provide it globally
         setFinalSelectedImages, // ✅ Allow updates
+        fileFrames,
+        setFileFrames,
       }}
     >
       {children}
