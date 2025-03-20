@@ -4,6 +4,7 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
 import { FaPlus, FaTimes } from "react-icons/fa";
+import { Box } from "@chakra-ui/react"; // Import Chakra UI Box
 import "./SearchFor.css";
 
 // Composite the image onto a white background at 500×500.
@@ -88,9 +89,9 @@ export default function SearchFor() {
   const [response, setResponse] = useState("");
   const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
   const [currentBoxId, setCurrentBoxId] = useState(null); // Track which box is being edited
-  const canvasRef = useRef(null);
   const [showFileInfoModal, setShowFileInfoModal] = useState(false); // State for File Info Modal
   const [showOpenFileModal, setShowOpenFileModal] = useState(false); // State for Open File Modal
+  const canvasRef = useRef(null);
 
   // Log boxes state changes for debugging
   useEffect(() => {
@@ -347,321 +348,337 @@ export default function SearchFor() {
       </div>
 
       <div style={{ padding: "20px", color: "black" }}>
-        <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "20px" }}>
-          {boxes.map((box) => (
-            <div key={box.id} style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-              {!box.selectedImage ? (
-                <div
-                  style={{
-                    width: "250px",
-                    height: "250px",
-                    backgroundColor: "#f3f3f3",
-                    border: "2px dashed #999",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
-                    opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
-                  }}
-                  onClick={() => handleOpenModal(box.id)}
-                >
-                  <FaPlus size={50} color="#999" />
-                </div>
-              ) : (
-                <div style={{ display: "flex", gap: "20px", position: "relative" }}>
-                  <div
-                    style={{
-                      width: "250px",
-                      height: "250px",
-                      border: "1px solid #ccc",
-                    }}
+        {/* Outer container for all boxes */}
+        <Box
+          border="1px solid #ccc"
+          borderRadius="5px"
+          padding="10px"
+          maxHeight="500px"
+          overflowY="auto"
+        >
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "20px" }}>
+            {boxes.map((box) => (
+              <Box
+                key={box.id}
+                bg="gray.300" // Slightly darker grey for the outer rectangle
+                borderRadius="5px"
+                padding="10px"
+                display="flex"
+                alignItems="center"
+                gap="20px"
+              >
+                {!box.selectedImage ? (
+                  <Box
+                    width="250px"
+                    height="150px" // Rectangle dimensions
+                    bg="gray.200" // Grey background
+                    _hover={{ bg: "blue.100" }} // Light blue on hover
+                    border="2px dashed #999"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    cursor={finalSelectedImages.length > 0 ? "pointer" : "not-allowed"}
+                    opacity={finalSelectedImages.length > 0 ? 1 : 0.5}
+                    onClick={() => handleOpenModal(box.id)}
                   >
-                    {box.imageUrl ? (
-                      <img
-                        src={box.imageUrl}
-                        alt={`Selected for box ${box.id}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
-                    ) : null}
-                  </div>
+                    <FaPlus size={50} color="white" /> {/* White + icon */}
+                  </Box>
+                ) : (
+                  <div style={{ display: "flex", gap: "20px", position: "relative" }}>
+                    <div
+                      style={{
+                        width: "250px",
+                        height: "250px",
+                        border: "1px solid #ccc",
+                      }}
+                    >
+                      {box.imageUrl ? (
+                        <img
+                          src={box.imageUrl}
+                          alt={`Selected for box ${box.id}`}
+                          style={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "contain",
+                          }}
+                        />
+                      ) : null}
+                    </div>
 
+                    <div
+                      style={{
+                        flex: 1,
+                        display: "flex",
+                        flexDirection: "column",
+                        gap: "10px",
+                      }}
+                    >
+                      <p>
+                        <strong>{box.fileName || "UnknownFile.jpg"}</strong>
+                        <br />
+                        {box.fileSize ? `${(box.fileSize / (1024 * 1024)).toFixed(2)} MB` : "0 MB"}
+                      </p>
+                      <p
+                        style={{ color: "#3083F9", cursor: "pointer" }}
+                        onClick={() => setShowFileInfoModal(true)}
+                      >
+                        File Info
+                      </p>
+                      <p
+                        style={{ color: "#3083F9", cursor: "pointer" }}
+                        onClick={() => setShowOpenFileModal(true)}
+                      >
+                        Open File
+                      </p>
+                      <button
+                        onClick={() => handleIsolateSubject(box.id)}
+                        style={{ width: "150px", padding: "8px", color: "black" }}
+                      >
+                        Isolate Subject
+                      </button>
+                      <button
+                        onClick={() => openMaskEditor(box.id)}
+                        style={{ width: "150px", padding: "8px", color: "black" }}
+                      >
+                        Manual Mask
+                      </button>
+                      <button
+                        style={{ width: "150px", padding: "8px", color: "black" }}
+                      >
+                        Create New Object
+                      </button>
+                      <button
+                        style={{ width: "150px", padding: "8px", color: "black" }}
+                      >
+                        Add to Object Family
+                      </button>
+                      <button
+                        onClick={() => handleRemoveBox(box.id)}
+                        style={{
+                          position: "absolute",
+                          top: "-10px",
+                          right: "-10px",
+                          background: "red",
+                          color: "white",
+                          border: "none",
+                          borderRadius: "50%",
+                          width: "20px",
+                          height: "20px",
+                          cursor: "pointer",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        <FaTimes size={12} />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {!box.selectedImage && (
                   <div
                     style={{
-                      flex: 1,
+                      marginLeft: "20px",
                       display: "flex",
                       flexDirection: "column",
                       gap: "10px",
                     }}
                   >
-                    <p>
-                      <strong>{box.fileName || "UnknownFile.jpg"}</strong>
-                      <br />
-                      {box.fileSize ? `${(box.fileSize / (1024 * 1024)).toFixed(2)} MB` : "0 MB"}
-                    </p>
-                    <p
-                      style={{ color: "#3083F9", cursor: "pointer" }}
-                      onClick={() => setShowFileInfoModal(true)}
-                    >
-                      File Info
-                    </p>
-                    <p
-                      style={{ color: "#3083F9", cursor: "pointer" }}
-                      onClick={() => setShowOpenFileModal(true)}
-                    >
-                      Open File
-                    </p>
                     <button
-                      onClick={() => handleIsolateSubject(box.id)}
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Isolate Subject
-                    </button>
-                    <button
-                      onClick={() => openMaskEditor(box.id)}
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Manual Mask
-                    </button>
-                    <button
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Create New Object
-                    </button>
-                    <button
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Add to Object Family
-                    </button>
-                    <button
-                      onClick={() => handleRemoveBox(box.id)}
                       style={{
-                        position: "absolute",
-                        top: "-10px",
-                        right: "-10px",
-                        background: "red",
+                        backgroundColor: "#3083F9",
                         color: "white",
                         border: "none",
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
+                        padding: "10px 20px",
+                        borderRadius: "5px",
                         cursor: "pointer",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                      }}
+                      onClick={() => handleOpenModal(box.id)}
+                    >
+                      Select Image
+                    </button>
+                    <button
+                      style={{
+                        backgroundColor: "#3083F9",
+                        color: "white",
+                        border: "none",
+                        padding: "10px 20px",
+                        borderRadius: "5px",
+                        cursor: "pointer",
                       }}
                     >
-                      <FaTimes size={12} />
+                      Select Object
                     </button>
                   </div>
-                </div>
-              )}
+                )}
 
-              {!box.selectedImage && (
-                <div
-                  style={{
-                    marginLeft: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                  }}
-                >
-                  <button
-                    style={{
-                      backgroundColor: "#3083F9",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 20px",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
-                    onClick={() => handleOpenModal(box.id)}
-                  >
-                    Select Image
-                  </button>
-                  <button
-                    style={{
-                      backgroundColor: "#3083F9",
-                      color: "white",
-                      border: "none",
-                      padding: "10px 20px",
-                      borderRadius: "5px",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Select Object
-                  </button>
-                </div>
-              )}
-
-              {/* Modal for selecting images or frames */}
-              {isModalOpen && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    background: "#fff",
-                    padding: "20px",
-                    border: "1px solid #ccc",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-                    zIndex: 1000,
-                    display: "flex",
-                    width: "500px",
-                    height: "300px",
-                  }}
-                >
-                  {/* Left Side: Image and Frame Names */}
+                {/* Modal for selecting images or frames */}
+                {isModalOpen && (
                   <div
                     style={{
-                      flex: 1,
-                      padding: "10px",
-                      borderRight: "1px solid #ddd",
-                      overflowY: "auto",
+                      position: "fixed",
+                      top: "50%",
+                      left: "50%",
+                      transform: "translate(-50%, -50%)",
+                      background: "#fff",
+                      padding: "20px",
+                      border: "1px solid #ccc",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                      zIndex: 1000,
+                      display: "flex",
+                      width: "500px",
+                      height: "300px",
                     }}
                   >
-                    <h3>Select an Image or Frame</h3>
-                    {finalSelectedImages.length > 0 ? (
-                      finalSelectedImages.flatMap((file, index) => {
-                        // Generate a unique file ID for videos
-                        const fileId = `${file.name}-${file.lastModified}`;
-                        console.log(`Processing file: ${file.name}, type: ${file.type}, fileId: ${fileId}`);
+                    {/* Left Side: Image and Frame Names */}
+                    <div
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        borderRight: "1px solid #ddd",
+                        overflowY: "auto",
+                      }}
+                    >
+                      <h3>Select an Image or Frame</h3>
+                      {finalSelectedImages.length > 0 ? (
+                        finalSelectedImages.flatMap((file, index) => {
+                          // Generate a unique file ID for videos
+                          const fileId = `${file.name}-${file.lastModified}`;
+                          console.log(`Processing file: ${file.name}, type: ${file.type}, fileId: ${fileId}`);
 
-                        // Check if the file is a video
-                        if (file.type.startsWith("video/")) {
-                          // Get the frames for this video from fileFrames
-                          const frames = fileFrames[fileId]?.frames || [];
-                          console.log(`Frames for ${file.name} (fileId: ${fileId}):`, frames);
+                          // Check if the file is a video
+                          if (file.type.startsWith("video/")) {
+                            // Get the frames for this video from fileFrames
+                            const frames = fileFrames[fileId]?.frames || [];
+                            console.log(`Frames for ${file.name} (fileId: ${fileId}):`, frames);
 
-                          // If no frames are available, show a placeholder
-                          if (frames.length === 0) {
+                            // If no frames are available, show a placeholder
+                            if (frames.length === 0) {
+                              return (
+                                <p
+                                  key={`${fileId}-no-frames`}
+                                  style={{
+                                    fontSize: "14px",
+                                    marginBottom: "5px",
+                                    color: "gray",
+                                  }}
+                                >
+                                  No frames available for {file.name}
+                                </p>
+                              );
+                            }
+
+                            // Map each frame to a selectable item
+                            return frames.map((frame, frameIndex) => {
+                              // Convert the frame data URL to a File object
+                              const frameFile = dataURLtoFile(
+                                frame,
+                                `${file.name}-frame-${frameIndex + 1}.jpg`
+                              );
+                              const frameUrl = URL.createObjectURL(frameFile);
+                              console.log(`Frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
+
+                              return (
+                                <p
+                                  key={`${fileId}-frame-${frameIndex}`}
+                                  style={{
+                                    fontSize: "16px",
+                                    marginBottom: "5px",
+                                    fontWeight: "bold",
+                                    cursor: "pointer",
+                                    color: selectedModalImage === frameUrl ? "blue" : "black",
+                                  }}
+                                  onClick={() => {
+                                    console.log(`Selected frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
+                                    setSelectedModalImage(frameUrl);
+                                    setSelectedFile(frameFile); // Store the frame as a File object
+                                  }}
+                                >
+                                  {`${file.name} - Frame ${frameIndex + 1}`}
+                                </p>
+                              );
+                            });
+                          } else {
+                            // Handle images (non-videos)
+                            const imageUrl = URL.createObjectURL(file);
+                            console.log(`Image: ${file.name}, URL: ${imageUrl}`);
+
                             return (
                               <p
-                                key={`${fileId}-no-frames`}
-                                style={{
-                                  fontSize: "14px",
-                                  marginBottom: "5px",
-                                  color: "gray",
-                                }}
-                              >
-                                No frames available for {file.name}
-                              </p>
-                            );
-                          }
-
-                          // Map each frame to a selectable item
-                          return frames.map((frame, frameIndex) => {
-                            // Convert the frame data URL to a File object
-                            const frameFile = dataURLtoFile(
-                              frame,
-                              `${file.name}-frame-${frameIndex + 1}.jpg`
-                            );
-                            const frameUrl = URL.createObjectURL(frameFile);
-                            console.log(`Frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
-
-                            return (
-                              <p
-                                key={`${fileId}-frame-${frameIndex}`}
+                                key={index}
                                 style={{
                                   fontSize: "16px",
                                   marginBottom: "5px",
                                   fontWeight: "bold",
                                   cursor: "pointer",
-                                  color: selectedModalImage === frameUrl ? "blue" : "black",
+                                  color: selectedModalImage === imageUrl ? "blue" : "black",
                                 }}
                                 onClick={() => {
-                                  console.log(`Selected frame ${frameIndex + 1} for ${file.name}: ${frameUrl}`);
-                                  setSelectedModalImage(frameUrl);
-                                  setSelectedFile(frameFile); // Store the frame as a File object
+                                  console.log(`Selected image: ${file.name}, URL: ${imageUrl}`);
+                                  setSelectedModalImage(imageUrl);
+                                  setSelectedFile(file); // Store the file object
                                 }}
                               >
-                                {`${file.name} - Frame ${frameIndex + 1}`}
+                                {file.name}
                               </p>
                             );
-                          });
-                        } else {
-                          // Handle images (non-videos)
-                          const imageUrl = URL.createObjectURL(file);
-                          console.log(`Image: ${file.name}, URL: ${imageUrl}`);
+                          }
+                        })
+                      ) : (
+                        <p>No images or frames available.</p>
+                      )}
+                    </div>
 
-                          return (
-                            <p
-                              key={index}
-                              style={{
-                                fontSize: "16px",
-                                marginBottom: "5px",
-                                fontWeight: "bold",
-                                cursor: "pointer",
-                                color: selectedModalImage === imageUrl ? "blue" : "black",
-                              }}
-                              onClick={() => {
-                                console.log(`Selected image: ${file.name}, URL: ${imageUrl}`);
-                                setSelectedModalImage(imageUrl);
-                                setSelectedFile(file); // Store the file object
-                              }}
-                            >
-                              {file.name}
-                            </p>
-                          );
-                        }
-                      })
-                    ) : (
-                      <p>No images or frames available.</p>
-                    )}
+                    {/* Right Side: Selected Image/Frame Preview */}
+                    <div
+                      style={{
+                        flex: 1,
+                        padding: "10px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      {selectedModalImage ? (
+                        <img
+                          src={selectedModalImage}
+                          alt="Selected Preview"
+                          style={{
+                            width: "150px",
+                            height: "150px",
+                            objectFit: "contain",
+                            borderRadius: "5px",
+                            border: "1px solid #ccc",
+                          }}
+                        />
+                      ) : (
+                        <p style={{ fontSize: "14px", color: "#666" }}>Click a name to preview</p>
+                      )}
+                    </div>
+
+                    {/* Open Button */}
+                    <button
+                      onClick={() => handleCloseModal(currentBoxId)}
+                      style={{
+                        position: "absolute",
+                        top: "10px",
+                        right: "10px",
+                        padding: "5px 10px",
+                        background: "red",
+                        color: "white",
+                        border: "none",
+                        cursor: "pointer",
+                      }}
+                    >
+                      Open
+                    </button>
                   </div>
-
-                  {/* Right Side: Selected Image/Frame Preview */}
-                  <div
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {selectedModalImage ? (
-                      <img
-                        src={selectedModalImage}
-                        alt="Selected Preview"
-                        style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "contain",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
-                        }}
-                      />
-                    ) : (
-                      <p style={{ fontSize: "14px", color: "#666" }}>Click a name to preview</p>
-                    )}
-                  </div>
-
-                  {/* Open Button */}
-                  <button
-                    onClick={() => handleCloseModal(currentBoxId)}
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      padding: "5px 10px",
-                      background: "red",
-                      color: "white",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Open
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                )}
+              </Box>
+            ))}
+          </div>
+        </Box>
       </div>
 
       {showFileInfoModal && (
