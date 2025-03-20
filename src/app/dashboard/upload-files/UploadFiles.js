@@ -5,10 +5,11 @@ import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataB
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
 import { ImageContext } from "@/contexts/ImageContext";
-import { FaPlus, FaChevronDown, FaChevronUp, FaTimes } from "react-icons/fa"; // Added FaTimes for the X button
-import { Box } from "@chakra-ui/react"; // Import Chakra UI Box
+import { FaPlus, FaChevronDown, FaChevronUp, FaTimes, FaSearch, FaInfoCircle, FaArrowUp, FaArrowDown, FaTh, FaList } from "react-icons/fa";
+import { Box } from "@chakra-ui/react";
+import "./uploadFiles.css"; // Updated import path
 
-// Reusable button styles
+// Reusable button styles (for center buttons, keeping this as a function since it’s reused with dynamic colors)
 const buttonStyle = (bgColor, textColor) => ({
   padding: "2px 2px",
   fontSize: "12px",
@@ -47,7 +48,7 @@ export default function UploadFiles() {
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
   // State for frame expansion (only for toggling visibility of saved frames)
-  const [expandedFrames, setExpandedFrames] = useState({}); // { fileId: boolean }
+  const [expandedFrames, setExpandedFrames] = useState({});
 
   // Get the setters and state from ImageContext
   const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext);
@@ -70,7 +71,7 @@ export default function UploadFiles() {
   const handleOpenCreateDatabase = () => {
     setShowCreateDbModal(true);
     setShowPlusModal(false);
-    setIsCreateButtonClicked(true); // Set the button clicked state
+    setIsCreateButtonClicked(true);
   };
 
   const handleImageClick = (file) => {
@@ -138,30 +139,22 @@ export default function UploadFiles() {
   };
 
   return (
-    <div style={{ marginTop: "30px", marginLeft: "30px" }}>
+    <div className="upload-files-container">
       {/* Database Tabs Row at the Top */}
       {databases.length > 0 && (
         <Box
           display="flex"
           gap="10px"
-          mb="10px" // Margin bottom to separate from the main container
-          flexWrap="wrap" // Allow wrapping if there are many databases
+          mb="10px"
+          flexWrap="wrap"
         >
           {databases.map((db, index) => (
             <Box
               key={index}
-              bg="gray.200" // Light grey background
-              _hover={{ bg: "gray.300" }} // Slightly darker grey on hover
-              borderRadius="5px"
-              padding="5px 10px"
-              display="flex"
-              alignItems="center"
-              gap="10px"
-              cursor="pointer"
+              className="database-tab"
             >
               <Box
-                fontWeight="bold"
-                color={selectedDatabaseIndex === index ? "blue" : "black"}
+                className="database-tab-name"
                 onClick={() => {
                   setSelectedDatabaseIndex(index);
                   setLocalFinalSelectedImages([
@@ -174,17 +167,8 @@ export default function UploadFiles() {
               </Box>
               <Box
                 as="button"
-                bg="red.500"
-                color="white"
-                borderRadius="50%"
-                width="20px"
-                height="20px"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                cursor="pointer"
+                className="database-tab-close"
                 onClick={() => handleDeleteDatabase(index)}
-                _hover={{ bg: "red.600" }}
               >
                 <FaTimes size={12} />
               </Box>
@@ -192,15 +176,7 @@ export default function UploadFiles() {
           ))}
           <Box
             as="button"
-            padding="5px"
-            fontSize="20px"
-            cursor="pointer"
-            bg="gray.200"
-            borderRadius="5px"
-            display="flex"
-            alignItems="center"
-            justifyContent="center"
-            _hover={{ bg: "gray.300" }}
+            className="database-tab-add"
             onClick={() => setShowPlusModal(true)}
           >
             <FaPlus />
@@ -209,143 +185,54 @@ export default function UploadFiles() {
       )}
 
       {/* Main UploadFiles Container */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          width: "90%",
-          height: "650px",
-          backgroundColor: "white",
-          borderRadius: "10px",
-          boxShadow: "0px 4px 6px rgba(0,0,0,0.1)",
-          paddingBottom: "40px",
-        }}
-      >
+      <div className="main-container">
         {/* Top Navigation: Search and Controls (shown only if no database exists) */}
         {databases.length === 0 && (
-          <div
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              width: "100%",
-              padding: "10px",
-            }}
-          >
+          <div className="top-navigation">
             {/* Left side: Search Input & + Button */}
-            <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+            <div className="search-container">
               <button
+                className="add-button"
                 onClick={handleOpenCreateDatabase}
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  fontSize: "40px",
-                  fontWeight: "300",
-                  borderRadius: "10px",
-                  border: "none",
-                  backgroundColor: "#D6D6D6",
-                  color: "white",
-                  cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  lineHeight: "2",
-                  paddingBottom: "5px",
-                  transition: "background-color 0.3s ease",
-                }}
-                onMouseOver={(e) => (e.currentTarget.style.backgroundColor = "#A9D096")}
-                onMouseOut={(e) => (e.currentTarget.style.backgroundColor = "#D6D6D6")}
               >
                 +
               </button>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                onFocus={() => setIsExpanded(true)}
-                onBlur={() => setIsExpanded(false)}
-                style={{
-                  width: isExpanded ? "200px" : "120px",
-                  padding: "8px 8px 8px 30px",
-                  transition: "width 0.3s ease",
-                  height: "30px",
-                  borderRadius: "20px",
-                  border: "none",
-                  backgroundColor: "#D6D6D6",
-                  outline: "none",
-                  boxShadow: "none",
-                  backgroundImage: "url('/images/logos/searchIcon.png')",
-                  backgroundSize: "20px 20px",
-                  backgroundPosition: "10px center",
-                  backgroundRepeat: "no-repeat",
-                }}
-              />
+              <div className="search-input-wrapper">
+                <FaSearch className="search-icon" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsExpanded(true)}
+                  onBlur={() => setIsExpanded(false)}
+                  className="search-input"
+                  style={{
+                    width: isExpanded ? "200px" : "120px", // Dynamic width based on state
+                    transition: "width 0.3s ease",
+                  }}
+                />
+              </div>
             </div>
             {/* Right side: Info, Sort, Grid/List Buttons */}
-            <div style={{ display: "flex", alignItems: "flex-end", gap: "10px" }}>
+            <div className="controls-container">
               <button
+                className="info-button"
                 onClick={() => console.log("Info clicked")}
-                style={{
-                  width: "30px",
-                  height: "30px",
-                  borderRadius: "50%",
-                  border: "none",
-                  backgroundColor: "#D6D6D6",
-                  backgroundImage: `url('/images/logos/DB Info.png')`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
-                  cursor: "pointer",
-                }}
-              />
-              <button
-                onClick={handleSort}
-                style={{
-                  width: "70px",
-                  height: "30px",
-                  display: "flex",
-                  flexDirection: "column",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  borderRadius: "7px",
-                  backgroundColor: "#D6D6D6",
-                  cursor: "pointer",
-                  paddingRight: "30px",
-                  paddingLeft: "0px",
-                  paddingTop: "0px",
-                  gap: "3px",
-                }}
               >
-                <img
-                  src="/images/logos/upCaretIcon.png"
-                  alt="Up Arrow"
-                  style={{ width: "12px", height: "12px", objectFit: "contain" }}
-                />
-                <img
-                  src="/images/logos/downCareticon.png"
-                  alt="Down Arrow"
-                  style={{ width: "12px", height: "12px", objectFit: "contain" }}
-                />
+                <FaInfoCircle className="info-icon" />
               </button>
               <button
-                onClick={toggleView}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "5px",
-                  padding: "5px 10px",
-                  borderRadius: "5px",
-                  width: "45px",
-                  height: "30px",
-                  cursor: "pointer",
-                }}
+                className="sort-button"
+                onClick={handleSort}
               >
-                <img
-                  src={isGridView ? "/images/logos/Toggle Grid.png" : "/images/logos/toggle list.png"}
-                  alt={isGridView ? "Grid View" : "List View"}
-                  style={{ width: "25px", height: "25px", objectFit: "contain" }}
-                />
+                <FaArrowUp className="sort-icon" />
+                <FaArrowDown className="sort-icon" />
+              </button>
+              <button
+                className="toggle-button"
+                onClick={toggleView}
+              >
+                {isGridView ? <FaTh className="toggle-icon" /> : <FaList className="toggle-icon" />}
               </button>
             </div>
           </div>
@@ -353,49 +240,29 @@ export default function UploadFiles() {
 
         {/* Center Buttons for Database (shown only if no database exists) */}
         {databases.length === 0 && !showCreateDbModal && !showImportMediaModal && !showDisplayDbModal && !showPlusModal && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "5px",
-              marginTop: "250px",
-            }}
-          >
+          <div className="center-buttons">
             <button
-              style={buttonStyle("#4A88FF", "white")}
-              onMouseOver={(e) => (e.currentTarget.style.background = "#2A6CD3")}
-              onMouseOut={(e) => (e.currentTarget.style.background = "#4A88FF")}
+              className="action-button open-database"
             >
               Open a Database
             </button>
             <button
-              style={buttonStyle("#4A88FF", "white")}
-              onMouseOver={(e) => (e.currentTarget.style.background = "#2A6CD3")}
-              onMouseOut={(e) => (e.currentTarget.style.background = "#4A88FF")}
+              className="action-button connect-es-database"
             >
               Connect to ES Database
             </button>
-            <button style={buttonStyle("#4A88FF", "white")} disabled>
+            <button
+              className="action-button connect-live-video"
+              disabled
+            >
               Connect to Live Video
             </button>
             <button
+              className="action-button create-new-database"
               style={{
-                ...buttonStyle("#A9D096", "white"),
                 background: isCreateButtonClicked
                   ? "linear-gradient(to bottom, #2E7D32, #81C784)"
-                  : "#A9D096",
-                transition: "background 0.3s ease",
-              }}
-              onMouseOver={(e) => {
-                if (!isCreateButtonClicked) {
-                  e.currentTarget.style.background = "#7FA763";
-                }
-              }}
-              onMouseOut={(e) => {
-                if (!isCreateButtonClicked) {
-                  e.currentTarget.style.background = "#A9D096";
-                }
+                  : undefined, // Dynamic background based on state
               }}
               onClick={handleOpenCreateDatabase}
             >
@@ -406,30 +273,10 @@ export default function UploadFiles() {
 
         {/* + Icon Modal (without Close button) */}
         {showPlusModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "#fff",
-              padding: "20px",
-              border: "1px solid #ccc",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-              zIndex: 1000,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-            }}
-          >
+          <div className="plus-modal">
             <h3>Create New Database</h3>
             <button
-              style={{
-                marginTop: "20px",
-                padding: "10px 20px",
-                fontSize: "16px",
-                cursor: "pointer",
-              }}
+              className="plus-modal-button"
               onClick={handleOpenCreateDatabase}
             >
               Create New Database
@@ -442,7 +289,7 @@ export default function UploadFiles() {
           <CreateNewDataBaseModal
             onClose={() => {
               setShowCreateDbModal(false);
-              setIsCreateButtonClicked(false); // Reset the button clicked state
+              setIsCreateButtonClicked(false);
             }}
             onNext={(folders) => {
               setFolderSelections(folders);
@@ -476,9 +323,9 @@ export default function UploadFiles() {
 
         {/* Final Gallery Display on Main Page */}
         {selectedDatabaseIndex !== null && !showDisplayDbModal && (
-          <div style={{ width: "100%", flex: 1, overflowY: "auto", padding: "10px" }}>
-            <h3 style={{ marginBottom: "10px" }}>Final Gallery</h3>
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+          <div className="gallery-container">
+            <h3 className="gallery-title">Final Gallery</h3>
+            <div className="gallery-items">
               {databases[selectedDatabaseIndex].files.map((file, index, arr) => {
                 const fileUrl = URL.createObjectURL(file);
                 const fileId = `${file.name}-${file.lastModified}`;
@@ -491,41 +338,23 @@ export default function UploadFiles() {
                 return (
                   <div
                     key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      borderBottom: "1px solid #ddd",
-                      padding: "10px 0",
-                      cursor: "pointer",
-                    }}
+                    className="gallery-item"
                     onClick={() => handleImageClick(file)}
                   >
-                    <div style={{ width: "60px", textAlign: "center", fontWeight: "bold" }}>
+                    <div className="gallery-item-index">
                       {index + 1} of {arr.length}
                     </div>
-                    <div>
+                    <div className="gallery-item-media">
                       {file.type.startsWith("image/") ? (
                         <img
                           src={fileUrl}
                           alt={file.name}
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            objectFit: "cover",
-                            borderRadius: "4px",
-                            marginRight: "10px",
-                          }}
+                          className="gallery-image"
                         />
                       ) : file.type.startsWith("video/") ? (
                         <video
                           src={fileUrl}
-                          style={{
-                            width: "100px",
-                            height: "100px",
-                            objectFit: "cover",
-                            borderRadius: "4px",
-                            marginRight: "10px",
-                          }}
+                          className="gallery-video"
                           muted
                           loop
                         >
@@ -533,10 +362,10 @@ export default function UploadFiles() {
                         </video>
                       ) : null}
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ fontWeight: "bold" }}>{file.name}</div>
+                    <div className="gallery-item-details">
+                      <div className="gallery-item-name">{file.name}</div>
                       <div
-                        style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer" }}
+                        className="gallery-item-media-info"
                         onClick={(e) => {
                           e.stopPropagation();
                           handleMediaInfoClick(file);
@@ -546,7 +375,7 @@ export default function UploadFiles() {
                       </div>
                       {file.type.startsWith("video/") && (
                         <div
-                          style={{ fontSize: "0.9rem", color: "#555", cursor: "pointer", marginTop: "5px" }}
+                          className="gallery-item-expand-frames"
                           onClick={(e) => {
                             e.stopPropagation();
                             handleExpandFrames(file);
@@ -556,29 +385,24 @@ export default function UploadFiles() {
                         </div>
                       )}
                       {isExpanded && (
-                        <div style={{ marginTop: "5px", padding: "5px", background: "#f9f9f9" }}>
+                        <div className="gallery-item-frames">
                           {associatedFrames.length > 0 ? (
-                            <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                            <div className="gallery-item-frames-list">
                               {associatedFrames.map((frame, frameIndex) => (
-                                <div key={frameIndex} style={{ textAlign: "center" }}>
+                                <div key={frameIndex} className="gallery-item-frame">
                                   <img
                                     src={frame.dataUrl}
                                     alt={`Frame at ${formatTime(frame.timestamp)}`}
-                                    style={{
-                                      width: "100px",
-                                      height: "100px",
-                                      objectFit: "cover",
-                                      borderRadius: "4px",
-                                    }}
+                                    className="gallery-frame-image"
                                   />
-                                  <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                                  <p className="gallery-frame-timestamp">
                                     {formatTime(frame.timestamp)}
                                   </p>
                                 </div>
                               ))}
                             </div>
                           ) : (
-                            <p style={{ fontSize: "0.9rem", color: "#666" }}>
+                            <p className="gallery-no-frames">
                               No frames saved for this video.
                             </p>
                           )}
@@ -594,22 +418,15 @@ export default function UploadFiles() {
 
         {/* Media Info Modal */}
         {showMediaInfoModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: "50%",
-              left: "50%",
-              transform: "translate(-50%, -50%)",
-              background: "#fff",
-              padding: "20px",
-              border: "1px solid #ccc",
-              boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-              zIndex: 1000,
-            }}
-          >
+          <div className="media-info-modal">
             <h3>Media Info</h3>
             <p>{mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}</p>
-            <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
+            <button
+              className="media-info-modal-close"
+              onClick={() => setShowMediaInfoModal(false)}
+            >
+              Close
+            </button>
           </div>
         )}
       </div>
