@@ -442,13 +442,15 @@
 
 
 
-
-
 "use client";
-import React, { useState, useEffect, useRef, useMemo } from "react";
-import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt, FaForward, FaBackward } from "react-icons/fa";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { ImageContext } from "@/contexts/ImageContext"; // Import ImageContext to store frames
+import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt, FaForward, FaBackward, FaSave } from "react-icons/fa";
 
 const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
+  // Access ImageContext to store saved frames
+  const { setFinalSelectedImages } = useContext(ImageContext);
+
   // State to track folder selections (all folders initially checked)
   const [folderSelections, setFolderSelections] = useState(
     selectedFolders.reduce((acc, _, index) => {
@@ -483,9 +485,13 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const videoRef = useRef(null);
+  const canvasRef = useRef(null); // Hidden canvas for capturing frames
 
   // State to store file URLs to prevent regeneration
   const [fileUrls, setFileUrls] = useState({});
+
+  // State to store saved frames locally (timestamp, data URL, and source file ID)
+  const [savedFrames, setSavedFrames] = useState([]); // [{ timestamp: number, dataUrl: string, file: File, sourceFileId: string }]
 
   // State to track database name sequence
   const [databaseCount, setDatabaseCount] = useState(() => {
@@ -573,9 +579,13 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
       folder.files.filter((_, fileIndex) => fileSelections[folderIndex][fileIndex])
     );
 
+    // Add saved frames to the final selected images in ImageContext
+    const frameFiles = savedFrames.map((frame) => frame.file);
+    setFinalSelectedImages((prev) => [...prev, ...frameFiles]);
+
     const databaseName = `database ${String.fromCharCode(65 + databaseCount)}`; // B, C, D, ...
     setDatabaseCount((prev) => prev + 1); // Increment for next database
-    onNext({ files: selectedFiles, databaseName }); // Send selected files and database name to parent
+    onNext({ files: selectedFiles, databaseName, savedFrames }); // Pass saved frames to UploadFiles.js
   };
 
   // Helper function to get an icon based on file type (for non-preview cases)
@@ -594,6 +604,10 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   const handleVideoLoadedMetadata = () => {
     if (videoRef.current) {
       setVideoDuration(videoRef.current.duration);
+      // Set canvas dimensions to match video
+      const canvas = canvasRef.current;
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
     }
   };
 
@@ -636,6 +650,55 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  // Helper function to convert a data URL to a File object
+  const dataURLtoFile = (dataUrl, filename) => {
+    const arr = dataUrl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
+  // Handle saving the current frame
+  const handleSaveFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    // Draw the current video frame onto the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert the canvas content to a data URL (JPEG format)
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.8); // 0.8 is the quality (0 to 1)
+
+    // Create a File object from the data URL
+    const fileName = `frame-${formatTime(currentTime).replace(":", "-")}.jpg`;
+    const frameFile = dataURLtoFile(dataUrl, fileName);
+
+    // Get the source file ID of the current video
+    const sourceFile = selectedFolders
+      .flatMap((folder) => folder.files)
+      [selectedFileIndex];
+    const sourceFileId = `${sourceFile.name}-${sourceFile.lastModified}`;
+
+    // Store the frame with its timestamp and source file ID
+    setSavedFrames((prev) => [
+      ...prev,
+      { timestamp: currentTime, dataUrl, file: frameFile, sourceFileId },
+    ]);
+  };
+
+  // Handle deleting a frame
+  const handleDeleteFrame = (originalIndex) => {
+    setSavedFrames((prev) => prev.filter((_, i) => i !== originalIndex));
   };
 
   return (
@@ -783,7 +846,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                   >
                     Your browser does not support the video tag.
                   </video>
-                  {/* Custom Scrollbar with Fast-Forward and Rewind Buttons */}
+                  {/* Custom Scrollbar with Fast-Forward, Rewind, and Save Frame Buttons */}
                   <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
                     <button
                       onClick={handleRewind}
@@ -827,6 +890,20 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                     >
                       <FaForward size={20} color="#555" />
                     </button>
+                    <button
+                      onClick={handleSaveFrame}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Save frame at current timestamp"
+                    >
+                      <FaSave size={20} color="#555" />
+                    </button>
                   </div>
                 </div>
               ) : (
@@ -842,7 +919,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                   }}
                 />
               )}
-              <div style={{ marginTop: "50px", textAlign: "center" }}>
+              <div style={{ marginTop: "40px", textAlign: "center" }}>
                 <p>
                   <strong>Name:</strong>{" "}
                   {selectedFolders
@@ -900,13 +977,84 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
         <div style={modalOverlayStyle}>
           <div style={modalContentStyle}>
             <h3>Open File</h3>
-            <p>I am a modal for open files</p>
+            {selectedFolders
+              .flatMap((folder) => folder.files)
+              [selectedFileIndex]?.type.startsWith("video/") ? (
+              <>
+                <p>Frames saved for this video:</p>
+                {savedFrames.length > 0 ? (
+                  <div style={{ maxHeight: "300px", overflowY: "auto", marginTop: "10px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                      {savedFrames
+                        .map((frame, originalIndex) => ({ frame, originalIndex })) // Keep track of original index
+                        .filter(
+                          ({ frame }) =>
+                            frame.sourceFileId ===
+                            `${selectedFolders
+                              .flatMap((folder) => folder.files)
+                              [selectedFileIndex]?.name}-${selectedFolders
+                              .flatMap((folder) => folder.files)
+                              [selectedFileIndex]?.lastModified}`
+                        )
+                        .map(({ frame, originalIndex }) => (
+                          <div key={originalIndex} style={{ textAlign: "center", position: "relative" }}>
+                            <img
+                              src={frame.dataUrl}
+                              alt={`Saved frame at ${formatTime(frame.timestamp)}`}
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                objectFit: "cover",
+                                borderRadius: "4px",
+                              }}
+                            />
+                            <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                              {formatTime(frame.timestamp)}
+                            </p>
+                            <button
+                              onClick={() => handleDeleteFrame(originalIndex)} // Use original index
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                background: "rgba(255, 0, 0, 0.7)",
+                                border: "none",
+                                borderRadius: "4px",
+                                width: "20px",
+                                height: "20px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                color: "white",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                                padding: "0",
+                              }}
+                              title="Delete frame"
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: "0.9rem", color: "#666" }}>No frames saved for this video.</p>
+                )}
+              </>
+            ) : (
+              <p>No frames available for images.</p>
+            )}
             <button onClick={() => setShowOpenFileModal(false)} style={buttonStyle}>
               Close
             </button>
           </div>
         </div>
       )}
+
+      {/* Hidden canvas for capturing frames */}
+      <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
 };
@@ -977,6 +1125,8 @@ const modalContentStyle = {
   padding: "20px",
   borderRadius: "8px",
   textAlign: "center",
+  maxWidth: "600px",
+  width: "100%",
 };
 
 export default DisplayDataBaseModal;
