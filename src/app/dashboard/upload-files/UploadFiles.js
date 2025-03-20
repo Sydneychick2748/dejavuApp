@@ -1,6 +1,8 @@
 
+
+
 "use client";
-import React, { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
@@ -27,10 +29,8 @@ export default function UploadFiles() {
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
   const [mediaInfoFile, setMediaInfoFile] = useState(null);
 
-  // State for frame expansion and extracted frames, scoped to each file
-  const [fileFrames, setFileFrames] = useState({}); // { fileId: { frames: [], isExpanded: false, loading: false } }
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  // State for frame expansion (only for toggling visibility of saved frames)
+  const [expandedFrames, setExpandedFrames] = useState({}); // { fileId: boolean }
 
   // Get the setters and state from ImageContext
   const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages } = useContext(ImageContext);
@@ -62,9 +62,13 @@ export default function UploadFiles() {
   };
 
   const handleDisplayDbNext = (data) => {
-    const newDatabase = { name: data.databaseName, files: data.files };
+    const newDatabase = {
+      name: data.databaseName,
+      files: data.files,
+      savedFrames: data.savedFrames || [], // Store saved frames in the database
+    };
     setDatabases((prev) => [...prev, newDatabase]);
-    setLocalFinalSelectedImages(data.files);
+    setLocalFinalSelectedImages([...data.files, ...(data.savedFrames || []).map((frame) => frame.file)]);
     setSelectedDatabaseIndex(databases.length);
     setShowDisplayDbModal(false);
   };
@@ -80,141 +84,24 @@ export default function UploadFiles() {
     console.log("Database deleted, returning to initial state");
   };
 
-  // Client-side frame extraction (kept as fallback)
-  const extractFramesClient = (file) => {
-    return new Promise((resolve) => {
-      const url = URL.createObjectURL(file);
-      const video = videoRef.current;
-      const canvas = canvasRef.current;
-      const context = canvas.getContext("2d");
-      const frameList = [];
-
-      video.src = url;
-      video.load();
-
-      video.onloadedmetadata = () => {
-        const duration = video.duration;
-        const frameRate = 30; // Assuming 30 FPS; adjust based on video metadata if needed
-        const totalFrames = Math.floor(duration * frameRate);
-        const interval = duration / totalFrames;
-
-        let currentTime = 0;
-        const captureFrame = () => {
-          if (currentTime <= duration) {
-            video.currentTime = currentTime;
-            video.onseeked = () => {
-              context.drawImage(video, 0, 0, canvas.width, canvas.height);
-              frameList.push(canvas.toDataURL("image/jpeg"));
-              currentTime += interval;
-              video.onseeked = captureFrame;
-            };
-          } else {
-            video.onseeked = null;
-            URL.revokeObjectURL(url);
-            resolve(frameList);
-          }
-        };
-
-        captureFrame();
-      };
-    });
-  };
-
-  // Backend frame extraction using FFmpeg, updated with dynamic timestamps
-  const extractFramesBackend = async (file) => {
-    // Use a unique identifier for the file to avoid conflicts
-    const fileId = `${file.name}-${file.lastModified}`;
-    setFileFrames((prev) => ({
-      ...prev,
-      [fileId]: { ...prev[fileId], frames: [], loading: true },
-    }));
-
-    try {
-      console.log("Uploading file to /extract-frames:", file);
-      const formData = new FormData();
-      formData.append("file", file);
-
-      // Fetch video duration to set appropriate timestamps
-      const url = URL.createObjectURL(file);
-      const video = document.createElement("video");
-      video.src = url;
-      await new Promise((resolve) => {
-        video.onloadedmetadata = () => resolve();
-        video.load();
-      });
-      const duration = video.duration;
-      URL.revokeObjectURL(url);
-
-      // Generate timestamps based on video duration (1 frame per second)
-      const timestamps = Array.from(
-        { length: Math.floor(duration) + 1 },
-        (_, i) => i.toString()
-      ).join(",");
-      formData.append("timestamps", timestamps); // e.g., "0,1,2,3" for a 3.96s video
-      formData.append("save_frames", "false");
-
-      const response = await fetch("http://localhost:8000/extract-frames/", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
-        throw new Error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
-      }
-
-      const data = await response.json();
-      if (data.error) {
-        console.error("Server returned error:", data.error);
-        throw new Error(data.error);
-      }
-
-      // Map the frames from the response
-      const frameData = data.frames.map((frame) => frame.data || frame.url || "");
-      return { frames: frameData, fileId };
-    } catch (error) {
-      console.error("Error extracting frames from backend:", error);
-      // Fallback to client-side extraction if backend fails
-      const frameData = await extractFramesClient(file);
-      return { frames: frameData, fileId };
-    } finally {
-      setFileFrames((prev) => ({
-        ...prev,
-        [fileId]: { ...prev[fileId], loading: false },
-      }));
-    }
-  };
-
-  // Handle frame expansion click
-  const handleExpandFrames = async (file) => {
+  // Handle frame expansion click (only toggles visibility of saved frames)
+  const handleExpandFrames = (file) => {
     if (!file.type.startsWith("video/")) {
       return; // Only process videos
     }
 
     const fileId = `${file.name}-${file.lastModified}`;
-    // Initialize state for this file if not present
-    setFileFrames((prev) => ({
+    setExpandedFrames((prev) => ({
       ...prev,
-      [fileId]: { frames: [], isExpanded: false, loading: false, ...prev[fileId] },
+      [fileId]: !prev[fileId],
     }));
+  };
 
-    // Toggle expansion
-    setFileFrames((prev) => ({
-      ...prev,
-      [fileId]: { ...prev[fileId], isExpanded: !prev[fileId]?.isExpanded },
-    }));
-
-    // If already extracted, no need to fetch again
-    if (fileFrames[fileId]?.frames?.length > 0) {
-      return;
-    }
-
-    const { frames } = await extractFramesBackend(file);
-    setFileFrames((prev) => ({
-      ...prev,
-      [fileId]: { ...prev[fileId], frames },
-    }));
+  // Format timestamp for display (MM:SS)
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   return (
@@ -250,7 +137,7 @@ export default function UploadFiles() {
                 }}
                 onClick={() => {
                   setSelectedDatabaseIndex(index);
-                  setLocalFinalSelectedImages(db.files);
+                  setLocalFinalSelectedImages([...db.files, ...db.savedFrames.map((frame) => frame.file)]);
                 }}
               >
                 {db.name}
@@ -299,7 +186,7 @@ export default function UploadFiles() {
             padding: "20px",
             border: "1px solid #ccc",
             boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-            zIndex: 1000,
+            zIndex: "1000",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
@@ -362,7 +249,12 @@ export default function UploadFiles() {
             {databases[selectedDatabaseIndex].files.map((file, index, arr) => {
               const fileUrl = URL.createObjectURL(file);
               const fileId = `${file.name}-${file.lastModified}`;
-              const frameData = fileFrames[fileId] || { frames: [], isExpanded: false, loading: false };
+              const isExpanded = expandedFrames[fileId] || false;
+
+              // Filter saved frames associated with this video file
+              const associatedFrames = databases[selectedDatabaseIndex].savedFrames.filter(
+                (frame) => frame.sourceFileId === fileId
+              );
 
               return (
                 <div
@@ -433,27 +325,34 @@ export default function UploadFiles() {
                           handleExpandFrames(file);
                         }}
                       >
-                        Expand Frames {frameData.isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                        Expand Frames {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
                       </div>
                     )}
-                    {frameData.loading && <p>Loading frames...</p>}
-                    {frameData.isExpanded && frameData.frames.length > 0 && (
+                    {isExpanded && (
                       <div style={{ marginTop: "5px", padding: "5px", background: "#f9f9f9" }}>
-                        <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
-                          {frameData.frames.map((frame, frameIndex) => (
-                            <img
-                              key={frameIndex}
-                              src={frame}
-                              alt={`Frame ${frameIndex + 1}`}
-                              style={{
-                                width: "100px",
-                                height: "100px",
-                                objectFit: "cover",
-                                borderRadius: "4px",
-                              }}
-                            />
-                          ))}
-                        </div>
+                        {associatedFrames.length > 0 ? (
+                          <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                            {associatedFrames.map((frame, frameIndex) => (
+                              <div key={frameIndex} style={{ textAlign: "center" }}>
+                                <img
+                                  src={frame.dataUrl}
+                                  alt={`Frame at ${formatTime(frame.timestamp)}`}
+                                  style={{
+                                    width: "100px",
+                                    height: "100px",
+                                    objectFit: "cover",
+                                    borderRadius: "4px",
+                                  }}
+                                />
+                                <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                                  {formatTime(frame.timestamp)}
+                                </p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p style={{ fontSize: "0.9rem", color: "#666" }}>No frames saved for this video.</p>
+                        )}
                       </div>
                     )}
                   </div>
@@ -484,10 +383,7 @@ export default function UploadFiles() {
           <button onClick={() => setShowMediaInfoModal(false)}>Close</button>
         </div>
       )}
-
-      {/* Hidden video and canvas elements for frame extraction */}
-      <video ref={videoRef} style={{ display: "none" }} />
-      <canvas ref={canvasRef} style={{ display: "none" }} width="100" height="100" />
     </div>
   );
 }
+
