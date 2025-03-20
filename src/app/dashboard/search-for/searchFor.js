@@ -5,7 +5,7 @@ import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { Box } from "@chakra-ui/react";
-import "./SearchFor.css";
+import "./searchFor.css"; // Keep the updated import path
 
 // Composite the image onto a white background at 500×500.
 async function compositeImageOnWhite(imageUrl) {
@@ -328,51 +328,22 @@ export default function SearchFor() {
     });
   };
 
-  const buttonStyle = {
-    backgroundColor: "#3083F9",
-    color: "white",
-    border: "none",
-    padding: "10px 20px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    width: "150px",
-    textAlign: "center",
-  };
-
   return (
-    <div
-      style={{
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <div
-        style={{
-          flex: "0 0 auto",
-          padding: "10px 20px",
-          backgroundColor: "#f0f0f0",
-        }}
-      >
-        <h1 style={{ margin: 0 }}>Search For</h1>
+    <div className="search-for-container">
+      <div className="header">
+        <h1>Search For</h1>
       </div>
 
-      <div
-        style={{
-          flex: 1,
-          overflowY: "auto",
-          padding: "20px",
-          color: "black",
-        }}
-      >
+      <div className="content">
         <Box
           border="1px solid #ccc"
           borderRadius="5px"
           padding="10px"
-          height="100%" // Take up the full height of the parent
+          height="100%"
           overflowY="auto"
           width="100%"
         >
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "20px", marginTop: "20px" }}>
+          <div className="boxes-wrapper">
             {boxes.map((box) => (
               <Box
                 key={box.id}
@@ -398,118 +369,80 @@ export default function SearchFor() {
                     opacity={finalSelectedImages.length > 0 ? 1 : 0.5}
                     onClick={() => handleOpenModal(box.id)}
                   >
-                    <FaPlus size={50} color="white" />
+                    <FaPlus className="plus-icon" />
                   </Box>
                 ) : (
-                  <div style={{ display: "flex", gap: "20px", position: "relative", width: "100%" }}>
-                    <div
-                      style={{
-                        width: "250px",
-                        height: "150px",
-                        border: "1px solid #ccc",
-                      }}
-                    >
+                  <div className="image-content">
+                    <div className="image-wrapper">
                       {box.imageUrl ? (
                         <img
                           src={box.imageUrl}
                           alt={`Selected for box ${box.id}`}
-                          style={{
-                            width: "100%",
-                            height: "100%",
-                            objectFit: "contain",
-                          }}
+                          className="selected-image"
                         />
                       ) : null}
                     </div>
 
-                    <div
-                      style={{
-                        flex: 1,
-                        display: "flex",
-                        flexDirection: "column",
-                        gap: "10px",
-                      }}
-                    >
-                      <p>
+                    <div className="image-details">
+                      <p className="file-info">
                         <strong>{box.fileName || "UnknownFile.jpg"}</strong>
                         <br />
                         {box.fileSize ? `${(box.fileSize / (1024 * 1024)).toFixed(2)} MB` : "0 MB"}
                       </p>
                       <p
-                        style={{ color: "#3083F9", cursor: "pointer" }}
+                        className="file-info-link"
                         onClick={() => setShowFileInfoModal(true)}
                       >
                         File Info
                       </p>
                       <p
-                        style={{ color: "#3083F9", cursor: "pointer" }}
+                        className="file-info-link"
                         onClick={() => setShowOpenFileModal(true)}
                       >
                         Open File
                       </p>
                       <button
                         onClick={() => handleIsolateSubject(box.id)}
-                        style={buttonStyle}
+                        className="action-button"
                       >
                         Isolate Subject
                       </button>
                       <button
                         onClick={() => openMaskEditor(box.id)}
-                        style={buttonStyle}
+                        className="action-button"
                       >
                         Manual Mask
                       </button>
                       <button
-                        style={buttonStyle}
+                        className="action-button"
                       >
                         Create New Object
                       </button>
                       <button
-                        style={buttonStyle}
+                        className="action-button"
                       >
                         Add to Object Family
                       </button>
                       <button
                         onClick={() => handleRemoveBox(box.id)}
-                        style={{
-                          position: "absolute",
-                          top: "-10px",
-                          right: "-10px",
-                          background: "red",
-                          color: "white",
-                          border: "none",
-                          borderRadius: "50%",
-                          width: "20px",
-                          height: "20px",
-                          cursor: "pointer",
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "center",
-                        }}
+                        className="remove-button"
                       >
-                        <FaTimes size={12} />
+                        <FaTimes className="remove-icon" />
                       </button>
                     </div>
                   </div>
                 )}
 
                 {!box.selectedImage && (
-                  <div
-                    style={{
-                      marginLeft: "20px",
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                    }}
-                  >
+                  <div className="placeholder-actions">
                     <button
-                      style={buttonStyle}
+                      className="action-button"
                       onClick={() => handleOpenModal(box.id)}
                     >
                       Select Image
                     </button>
                     <button
-                      style={buttonStyle}
+                      className="action-button"
                     >
                       Select Object
                     </button>
@@ -620,7 +553,9 @@ export default function SearchFor() {
                           }
                         })
                       ) : (
-                        <p>No images or frames available.</p>
+                        <p style={{ fontSize: "14px", color: "#666" }}>
+                          No images or frames available.
+                        </p>
                       )}
                     </div>
 
@@ -640,28 +575,21 @@ export default function SearchFor() {
                           style={{
                             width: "150px",
                             height: "150px",
-                            objectFit: "contain",
+                            objectFit: "cover",
                             borderRadius: "5px",
                             border: "1px solid #ccc",
                           }}
                         />
                       ) : (
-                        <p style={{ fontSize: "14px", color: "#666" }}>Click a name to preview</p>
+                        <p style={{ fontSize: "14px", color: "#666" }}>
+                          Click a name to preview
+                        </p>
                       )}
                     </div>
 
                     <button
                       onClick={() => handleCloseModal(currentBoxId)}
-                      style={{
-                        position: "absolute",
-                        top: "10px",
-                        right: "10px",
-                        padding: "5px 10px",
-                        background: "red",
-                        color: "white",
-                        border: "none",
-                        cursor: "pointer",
-                      }}
+                      className="modal-open-button"
                     >
                       Open
                     </button>
@@ -689,7 +617,12 @@ export default function SearchFor() {
         >
           <h3>File Info</h3>
           <p>I am a modal for file info</p>
-          <button onClick={() => setShowFileInfoModal(false)}>Close</button>
+          <button
+            onClick={() => setShowFileInfoModal(false)}
+            className="modal-close-button"
+          >
+            Close
+          </button>
         </div>
       )}
 
@@ -709,7 +642,12 @@ export default function SearchFor() {
         >
           <h3>Open File</h3>
           <p>I am a modal for open files</p>
-          <button onClick={() => setShowOpenFileModal(false)}>Close</button>
+          <button
+            onClick={() => setShowOpenFileModal(false)}
+            className="modal-close-button"
+          >
+            Close
+          </button>
         </div>
       )}
 
@@ -728,7 +666,12 @@ export default function SearchFor() {
             zIndex: 1000,
           }}
         >
-          <div style={{ backgroundColor: "white", padding: "20px" }}>
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+            }}
+          >
             <h2>Manual Mask Editor</h2>
             <div
               style={{
@@ -746,13 +689,20 @@ export default function SearchFor() {
                     position: "absolute",
                     width: "500px",
                     height: "500px",
-                    objectFit: "contain",
+                    objectFit: "cover",
                     border: "1px solid #ccc",
                     zIndex: 1,
                   }}
                 />
               ) : (
-                <p>No image available for masking</p>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                  }}
+                >
+                  No image available for masking
+                </p>
               )}
               <CanvasDraw
                 ref={canvasRef}
@@ -771,18 +721,16 @@ export default function SearchFor() {
                 }}
               />
             </div>
-            <div
-              style={{ marginTop: "10px", display: "flex", gap: "10px" }}
-            >
+            <div className="canvas-actions">
               <button
                 onClick={handleManualMask}
-                style={buttonStyle}
+                className="action-button"
               >
                 Apply Mask
               </button>
               <button
                 onClick={() => setIsMaskEditorOpen(false)}
-                style={buttonStyle}
+                className="action-button"
               >
                 Close Editor
               </button>
@@ -793,3 +741,5 @@ export default function SearchFor() {
     </div>
   );
 }
+
+
