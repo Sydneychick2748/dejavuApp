@@ -1,0 +1,36 @@
+.resolutionSlider {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.advancedOptions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.titles {
+    color: black;
+}
+
+.chakra-slider__range {
+    background-color: grey;
+    background: grey;
+}
+
+.chakra-slider__track {
+    background-color: grey;
+    background: grey;
+}
+
+.chakra-slider__thumb {
+    background-color: #4A87FB;
+    height: 2rem;
+    width: 1rem;
+}
+
+.chakra-slider__label {
+    color: black;
+}

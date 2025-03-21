@@ -1,3 +1,8 @@
+.content2 {
+    display: flex;
+    align-items: center;
+}
+
 .sliderDiv {
     color: black;
     width: 100%;
@@ -6,14 +11,14 @@
 .fastThoroughSlider {
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: baseline;
 }
 
 .fastThoroughBoxes {
-    background-color: #125FEE;
+    background-color: #4A87FB;
     color: white;
     border-radius: 1rem;
-    margin: 5%;
+    /* margin: 5%; */
     /* padding: 1%; */
     flex-grow: 1;
     text-align: center
@@ -21,6 +26,7 @@
 
 .slider {
     flex-grow: 4;
+    cursor: pointer;
 }
 
 .chakra-slider__range {
@@ -35,9 +41,14 @@
 
 .chakra-slider__thumb {
     background-color: #4A87FB;
-    height: 3.5rem;
+    height: 2rem;
+    width: 1rem;
 }
 
 .chakra-checkbox__control {
     border-color: #4A87FB;
+}
+
+.defaultCheckbox {
+    margin-left: 1rem;
 }
