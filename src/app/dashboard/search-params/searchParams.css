@@ -1,5 +1,4 @@
-SEARCHPARAMS CSS
-10:25
+
 .headerBox {
     background-color: #4A88EF;
     border-radius: 0.5rem;
@@ -22,49 +21,7 @@ SEARCHPARAMS CSS
 .infoLetter {
     color: #4888F0
 }
-/* **************************Showing each option only when active**************** */
-/* .container2 {
-    display: flex;
-    width: auto;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: white;
-}
-.sidebar {
-    width: 25%;
-    background: white;
-    padding: 15px;
-    border-right: 1px solid #ddd;
-}
-.sidebar ul {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-.sidebar li {
-    padding: 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    margin-bottom: 5px;
-    transition: background 0.2s;
-    font-weight: bold;
-    color: #333;
-    display: block;
-}
-.sidebar li:hover {
-    background: white;
-}
-.sidebar li.active {
-    background: white;
-    color: #007bff;
-}
-.content2 {
-    width: 75%;
-    padding: 5px;
-} */
-/* **********************Showing both options stacked************************ */
+
 .container2 {
     display: flex;
     background-color: #E7E9EF;

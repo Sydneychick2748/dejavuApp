@@ -536,6 +536,13 @@ export default function SearchFor() {
                               `Processing file: ${file.name}, type: ${file.type}, fileId: ${fileId}`
                             );
 
+                            // Common styles for all result text
+                            const resultTextStyle = {
+                              fontSize: "12px", // Adjusted from 10px to 12px (change as desired)
+                              marginBottom: "5px",
+                              color: "#000000", // Changed from gray to black for consistency, adjust as needed
+                            };
+
                             if (file.type.startsWith("video/")) {
                               const frames = fileFrames[fileId]?.frames || [];
                               console.log(
@@ -548,7 +555,7 @@ export default function SearchFor() {
                                   <p
                                     key={`${fileId}-no-frames`}
                                     style={{
-                                      fontSize: "14px",
+                                      fontSize: "10px",
                                       marginBottom: "5px",
                                       color: "gray",
                                     }}
@@ -607,7 +614,7 @@ export default function SearchFor() {
                                 <p
                                   key={index}
                                   style={{
-                                    fontSize: "16px",
+                                    fontSize: "12px",
                                     marginBottom: "5px",
                                     fontWeight: "bold",
                                     cursor: "pointer",

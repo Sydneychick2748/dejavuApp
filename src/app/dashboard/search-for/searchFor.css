@@ -109,14 +109,14 @@
 /* Remove button */
 .remove-button {
   position: absolute;
-  top: -8px; /* Adjusted slightly */
+  top: -10px; /* Adjusted slightly */
   right: -8px;
-  background: red;
-  color: white;
+  /* background: #d1d7e0; */
+  color: red;
   border: none;
   border-radius: 50%;
-  width: 16px; /* Reduced from 20px */
-  height: 16px;
+  width: 20px; /* Reduced from 20px */
+  height: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;

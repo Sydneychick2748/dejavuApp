@@ -5,8 +5,8 @@
   display: flex;
   flex-direction: column;
   gap: 0; /* Remove any gap between children */
-  /* margin-left: 10px;
-  margin-right: -12px; */
+  margin-left: 10px;
+  margin-right: -16px;
 }
 
 /* Main container */
@@ -15,7 +15,7 @@
   flex-direction: column;
   align-items: center;
   width: 95%;
-  height: 600px;
+  height: 650px;
   background-color: white;
   border-radius: 10px;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -51,8 +51,9 @@
 }
 
 .database-tab-close {
-  background-color: #ef4444; /* red.500 */
-  color: white;
+  background-color: white; /* red.500 */
+  color: red;
+  font-size: 10px;
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -243,7 +244,7 @@
   flex-direction: column;
   align-items: center;
   gap: 5px;
-  margin-top: 190px;
+  margin-top: 230px;
 }
 
 .action-button {
@@ -288,25 +289,70 @@
 
 /* Plus Modal */
 .plus-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: #fff;
-  padding: 20px;
-  border: 1px solid #ccc;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-  z-index: 1000;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+    position: absolute;
+    top: 50%;
+    left: 30%; /* Move left from 50% to 30% */
+    transform: translate(-50%, -50%); /* Still centers it relative to the new left position */
+    background: #fff;
+    padding: 10px; /* Reduced from 20px to make the box smaller */
+    border: 1px solid #ccc;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start; /* Changed from "left" to "flex-start" (correct value) */
+    color: #4a88ff;
+    font-size: 12px; /* Added to decrease font size (default is usually 16px) */
+    width: 200px; /* Added to explicitly shrink the width */
+    margin-top: -150px;
 }
 
 .plus-modal-button {
-  margin-top: 20px;
-  padding: 10px 20px;
-  font-size: 16px;
+  /* margin-top: 20px; */
+  /* padding: 10px 20px; */
+  font-size: 12px;
   cursor: pointer;
+  color: #a9d096;
+  /* align-items: flex-start; */
+}
+
+.plus-modal-close {
+    position: absolute;
+    top: 5px; /* Position near the top */
+    right: 5px; /* Position near the right */
+    background: white; /* Red background */
+    color: red; /* White "×" for contrast */
+    border: none;
+    border-radius: 50%; /* Circular shape */
+    width: 20px; /* Size of the button */
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Size of the "×" */
+  }
+
+  .media-info-modal-close {
+    position: absolute;
+    top: 5px; /* Position near the top */
+    right: 5px; /* Position near the right */
+    background: white; /* Red background */
+    color: red; /* White "×" for contrast */
+    border: none;
+    border-radius: 50%; /* Circular shape */
+    width: 20px; /* Size of the button */
+    height: 20px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px; /* Size of the "×" (ignored if using FaTimes) */
+    padding: 0; /* Remove padding to keep size precise */
+  }
+
+.plusModalConnecttoLive {
+    color: grey;
 }
 
 /* Gallery Container */
@@ -428,7 +474,7 @@
   color: black;
 }
 
-.media-info-modal-close {
+/* .media-info-modal-close {
   padding: 5px 10px;
   cursor: pointer;
-}
+} */
