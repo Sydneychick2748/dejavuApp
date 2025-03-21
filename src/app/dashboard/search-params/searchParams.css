@@ -6,47 +6,41 @@
     align-items: center;
     padding: 1%;
 }
-
 .searchParamsWording {
     color: white;
     font: bold;
     font-size: 2rem;
 }
-
 .infoBox {
     background-color: white;
     border-radius: 0.2rem;
     padding: 2%;
     font-style: italic;
 }
-
 .infoLetter {
     color: #4888F0
 }
-
-.container2 {
+/* **************************Showing each option only when active**************** */
+/* .container2 {
     display: flex;
     width: auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     overflow: hidden;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
-    background-color: #EEF5FE;
+    background-color: white;
 }
-
 .sidebar {
-    width: 30%;
-    background: #EEF5FE;
+    width: 25%;
+    background: white;
     padding: 15px;
     border-right: 1px solid #ddd;
 }
-
 .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
 }
-
 .sidebar li {
     padding: 10px;
     cursor: pointer;
@@ -54,148 +48,133 @@
     margin-bottom: 5px;
     transition: background 0.2s;
     font-weight: bold;
-    /* Ensures text is visible */
     color: #333;
     display: block;
 }
-
 .sidebar li:hover {
-    background: #ddd;
+    background: white;
 }
-
 .sidebar li.active {
-    background: #007bff;
-    color: white;
+    background: white;
+    color: #007bff;
 }
-
 .content2 {
-    width: 70%;
+    width: 75%;
     padding: 5px;
-}
-
-
-
-/* BELOW IS EARLIER ATTEMPT */
-
-
-/* .container2 {
+} */
+/* **********************Showing both options stacked************************ */
+.container2 {
     display: flex;
-    height: 100vh;
-    width: 100%;
+    background-color: #E7E9EF;
 }
-
 .sidebar {
     width: 25%;
-    padding: 20px;
-    box-sizing: border-box;
+    padding: 5px 0px 5px 5px;
+    margin-right: 0px;
 }
-
-.optionList {
+.sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
+    height: 100%;
 }
-
-.optionText {
-    font-size: 1rem;
-    display: block;
-    width: 100%;
+.sidebar li {
     padding: 10px;
-    margin-bottom: 10px;
-    text-align: right;
-    border: none;
-    border-radius: 5px;
     cursor: pointer;
-}
-
-.active {
+    border-radius: 0.5rem 0rem 0rem 0.5rem;
+    transition: background 0.2s;
     font-weight: bold;
+    color: #333;
+    display: block;
 }
-
-.contentArea {
+.sidebar li:hover {
+    background: white;
+}
+.sidebar li.active {
+    background: white;
+    color: #007BFF;
+    opacity: 1;
+    pointer-events: auto;
+}
+.sidebar li.inactive {
+    opacity: 0.5;
+    background-color: #E7E9EF;
+    pointer-events: auto;
+}
+.sidebar li:nth-child(1) {
+    height: 20%;
+    padding-left: 1rem;
+}
+.sidebar li:nth-child(2) {
+    height: 80%;
+    padding-top: 2rem;
+    padding-left: 1rem;
+}
+.content2 {
     width: 75%;
-    padding: 40px;
-    box-sizing: border-box;
+    padding: 5px 5px 5px 0px;
+}
+.panel-container {
+    position: relative;
+    height: 100%;
+    width: 100%;
+}
+.panel {
+    transition: opacity 0.3s ease;
+}
+.panel:nth-child(1) {
+    height: 20%;
+}
+.panel:nth-child(2) {
+    height: 80%;
+}
+.panel.inactive {
+    opacity: 0.5;
+    background-color: #E7E9EF;
+    pointer-events: none;
+    padding: 1rem;
+}
+.panel.active {
+    opacity: 1;
+    background-color: white;
+    pointer-events: auto;
+    padding: 1rem;
+    border-radius: 0rem 0.5rem 0.5rem 0rem;
+}
+.panel {
+    display: block;
+}
+/* *****************************Search Button************************* */
+.search {
     display: flex;
-    align-items: center;
+    flex-direction: row;
     justify-content: center;
 }
-
-.contentBox {
-    padding: 20px;
-    border-radius: 8px;
+.search .chakra-button {
+    background-color: #4A87FB;
+    color: white;
+    border-radius: 1.5rem;
+    margin-top: 1rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
 }
 
-.settings {
-    color: black;
-    display: flex;
-    flex-direction: column;
-}
 
-.headerBox {
-    background-color: #4888F0;
-    border-radius: 0.5rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 4%
-}
 
-.searchParamsWording {
-    color: white
-}
 
-.infoBox {
-    background-color: white;
-    border-radius: 0.2rem;
-    padding: 4%;
-}
 
-.infoLetter {
-    color: #4888F0
-}
 
-.fullBox {
-    display: flex;
-    flex-direction: row;
-}
 
-.tabs {
-    display: flex;
-    flex-direction: column;
-    width: 25%;
-    text-align: left;
-}
 
-.tabOptions {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-}
 
-.simple {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
 
-.savedSettings {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
 
-.advanced {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-}
 
-.tab {
-    width: 35%;
-    color: black;
-}
 
-.options {
-    flex-grow: 1;
-} */
+
+
+
+
+
+
+
