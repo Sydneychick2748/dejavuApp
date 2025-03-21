@@ -1,73 +1,73 @@
 "use client";
 
 import { SliderTrack, SliderThumb } from "@chakra-ui/react";
-
 import { Text, Box } from "@chakra-ui/react";
-
-
 import { Slider } from "@/components/ui/slider";
-import { Checkbox } from "@/components/ui/checkbox"
-import React, { useState } from 'react';
+import { Checkbox } from "@/components/ui/checkbox";
+import React, { useState, useEffect } from 'react';
 import "./simple.css";
 
-
 export default function Simple() {
-    const [value, setValue] = React.useState(50);
-    const [endValue, setEndValue] = React.useState(10);
+    const defaultValue = 70;
+    const [value, setValue] = useState(defaultValue);
+    const [checked, setChecked] = useState(false);
 
-    const [checked, setChecked] = useState(false)
+    useEffect(() => {
+        if (checked) {
+            setValue(defaultValue);
+            // Uncheck the box after setting the default value
+            // Using setTimeout to ensure the slider visually updates first
+            setTimeout(() => {
+                setChecked(false);
+            }, 100); // Small delay to allow slider animation to complete
+        }
+    }, [checked]);
 
-  return (
-    
-    <div className="sliderDiv">
-        <div className="fastThoroughSlider">
-            <Box className="fastThoroughBoxes">
-                <Text>Fast</Text>
-            </Box>
-            <Slider className="slider" aria-label='fast-to-thorough-slider' size="lg" variant="solid" marks={[{value:10, label: "previous"}, {value:70, label: "default"}]} defaultValue={[40]}>
-                <SliderTrack bg='purple' />
-                <SliderThumb boxSize={6}>
-                    <Box color='tomato' />
-                </SliderThumb>
-            </Slider>
-            <Box className="fastThoroughBoxes">
-                <Text>Thorough</Text>
-            </Box>
+    const handleSliderChange = (newValue) => {
+        if (!checked) {
+            setValue(newValue[0]);
+        }
+    };
+
+    return (
+        <div className="sliderDiv">
+            <div className="fastThoroughSlider">
+                <div className="fastThoroughBoxes">
+                    <Box>
+                        <Text>Fast</Text>
+                    </Box>
+                </div>
+                <div className="slider">
+                    <Slider 
+                        aria-label='fast-to-thorough-slider' 
+                        size="lg" 
+                        variant="solid" 
+                        marks={[{value: 10, label: "previous"}, {value: 70, label: "default"}]} 
+                        defaultValue={[defaultValue]}
+                        value={[value]}
+                        onValueChange={handleSliderChange}
+                    >
+                        <SliderTrack bg='purple' />
+                        <SliderThumb boxSize={6}>
+                            <Box />
+                        </SliderThumb>
+                    </Slider>
+                </div>
+                <div className="fastThoroughBoxes">
+                    <Box>
+                        <Text>Thorough</Text>
+                    </Box>
+                </div>
+                <div className="defaultCheckbox">
+                    <Checkbox 
+                        checked={checked}
+                        colorPalette="blue"
+                        onCheckedChange={(e) => setChecked(!!e.checked)}
+                    >
+                        Default
+                    </Checkbox>
+                </div>
+            </div>
         </div>
-        <div className="defaultCheckbox">
-            <Checkbox 
-                checked={checked}
-                colorPalette="blue"
-                onCheckedChange={(e) => setChecked(!!e.checked)}>
-                Set as Default
-            </Checkbox>
-        </div>
-    </div>
-    
-  );
+    );
 }
-
-
-
-// function CustomSlider({ defaultValue = 50, previousValue = 30 }) {
-//   return (
-//     <Box width="300px" p={5}>
-//       <Slider defaultValue={defaultValue} min={0} max={100}>
-//         {/* Previous Value Marker */}
-//         <SliderTrack bg="gray.200">
-//           <Box position="absolute" left={`${previousValue}%`} width="5px" height="100%" bg="red.500" />
-//           <SliderFilledTrack bg="blue.500" />
-//         </SliderTrack>
-//         <SliderThumb boxSize={6} bg="green.400" />
-//       </Slider>
-//     </Box>
-//   );
-// }
-
-// export default CustomSlider;
-
-// onChangeEnd={setEndValue} 
-
-// onChangeEnd={setPrevious}
-
-// onChangeEnd={(val) => console.log(val)} 
