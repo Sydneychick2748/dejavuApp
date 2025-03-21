@@ -7,10 +7,8 @@ import UploadFiles from "./upload-files/UploadFiles";
 import { ImageProvider } from "@/contexts/ImageContext";
 import "./dashboard.css";
 import "../globals.css";
-
 export default function Dashboard() {
   const [activeBox, setActiveBox] = useState(null);
-
   return (
     <ImageProvider>
       <Flex justify="flex-end" p={1} gap={2} w="100vw">
@@ -81,7 +79,6 @@ export default function Dashboard() {
             onMouseEnter={() => setActiveBox("searchFor")}
             onMouseLeave={() => setActiveBox(null)}
           >
-            {/* Header with Buttons */}
             <Flex
               align="center"
               justify="space-between"
@@ -94,8 +91,7 @@ export default function Dashboard() {
               borderTopLeftRadius="10px"
               transition="background 0.3s ease"
             >
-            
-              <Box> Search For...</Box>
+              <Box>Search For...</Box>
               <Flex gap={2}>
                 <Box
                   as="button"
@@ -134,23 +130,33 @@ export default function Dashboard() {
             <SearchFor />
           </Box>
           {/* Bottom Right (Search Parameters) */}
-          <Box bg="white" p={4} borderRadius="lg" shadow="md">
           <Box
-            className="uploadSearchWithin"
-            width="100%"
-            bg={activeBox === "upload" ? "#0B2856" : "#D6D6D6"}
-            p="14px 20px"
-            height="52px"
-            fontSize="16px"
-            fontWeight="600"
-            color="white"
-            borderTopRightRadius="10px"
-            borderTopLeftRadius="10px"
+            className="searchParamsBox"
+            flex="1"
+            bg={activeBox === "searchParams" ? "#E7EAEE" : "#F1F1F1"}
+            borderRadius="lg"
+            shadow="md"
             transition="background 0.3s ease"
+            onMouseEnter={() => setActiveBox("searchParams")}
+            onMouseLeave={() => setActiveBox(null)}
           >
-            Search Params...
-          </Box>
-            <SearchParams />
+            <Box
+              width="100%"
+              bg={activeBox === "searchParams" ? "#0B2856" : "#D6D6D6"}
+              p="14px 20px"
+              height="52px"
+              fontSize="16px"
+              fontWeight="600"
+              color="white"
+              borderTopRightRadius="10px"
+              borderTopLeftRadius="10px"
+              transition="background 0.3s ease"
+            >
+              Search Parameters
+            </Box>
+            <Box p={4}>
+              <SearchParams />
+            </Box>
           </Box>
         </Flex>
       </Box>
