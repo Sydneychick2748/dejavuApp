@@ -3,9 +3,10 @@ import React, { useContext, useState, useRef, useEffect } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
 import { FaPlus, FaTimes } from "react-icons/fa";
-import "./SearchFor.css";
-import ImageSelectModal from "../modals/image-select-modal/imageSelectModal";
+import { Box } from "@chakra-ui/react";
+import "./searchFor.css"; // Keep the updated import path
 
+// Composite the image onto a white background at 500×500.
 async function compositeImageOnWhite(imageUrl) {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -61,15 +62,25 @@ async function convertRedMaskToBinary(maskDataUrl) {
   });
 }
 
-
+// Helper function to convert a data URL to a File object
+function dataURLtoFile(dataUrl, filename) {
+  const arr = dataUrl.split(",");
+  const mime = arr[0].match(/:(.*?);/)[1];
+  const bstr = atob(arr[1]);
+  let n = bstr.length;
+  const u8arr = new Uint8Array(n);
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n);
+  }
+  return new File([u8arr], filename, { type: mime });
+}
 
 export default function SearchFor() {
-  const { selectedImage, setSelectedImage, finalSelectedImages } =
-    useContext(ImageContext);
-  // const { finalSelectedImages } = useContext(ImageContext);
+  const { finalSelectedImages, fileFrames } = useContext(ImageContext);
+
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedModalImage, setSelectedModalImage] = useState(null); // Temporary state for modal selection
-  const [selectedFile, setSelectedFile] = useState(null); // Store the selected file object
+  const [selectedModalImage, setSelectedModalImage] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
   const [boxes, setBoxes] = useState([
     {
       id: Date.now(),
@@ -84,11 +95,11 @@ export default function SearchFor() {
   ]);
   const [response, setResponse] = useState("");
   const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
-  const [currentBoxId, setCurrentBoxId] = useState(null); // Track which box is being edited
+  const [currentBoxId, setCurrentBoxId] = useState(null);
+  const [showFileInfoModal, setShowFileInfoModal] = useState(false);
+  const [showOpenFileModal, setShowOpenFileModal] = useState(false);
   const canvasRef = useRef(null);
-  const [showFileInfoModal, setShowFileInfoModal] = useState(false); // State for File Info Modal
-  const [showOpenFileModal, setShowOpenFileModal] = useState(false); // State for Open File Modal
-  // Log boxes state changes for debugging
+
   useEffect(() => {
     console.log(
       "Boxes state changed:",
@@ -99,7 +110,11 @@ export default function SearchFor() {
       }))
     );
   }, [boxes]);
-  // Composite each box's image when selected
+
+  useEffect(() => {
+    console.log("fileFrames from ImageContext:", fileFrames);
+  }, [fileFrames]);
+
   const handleImageComposite = (imageUrl, boxId) => {
     console.log(
       `Starting image composite for box ${boxId} with image: ${imageUrl}`
@@ -109,7 +124,7 @@ export default function SearchFor() {
       compositeImageOnWhite(imageUrl)
         .then((compositedUrl) => {
           setBoxes((prevBoxes) => {
-            const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+            const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
             const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
             if (boxIndex !== -1) {
               newBoxes[boxIndex] = {
@@ -128,7 +143,7 @@ export default function SearchFor() {
         .catch((error) => {
           console.error("Error compositing image on white:", error);
           setBoxes((prevBoxes) => {
-            const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+            const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
             const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
             if (boxIndex !== -1) {
               newBoxes[boxIndex] = {
@@ -149,18 +164,26 @@ export default function SearchFor() {
     };
     tempImg.src = imageUrl;
   };
-  const handleOpenModal = () => {
+
+  const handleOpenModal = (boxId) => {
     if (finalSelectedImages.length > 0) {
+      setCurrentBoxId(boxId);
       setIsModalOpen(true);
+      console.log(`Opening modal for box ${boxId}`);
     } else {
       alert("You must complete the upload process before clicking!");
     }
   };
+
   const handleCloseModal = (boxId) => {
+    console.log("handleCloseModal called with boxId:", boxId);
+    console.log("selectedModalImage:", selectedModalImage);
+    console.log("selectedFile:", selectedFile);
+    console.log("Current boxes:", boxes);
+
     if (selectedModalImage && selectedFile) {
-      // Update the specific box with the selected image and file metadata
       setBoxes((prevBoxes) => {
-        const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+        const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
         const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
         if (boxIndex !== -1) {
           newBoxes[boxIndex] = {
@@ -169,6 +192,8 @@ export default function SearchFor() {
             fileName: selectedFile.name,
             fileSize: selectedFile.size,
           };
+        } else {
+          console.error(`Box with ID ${boxId} not found in boxes!`);
         }
         console.log(
           `Setting selectedImage for box ${boxId} to: ${selectedModalImage}`
@@ -178,12 +203,10 @@ export default function SearchFor() {
         );
         return newBoxes;
       });
-      // Composite the image onto a white background
       handleImageComposite(selectedModalImage, boxId);
-      // Add a new box with a unique ID
       setBoxes((prevBoxes) => {
         const newBoxes = [
-          ...JSON.parse(JSON.stringify(prevBoxes)), // Deep copy
+          ...JSON.parse(JSON.stringify(prevBoxes)),
           {
             id: Date.now(),
             selectedImage: null,
@@ -201,12 +224,16 @@ export default function SearchFor() {
         );
         return newBoxes;
       });
+    } else {
+      console.warn(
+        "No image or frame selected! selectedModalImage or selectedFile is null."
+      );
     }
     setIsModalOpen(false);
-    setSelectedModalImage(null); // Reset modal image
-    setSelectedFile(null); // Reset selected file
+    setSelectedModalImage(null);
+    setSelectedFile(null);
   };
-  // "Isolate Subject": Send the current base image to FastAPI for background removal.
+
   const handleIsolateSubject = async (boxId) => {
     console.log(`Isolating subject for box ${boxId}`);
     const box = boxes.find((box) => box.id === boxId);
@@ -220,7 +247,7 @@ export default function SearchFor() {
       alert("No image selected!");
       return;
     }
-    console.log(`Sending baseImageUrl for box ${boxId}: ${box.baseImageUrl}`); // Added log
+    console.log(`Sending baseImageUrl for box ${boxId}: ${box.baseImageUrl}`);
     try {
       const imageRes = await fetch(box.baseImageUrl);
       const imageBlob = await imageRes.blob();
@@ -242,7 +269,7 @@ export default function SearchFor() {
           data.filename
         )}`;
         setBoxes((prevBoxes) => {
-          const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+          const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
           const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
           if (boxIndex !== -1) {
             newBoxes[boxIndex] = {
@@ -263,7 +290,7 @@ export default function SearchFor() {
       setResponse(`Error: ${error.message}`);
     }
   };
-  // Open the mask editor modal.
+
   const openMaskEditor = (boxId) => {
     setCurrentBoxId(boxId);
     setIsMaskEditorOpen(true);
@@ -271,7 +298,7 @@ export default function SearchFor() {
       `Opening mask editor for box ${boxId}, currentBoxId set to: ${boxId}`
     );
   };
-  // "Manual Mask": Applies the drawn mask using FastAPI, then updates the image.
+
   const handleManualMask = async () => {
     console.log(`Applying mask for box ${currentBoxId}`);
     const box = boxes.find((box) => box.id === currentBoxId);
@@ -287,7 +314,7 @@ export default function SearchFor() {
     }
     console.log(
       `Sending baseImageUrl for box ${currentBoxId}: ${box.baseImageUrl}`
-    ); // Added log
+    );
     if (!canvasRef.current) {
       alert("Drawing canvas not ready.");
       console.error("Canvas ref not ready:", canvasRef.current);
@@ -295,7 +322,6 @@ export default function SearchFor() {
     }
     const rawMaskDataUrl = canvasRef.current.getDataURL("png");
     const processedMaskDataUrl = await convertRedMaskToBinary(rawMaskDataUrl);
-    // Clear the canvas for the next drawing round.
     canvasRef.current.clear();
     try {
       const imageRes = await fetch(box.baseImageUrl);
@@ -321,7 +347,7 @@ export default function SearchFor() {
           data.filename
         )}`;
         setBoxes((prevBoxes) => {
-          const newBoxes = JSON.parse(JSON.stringify(prevBoxes)); // Deep copy
+          const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
           const boxIndex = newBoxes.findIndex((box) => box.id === currentBoxId);
           if (boxIndex !== -1) {
             newBoxes[boxIndex] = {
@@ -342,7 +368,7 @@ export default function SearchFor() {
       setResponse(`Error: ${error.message}`);
     }
   };
-  // Remove a box
+
   const handleRemoveBox = (boxId) => {
     setBoxes((prevBoxes) => {
       const newBoxes = prevBoxes.filter((box) => box.id !== boxId);
@@ -352,319 +378,307 @@ export default function SearchFor() {
   };
 
   return (
-    <div style={{ padding: "20px", color: "black" }}>
-      {/* Top Bar */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginBottom: "20px",
-        }}
-      ></div>
-      {/* Render all boxes dynamically */}
-      <div style={{ padding: "20px", color: "black" }}>
-        <div
-          style={{
-            display: "flex",
-            flexWrap: "wrap",
-            gap: "20px",
-            marginTop: "20px",
-            maxWidth: "100%", // Ensure it respects parent width
-            overflowX: "auto", // Scroll horizontally if needed
-          }}
+    <div className="search-for-container">
+      <div className="content">
+        <Box
+          border="1px solid #ccc"
+          borderRadius="5px"
+          padding="10px"
+          height="100%"
+          overflowY="auto"
+          width="100%"
         >
-          {boxes.map((box) => (
-            <div
-              key={box.id}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "20px",
-                flexShrink: 0, // Prevent shrinking smaller than content
-                maxWidth: "100%", // Ensure each box fits within parent
-              }}
+          <div className="boxes-wrapper">
+            <Box
+              height="400px" // Fixed height to constrain the boxes
+              overflowY="auto" // Allow scrolling within this Box
             >
-              {/* Show + Box and Buttons if No Image Selected */}
-              {!box.selectedImage ? (
-                <div
-                className="plus-box"
-                style={{
-                  width: "250px",
-                  height: "150px",
-                  backgroundColor: "#f1f1f1",
-                  border: "2px dashed #999",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: finalSelectedImages.length > 0 ? "pointer" : "not-allowed",
-                  opacity: finalSelectedImages.length > 0 ? 1 : 0.5,
-                  flexShrink: 0, // Prevent shrinking
-                }}
-                onClick={handleOpenModal}
+              {boxes.map((box) => (
+                <Box
+                  key={box.id}
+                  bg="gray.300"
+                  borderRadius="5px"
+                  padding="10px"
+                  display="flex"
+                  alignItems="center"
+                  gap="20px"
+                  width="100%"
+                  marginBottom="10px" // Adds space at the bottom of each box
                 >
-                  <FaPlus size={70} color="#ffffff" />
-                </div>
-              ) : (
-                // Show Image and Editing Buttons After Selection
-                <div
-                style={{
-                  display: "flex",
-                  gap: "20px",
-                  position: "relative",
-                  maxWidth: "100%",
-                }}
-                >
-                  {/* Left Column: Selected Image */}
-                  <div
-                    style={{
-                      width: "250px",
-                      height: "250px",
-                      border: "1px solid #ccc",
-                      flexShrink: 0,
-                    }}
-                  >
-                    {box.imageUrl ? (
-                      <img
-                        src={box.imageUrl}
-                        alt={`Selected for box ${box.id}`}
-                        style={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "contain",
-                        }}
-                      />
-                    ) : null}
-                  </div>
-                  {/* Right Column: Info, Action Buttons, and Close Button */}
-                  <div
-                    style={{
-                      flex: 1,
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "10px",
-                      minWidth: "150px", // Ensure buttons don’t collapse too small
-                    }}
-                  >
-                    <p>
-                      <strong>{box.fileName || "UnknownFile.jpg"}</strong>
-                      <br />
-                      {box.fileSize
-                        ? `${(box.fileSize / (1024 * 1024)).toFixed(2)} MB`
-                        : "0 MB"}
-                    </p>
-                    <p
-                      style={{ color: "#3083F9", cursor: "pointer" }}
-                      onClick={() => setShowFileInfoModal(true)}
+                  {!box.selectedImage ? (
+                    <Box
+                      width="250px"
+                      height="150px"
+                      bg="gray.200"
+                      _hover={{ bg: "blue.100" }}
+                      border="2px dashed #999"
+                      display="flex"
+                      alignItems="center"
+                      justifyContent="center"
+                      cursor={
+                        finalSelectedImages.length > 0
+                          ? "pointer"
+                          : "not-allowed"
+                      }
+                      opacity={finalSelectedImages.length > 0 ? 1 : 0.5}
+                      onClick={() => handleOpenModal(box.id)}
                     >
-                      File Info
-                    </p>
-                    <p
-                      style={{ color: "#3083F9", cursor: "pointer" }}
-                      onClick={() => setShowOpenFileModal(true)}
-                    >
-                      Open File
-                    </p>
-                    <button
-                      onClick={() => handleIsolateSubject(box.id)}
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Isolate Subject
-                    </button>
-                    <button
-                      onClick={() => openMaskEditor(box.id)}
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Manual Mask
-                    </button>
-                    <button
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Create New Object
-                    </button>
-                    <button
-                      style={{ width: "150px", padding: "8px", color: "black" }}
-                    >
-                      Add to Object Family
-                    </button>
-                    <button
-                      onClick={() => handleRemoveBox(box.id)}
+                      <FaPlus className="plus-icon" />
+                    </Box>
+                  ) : (
+                    <div className="image-content">
+                      <div className="image-wrapper">
+                        {box.imageUrl ? (
+                          <img
+                            src={box.imageUrl}
+                            alt={`Selected for box ${box.id}`}
+                            className="selected-image"
+                          />
+                        ) : null}
+                      </div>
+
+                      <div className="image-details">
+                        <div className="file-info-wrapper">
+                          <p className="file-info">
+                            <strong>{box.fileName || "UnknownFile.jpg"}</strong>
+                            <br />
+                            {box.fileSize
+                              ? `${(box.fileSize / (1024 * 1024)).toFixed(
+                                  2
+                                )} MB`
+                              : "0 MB"}
+                          </p>
+                          <p
+                            className="file-info-link"
+                            onClick={() => setShowFileInfoModal(true)}
+                          >
+                            File Info
+                          </p>
+                          <p
+                            className="file-info-link"
+                            onClick={() => setShowOpenFileModal(true)}
+                          >
+                            Open File
+                          </p>
+                        </div>
+                        <div className="buttons-wrapper">
+                          <button
+                            onClick={() => handleIsolateSubject(box.id)}
+                            className="action-button"
+                          >
+                            Isolate Subject
+                          </button>
+                          <button
+                            onClick={() => openMaskEditor(box.id)}
+                            className="action-button"
+                          >
+                            Manual Mask
+                          </button>
+                          <button className="action-button">
+                            Create New Object
+                          </button>
+                          <button className="action-button">
+                            Add to Object Family
+                          </button>
+                          <button
+                            onClick={() => handleRemoveBox(box.id)}
+                            className="remove-button"
+                          >
+                            <FaTimes className="remove-icon" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {!box.selectedImage && (
+                    <div className="placeholder-actions">
+                      <button
+                        className="action-button"
+                        onClick={() => handleOpenModal(box.id)}
+                      >
+                        Select Image
+                      </button>
+                      <button className="action-button">Select Object</button>
+                    </div>
+                  )}
+
+                  {isModalOpen && (
+                    <div
                       style={{
-                        position: "absolute",
-                        top: "-10px",
-                        right: "-10px",
-                        background: "red",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
-                        cursor: "pointer",
+                        position: "fixed",
+                        top: "50%",
+                        left: "50%",
+                        transform: "translate(-50%, -50%)",
+                        background: "#fff",
+                        padding: "20px",
+                        border: "1px solid #ccc",
+                        boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
+                        zIndex: 1000,
                         display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
+                        width: "500px",
+                        height: "300px",
                       }}
                     >
-                      <FaTimes size={12} />
-                    </button>
-                  </div>
-                </div>
-              )}
-              {/* Buttons Outside the Box (to the right) if no image selected */}
-              {!box.selectedImage && (
-                <div
-                  style={{
-                    marginLeft: "20px",
-                    display: "flex",
-                    flexDirection: "column",
-                    gap: "10px",
-                    flexShrink: 0, // Prevent shrinking
-                  }}
-                >
-                  {/* <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}> */}
-                  <button
-                    style={{
-                      backgroundColor: "#4C7EF3",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 25px",
-                      borderRadius: "10px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      width: "300px",
-                      
-                    }}
-                    onClick={handleOpenModal}
-                  >
-                    Select Image
-                  </button>
-                  <button
-                    style={{
-                      backgroundColor: "#4C7EF3",
-                      color: "white",
-                      border: "none",
-                      padding: "6px 25px",
-                      borderRadius: "10px",
-                      cursor: "pointer",
-                      fontSize: "14px",
-                      fontWeight: "bold",
-                      width: "300px",
-                    }}
-                  >
-                    Select Object
-                  </button>
-                </div>
-              )}
-              {/* Modal */}
-              {isModalOpen && (
-                <div
-                  style={{
-                    position: "fixed",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                    background: "#fff",
-                    padding: "20px",
-                    border: "1px solid #ccc",
-                    boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-                    zIndex: 1000,
-                    display: "flex",
-                    width: "500px",
-                    height: "300px",
-                  }}
-                >
-                  {/* Left Side: Image Names */}
-                  <div
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      borderRight: "1px solid #ddd",
-                      overflowY: "auto",
-                    }}
-                  >
-                    <h3>Select an Image</h3>
-                    {finalSelectedImages.length > 0 ? (
-                      finalSelectedImages.map((file, index) => {
-                        const imageUrl = URL.createObjectURL(file);
-                        return (
-                          <p
-                            key={index}
-                            style={{
-                              fontSize: "16px",
-                              marginBottom: "5px",
-                              fontWeight: "bold",
-                              cursor: "pointer",
-                              color:
-                                selectedModalImage === imageUrl
-                                  ? "blue"
-                                  : "black",
-                            }}
-                            onClick={() => {
-                              setSelectedModalImage(imageUrl);
-                              setSelectedFile(file); // Store the file object
-                            }}
-                          >
-                            {file.name}
-                          </p>
-                        );
-                      })
-                    ) : (
-                      <p>No images uploaded yet.</p>
-                    )}
-                  </div>
-
-                  {/* Right Side: Selected Image Preview */}
-                  <div
-                    style={{
-                      flex: 1,
-                      padding: "10px",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {selectedModalImage ? (
-                      <img
-                        src={selectedModalImage}
-                        alt="Selected Preview"
+                      <div
                         style={{
-                          width: "150px",
-                          height: "150px",
-                          objectFit: "contain",
-                          borderRadius: "5px",
-                          border: "1px solid #ccc",
+                          flex: 1,
+                          padding: "10px",
+                          borderRight: "1px solid #ddd",
+                          overflowY: "auto",
                         }}
-                      />
-                    ) : (
-                      <p style={{ fontSize: "14px", color: "#666" }}>
-                        Click a name to preview
-                      </p>
-                    )}
-                  </div>
-                  {/* Open Button */}
-                  <button
-                    onClick={() => handleCloseModal(box.id)}
-                    style={{
-                      position: "absolute",
-                      top: "10px",
-                      right: "10px",
-                      padding: "5px 10px",
-                      background: "red",
-                      color: "white",
-                      border: "none",
-                      cursor: "pointer",
-                    }}
-                  >
-                    Open
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
+                      >
+                        <h3>Select an Image or Frame</h3>
+                        {finalSelectedImages.length > 0 ? (
+                          finalSelectedImages.flatMap((file, index) => {
+                            const fileId = `${file.name}-${file.lastModified}`;
+                            console.log(
+                              `Processing file: ${file.name}, type: ${file.type}, fileId: ${fileId}`
+                            );
+
+                            if (file.type.startsWith("video/")) {
+                              const frames = fileFrames[fileId]?.frames || [];
+                              console.log(
+                                `Frames for ${file.name} (fileId: ${fileId}):`,
+                                frames
+                              );
+
+                              if (frames.length === 0) {
+                                return (
+                                  <p
+                                    key={`${fileId}-no-frames`}
+                                    style={{
+                                      fontSize: "14px",
+                                      marginBottom: "5px",
+                                      color: "gray",
+                                    }}
+                                  >
+                                    No frames available for {file.name}
+                                  </p>
+                                );
+                              }
+
+                              return frames.map((frame, frameIndex) => {
+                                const frameFile = dataURLtoFile(
+                                  frame,
+                                  `${file.name}-frame-${frameIndex + 1}.jpg`
+                                );
+                                const frameUrl = URL.createObjectURL(frameFile);
+                                console.log(
+                                  `Frame ${frameIndex + 1} for ${
+                                    file.name
+                                  }: ${frameUrl}`
+                                );
+
+                                return (
+                                  <p
+                                    key={`${fileId}-frame-${frameIndex}`}
+                                    style={{
+                                      fontSize: "16px",
+                                      marginBottom: "5px",
+                                      fontWeight: "bold",
+                                      cursor: "pointer",
+                                      color:
+                                        selectedModalImage === frameUrl
+                                          ? "blue"
+                                          : "black",
+                                    }}
+                                    onClick={() => {
+                                      console.log(
+                                        `Selected frame ${frameIndex + 1} for ${
+                                          file.name
+                                        }: ${frameUrl}`
+                                      );
+                                      setSelectedModalImage(frameUrl);
+                                      setSelectedFile(frameFile);
+                                    }}
+                                  >
+                                    {`${file.name} - Frame ${frameIndex + 1}`}
+                                  </p>
+                                );
+                              });
+                            } else {
+                              const imageUrl = URL.createObjectURL(file);
+                              console.log(
+                                `Image: ${file.name}, URL: ${imageUrl}`
+                              );
+
+                              return (
+                                <p
+                                  key={index}
+                                  style={{
+                                    fontSize: "16px",
+                                    marginBottom: "5px",
+                                    fontWeight: "bold",
+                                    cursor: "pointer",
+                                    color:
+                                      selectedModalImage === imageUrl
+                                        ? "blue"
+                                        : "black",
+                                  }}
+                                  onClick={() => {
+                                    console.log(
+                                      `Selected image: ${file.name}, URL: ${imageUrl}`
+                                    );
+                                    setSelectedModalImage(imageUrl);
+                                    setSelectedFile(file);
+                                  }}
+                                >
+                                  {file.name}
+                                </p>
+                              );
+                            }
+                          })
+                        ) : (
+                          <p style={{ fontSize: "14px", color: "#666" }}>
+                            No images or frames available.
+                          </p>
+                        )}
+                      </div>
+
+                      <div
+                        style={{
+                          flex: 1,
+                          padding: "10px",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "center",
+                        }}
+                      >
+                        {selectedModalImage ? (
+                          <img
+                            src={selectedModalImage}
+                            alt="Selected Preview"
+                            style={{
+                              width: "150px",
+                              height: "150px",
+                              objectFit: "cover",
+                              borderRadius: "5px",
+                              border: "1px solid #ccc",
+                            }}
+                          />
+                        ) : (
+                          <p style={{ fontSize: "14px", color: "#666" }}>
+                            Click a name to preview
+                          </p>
+                        )}
+                      </div>
+
+                      <button
+                        onClick={() => handleCloseModal(currentBoxId)}
+                        className="modal-open-button"
+                      >
+                        Open
+                      </button>
+                    </div>
+                  )}
+                </Box>
+              ))}
+            </Box>
+          </div>
+        </Box>
       </div>
-      {/* File Info Modal */}
+
       {showFileInfoModal && (
         <div
           style={{
@@ -677,14 +691,20 @@ export default function SearchFor() {
             border: "1px solid #ccc",
             boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
             zIndex: 1000,
+            color: "black",
           }}
         >
           <h3>File Info</h3>
           <p>I am a modal for file info</p>
-          <button onClick={() => setShowFileInfoModal(false)}>Close</button>
+          <button
+            onClick={() => setShowFileInfoModal(false)}
+            className="modal-close-button"
+          >
+            Close
+          </button>
         </div>
       )}
-      {/* Open File Modal */}
+
       {showOpenFileModal && (
         <div
           style={{
@@ -697,14 +717,20 @@ export default function SearchFor() {
             border: "1px solid #ccc",
             boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
             zIndex: 1000,
+            color: "black",
           }}
         >
           <h3>Open File</h3>
           <p>I am a modal for open files</p>
-          <button onClick={() => setShowOpenFileModal(false)}>Close</button>
+          <button
+            onClick={() => setShowOpenFileModal(false)}
+            className="modal-close-button"
+          >
+            Close
+          </button>
         </div>
       )}
-      {/* Manual Mask Editor Modal */}
+
       {isMaskEditorOpen && (
         <div
           style={{
@@ -720,7 +746,12 @@ export default function SearchFor() {
             zIndex: 1000,
           }}
         >
-          <div style={{ backgroundColor: "white", padding: "20px" }}>
+          <div
+            style={{
+              backgroundColor: "white",
+              padding: "20px",
+            }}
+          >
             <h2>Manual Mask Editor</h2>
             <div
               style={{
@@ -738,13 +769,20 @@ export default function SearchFor() {
                     position: "absolute",
                     width: "500px",
                     height: "500px",
-                    objectFit: "contain",
+                    objectFit: "cover",
                     border: "1px solid #ccc",
                     zIndex: 1,
                   }}
                 />
               ) : (
-                <p>No image available for masking</p>
+                <p
+                  style={{
+                    fontSize: "14px",
+                    color: "#666",
+                  }}
+                >
+                  No image available for masking
+                </p>
               )}
               <CanvasDraw
                 ref={canvasRef}
@@ -763,16 +801,13 @@ export default function SearchFor() {
                 }}
               />
             </div>
-            <div style={{ marginTop: "10px", display: "flex", gap: "10px" }}>
-              <button
-                onClick={handleManualMask}
-                style={{ width: "150px", padding: "8px", color: "black" }}
-              >
+            <div className="canvas-actions">
+              <button onClick={handleManualMask} className="action-button">
                 Apply Mask
               </button>
               <button
                 onClick={() => setIsMaskEditorOpen(false)}
-                style={{ width: "150px", padding: "8px", color: "black" }}
+                className="action-button"
               >
                 Close Editor
               </button>

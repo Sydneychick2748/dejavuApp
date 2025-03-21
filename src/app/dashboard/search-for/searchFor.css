@@ -1,13 +1,170 @@
-.imageSolid {
-    background-color: white;
-  }
+/* searchFor.css */
 
-  .plus-box {
-    /* Base styles are already defined in the inline style, but you can move them here if preferred */
-    transition: background-color 0.3s ease; /* Smooth transition for the hover effect */
-  }
-  
-  .plus-box:hover {
-    background-color: #b8c8e5; /* Change to the desired color on hover */
-  }
-  
+/* Main container */
+.search-for-container {
+  display: flex;
+  flex-direction: column;
+  height: 270px;
+}
+
+/* Header */
+.header {
+  flex: 0 0 auto;
+  padding: 10px 20px;
+  background-color: #f0f0f0;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+/* Content area */
+.content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px;
+  color: black;
+}
+
+/* Boxes wrapper */
+.boxes-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+/* Image content (after image selection) */
+.image-content {
+  display: flex;
+  gap: 15px; /* Reduced from 20px */
+  position: relative;
+  width: 100%;
+}
+
+/* Image wrapper */
+.image-wrapper {
+  width: 200px; /* Reduced from 250px */
+  height: 120px; /* Reduced from 150px */
+  border: 1px solid #ccc;
+  overflow: hidden;
+}
+
+/* Selected image */
+.selected-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Image details */
+.image-details {
+  display: flex;
+  justify-content: space-between; /* Pushes file info to left, buttons to right */
+  align-items: flex-start; /* Aligns items to the top for better stacking */
+  width: 100%;
+}
+
+.file-info-wrapper {
+  flex: 0 0 auto; /* Prevents it from stretching */
+  max-width: 150px; /* Limits width to encourage wrapping */
+}
+
+.buttons-wrapper {
+  display: flex;
+  flex-direction: column; /* Stacks buttons vertically */
+  gap: 3px; /* Further reduced from 5px */
+  align-items: flex-end; /* Aligns buttons to the right */
+}
+
+/* File info */
+.file-info {
+  margin: 0;
+  font-size: 9px; /* Reduced from 12px */
+  word-break: break-word; /* Allows long file names to wrap */
+  overflow-wrap: break-word; /* Fallback for broader compatibility */
+}
+
+/* File info links */
+.file-info-link {
+  color: #3083f9;
+  cursor: pointer;
+  margin: 0;
+  font-size: 10px; /* Reduced from 12px */
+}
+
+/* Action buttons */
+.action-button {
+  background-color: #3083f9;
+  color: white;
+  border: none;
+  padding: 3px 8px; /* Reduced from 5px 10px */
+  border-radius: 4px; /* Slightly smaller radius */
+  cursor: pointer;
+  width: 100px; /* Reduced from 120px */
+  text-align: center;
+  font-size: 10px; /* Reduced from 12px */
+}
+
+/* Remove button */
+.remove-button {
+  position: absolute;
+  top: -8px; /* Adjusted slightly */
+  right: -8px;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 16px; /* Reduced from 20px */
+  height: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove icon */
+.remove-icon {
+  font-size: 10px; /* Reduced from 12px */
+}
+
+/* Placeholder actions (before image selection) */
+.placeholder-actions {
+  margin-left: 15px; /* Reduced from 20px */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Reduced from 10px */
+}
+
+/* Plus icon */
+.plus-icon {
+  font-size: 40px; /* Reduced from 50px */
+  color: white;
+}
+
+/* Modal open button */
+.modal-open-button {
+  position: absolute;
+  top: 8px; /* Adjusted slightly */
+  right: 8px;
+  padding: 4px 8px; /* Reduced slightly */
+  background: red;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 10px; /* Added for consistency */
+}
+
+/* Modal close button */
+.modal-close-button {
+  padding: 4px 8px; /* Reduced slightly */
+  cursor: pointer;
+  font-size: 10px; /* Added for consistency */
+}
+
+/* Canvas actions */
+.canvas-actions {
+  margin-top: 8px; /* Reduced from 10px */
+  display: flex;
+  gap: 8px; /* Reduced from 10px */
+}

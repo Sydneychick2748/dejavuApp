@@ -1,3 +1,4 @@
+
 // "use client";
 
 // import React, { useState } from "react";
@@ -14,11 +15,29 @@
 
 //   return (
 //     <ImageProvider>
-//       <Flex
+//       <Flex justify="flex-end" p={2} gap={2} w="100vw">
+//         <button
+//           onClick={() => console.log("Info clicked")}
+//           style={{
+//             width: "30px",
+//             height: "30px",
+//             borderRadius: "50%",
+//             border: "none",
+//             backgroundColor: "#d6d6d6",
+//             backgroundImage: `url('/images/logos/DB Info.png')`,
+//             backgroundSize: "cover",
+//             backgroundPosition: "center",
+//             cursor: "pointer",
+//           }}
+//         ></button>
+//       </Flex>
+//       <Box
+//       display={"flex"}
 //         h="100vh"
-//         w="full"
+//         // w="full"
+//         maxW="100vw"
 //         p={4}
-//         bg="gray.100"
+//         bg="f1f1f1"
 //         direction={{ base: "column", md: "column", lg: "row" }}
 //         gap={4}
 //       >
@@ -53,9 +72,23 @@
 //         {/* Right Section (Search & Parameters) */}
 //         <Flex direction="column" flex="0 0 60%" gap={4}>
 //           {/* Top Right (Search for Image) */}
-//           <Box
+//           {/* <Box
 //             className="searchForBox"
 //             flex="0 0 40%"
+//             bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
+//             borderRadius="lg"
+//             shadow="md"
+//             transition="background 0.3s ease"
+//             onMouseEnter={() => setActiveBox("searchFor")}
+//             onMouseLeave={() => setActiveBox(null)}
+//             // width={"98%"}
+//           > */}
+//           <Box
+//             className="searchForBox"
+//             flex={{ base: "0 0 100%", lg: "0 0 40%" }} // Height in column layout
+//             w="100%" // Full width of its parent
+//             maxW="100%" // Prevent exceeding parent
+//             overflowX="auto" // Allow horizontal scrolling if content overflows
 //             bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
 //             borderRadius="lg"
 //             shadow="md"
@@ -82,13 +115,13 @@
 //                   as="button"
 //                   bg="white"
 //                   fontWeight={300}
-//                   color={activeBox === "searchFor" ? "#0B2856" : "#808080"} // Dark blue when active, grey otherwise
+//                   color={activeBox === "searchFor" ? "#0B2856" : "#808080"}
 //                   border="1px solid white"
 //                   borderRadius="8px"
 //                   p="4px 8px"
 //                   _hover={{
 //                     bg: "white",
-//                     color: "#FF4444", // Red on hover
+//                     color: "#FF4444",
 //                   }}
 //                   onClick={() => console.log("Remove All clicked")}
 //                 >
@@ -98,13 +131,13 @@
 //                   as="button"
 //                   bg="white"
 //                   fontWeight={300}
-//                   color={activeBox === "searchFor" ? "#0B2856" : "#808080"} // Dark blue when active, grey otherwise
+//                   color={activeBox === "searchFor" ? "#0B2856" : "#808080"}
 //                   border="1px solid white"
 //                   borderRadius="8px"
 //                   p="4px 8px"
 //                   _hover={{
 //                     bg: "white",
-//                     color: activeBox === "searchFor" ? "#4a88ff" : "#0B2856", // Lighter blue on hover when active, dark blue otherwise
+//                     color: activeBox === "searchFor" ? "#4a88ff" : "#0B2856",
 //                   }}
 //                   onClick={() => console.log("Object Library clicked")}
 //                 >
@@ -120,13 +153,13 @@
 //             <SearchParams />
 //           </Box>
 //         </Flex>
-//       </Flex>
+//       </Box>
 //     </ImageProvider>
 //   );
 // }
 
-"use client";
 
+"use client";
 import React, { useState } from "react";
 import { Flex, Box } from "@chakra-ui/react";
 import SearchFor from "./search-for/searchFor";
@@ -141,7 +174,7 @@ export default function Dashboard() {
 
   return (
     <ImageProvider>
-      <Flex justify="flex-end" p={2} gap={2} w="100vw">
+      <Flex justify="flex-end" p={1} gap={2} w="100vw">
         <button
           onClick={() => console.log("Info clicked")}
           style={{
@@ -149,19 +182,19 @@ export default function Dashboard() {
             height: "30px",
             borderRadius: "50%",
             border: "none",
-            backgroundColor: "#d6d6d6",
+            backgroundColor: "#D6D6D6",
             backgroundImage: `url('/images/logos/DB Info.png')`,
             backgroundSize: "cover",
             backgroundPosition: "center",
             cursor: "pointer",
           }}
-        ></button>
+        />
       </Flex>
-      <Flex
+      <Box
+        display="flex"
         h="100vh"
-        // w="full"
         maxW="100vw"
-        p={4}
+        p={1}
         bg="f1f1f1"
         direction={{ base: "column", md: "column", lg: "row" }}
         gap={4}
@@ -170,7 +203,7 @@ export default function Dashboard() {
         <Box
           className="uploadFilesBox"
           flex="0 0 40%"
-          bg={activeBox === "upload" ? "#e7eaee" : "#f1f1f1"}
+          bg={activeBox === "upload" ? "#E7EAEE" : "#F1F1F1"}
           borderRadius="lg"
           shadow="md"
           transition="background 0.3s ease"
@@ -180,8 +213,9 @@ export default function Dashboard() {
           <Box
             className="uploadSearchWithin"
             width="100%"
-            bg={activeBox === "upload" ? "#0b2856" : "#d6d6d6"}
-            p="10px 20px"
+            bg={activeBox === "upload" ? "#0B2856" : "#D6D6D6"}
+            p="14px 20px"
+            height="52px"
             fontSize="16px"
             fontWeight="600"
             color="white"
@@ -193,39 +227,25 @@ export default function Dashboard() {
           </Box>
           <UploadFiles />
         </Box>
-
         {/* Right Section (Search & Parameters) */}
         <Flex direction="column" flex="0 0 60%" gap={4}>
           {/* Top Right (Search for Image) */}
-          {/* <Box
-            className="searchForBox"
-            flex="0 0 40%"
-            bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
-            borderRadius="lg"
-            shadow="md"
-            transition="background 0.3s ease"
-            onMouseEnter={() => setActiveBox("searchFor")}
-            onMouseLeave={() => setActiveBox(null)}
-            // width={"98%"}
-          > */}
           <Box
             className="searchForBox"
-            flex={{ base: "0 0 100%", lg: "0 0 40%" }} // Height in column layout
-            w="100%" // Full width of its parent
-            maxW="100%" // Prevent exceeding parent
-            overflowX="auto" // Allow horizontal scrolling if content overflows
-            bg={activeBox === "searchFor" ? "#e7eaee" : "#f1f1f1"}
+            flex={{ base: "0 0 100%", lg: "0 0 40%" }}
+            w="100%"
+            maxW="100%"
+            bg={activeBox === "searchFor" ? "#E7EAEE" : "#F1F1F1"}
             borderRadius="lg"
             shadow="md"
             transition="background 0.3s ease"
             onMouseEnter={() => setActiveBox("searchFor")}
             onMouseLeave={() => setActiveBox(null)}
           >
-            {/* Header with Buttons */}
             <Flex
               align="center"
               justify="space-between"
-              bg={activeBox === "searchFor" ? "#0b2856" : "#d6d6d6"}
+              bg={activeBox === "searchFor" ? "#0B2856" : "#D6D6D6"}
               p="10px 20px"
               fontSize="16px"
               fontWeight="600"
@@ -262,7 +282,7 @@ export default function Dashboard() {
                   p="4px 8px"
                   _hover={{
                     bg: "white",
-                    color: activeBox === "searchFor" ? "#4a88ff" : "#0B2856",
+                    color: activeBox === "searchFor" ? "#4A88FF" : "#0B2856",
                   }}
                   onClick={() => console.log("Object Library clicked")}
                 >
@@ -272,13 +292,37 @@ export default function Dashboard() {
             </Flex>
             <SearchFor />
           </Box>
-
           {/* Bottom Right (Search Parameters) */}
-          <Box bg="white" p={4} borderRadius="lg" shadow="md">
-            <SearchParams />
+          <Box
+            className="searchParamsBox"
+            flex="1"
+            bg={activeBox === "searchParams" ? "#E7EAEE" : "#F1F1F1"}
+            borderRadius="lg"
+            shadow="md"
+            transition="background 0.3s ease"
+            onMouseEnter={() => setActiveBox("searchParams")}
+            onMouseLeave={() => setActiveBox(null)}
+          >
+            <Box
+              width="100%"
+              bg={activeBox === "searchParams" ? "#0B2856" : "#D6D6D6"}
+              p="14px 20px"
+              height="52px"
+              fontSize="16px"
+              fontWeight="600"
+              color="white"
+              borderTopRightRadius="10px"
+              borderTopLeftRadius="10px"
+              transition="background 0.3s ease"
+            >
+              Search Parameters
+            </Box>
+            <Box p={4}>
+              <SearchParams />
+            </Box>
           </Box>
         </Flex>
-      </Flex>
+      </Box>
     </ImageProvider>
   );
 }

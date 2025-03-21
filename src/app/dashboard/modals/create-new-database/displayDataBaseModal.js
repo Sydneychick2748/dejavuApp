@@ -1,3 +1,5 @@
+
+
 "use client";
 import React, { useState, useEffect } from "react";
 import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt } from "react-icons/fa";
@@ -31,7 +33,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
 
   // State to track selected preview (image or video)
   const [selectedPreview, setSelectedPreview] = useState(null);
-  const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Track selected file index
+  const [selectedFileIndex, setSelectedFileIndex] = useState(null);
 
   // State to track database name sequence
   const [databaseCount, setDatabaseCount] = useState(() => {
@@ -52,10 +54,13 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
     }));
     setFileSelections((prev) => ({
       ...prev,
-      [folderIndex]: selectedFolders[folderIndex].files.reduce((fileAcc, _, fileIndex) => {
-        fileAcc[fileIndex] = isChecked;
-        return fileAcc;
-      }, {}),
+      [folderIndex]: selectedFolders[folderIndex].files.reduce(
+        (fileAcc, _, fileIndex) => {
+          fileAcc[fileIndex] = isChecked;
+          return fileAcc;
+        },
+        {}
+      ),
     }));
   };
 
@@ -93,17 +98,21 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
   // Function to collect selected files and send them back with database name
   const handleFinish = () => {
     const selectedFiles = selectedFolders.flatMap((folder, folderIndex) =>
-      folder.files.filter((_, fileIndex) => fileSelections[folderIndex][fileIndex])
+      folder.files.filter(
+        (_, fileIndex) => fileSelections[folderIndex][fileIndex]
+      )
     );
     const databaseName = `database ${String.fromCharCode(65 + databaseCount)}`; // B, C, D, ...
     setDatabaseCount((prev) => prev + 1); // Increment for next database
     onNext({ files: selectedFiles, databaseName }); // Send selected files and database name to parent
   };
 
-  // Helper function to get an icon based on file type (for non-preview cases)
+  // Helper function to get an icon based on file type
   const getFileIcon = (file) => {
-    if (file.type.startsWith("image/")) return <FaFileImage style={{ color: "#4A88FF" }} />;
-    if (file.type.startsWith("video/")) return <FaFileVideo style={{ color: "#4A88FF" }} />;
+    if (file.type.startsWith("image/"))
+      return <FaFileImage style={{ color: "#4A88FF" }} />;
+    if (file.type.startsWith("video/"))
+      return <FaFileVideo style={{ color: "#4A88FF" }} />;
     return <FaFileAlt style={{ color: "#4A88FF" }} />;
   };
 
@@ -114,7 +123,14 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
 
   return (
     <div className="modal" style={modalStyle}>
-      <h3 style={{ color: "#000000" }}>Display Database</h3>
+      <div style={blueBarStyle}>
+        <h3 style={{ color: "black", margin: 0, fontSize: 15 }}>
+          New Database Settings
+        </h3>
+        <button onClick={onClose} style={closeButtonStyle}>
+          ×
+        </button>
+      </div>
       <div style={{ display: "flex", width: "100%", height: "300px" }}>
         {/* Left Side - Folders and Files */}
         <div style={leftPanelStyle}>
@@ -122,43 +138,63 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
             selectedFolders.map((folder, folderIndex) => (
               <div key={folderIndex} style={{ marginBottom: "10px" }}>
                 <div style={headerStyle}>
-                  <input
-                    type="checkbox"
-                    checked={folderSelections[folderIndex]}
-                    onChange={() => toggleFolderSelection(folderIndex)}
-                    style={{ marginRight: "8px" }}
-                  />
-                  <FaFolder size={32} style={{ marginRight: "8px", color: "#4A88FF" }} />
-                  <div>
-                    <strong style={{ color: "#000000" }}>{folder.folderName}</strong>
-                    <div style={{ fontSize: "0.9rem", color: "#555" }}>
-                      {getSelectedItemsCount(folderIndex)} item
-                      {getSelectedItemsCount(folderIndex) !== 1 ? "s" : ""} selected
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={folderSelections[folderIndex] || false}
+                      onChange={() => toggleFolderSelection(folderIndex)}
+                      style={{ marginRight: "8px" }}
+                    />
+                    <FaFolder
+                      size={32}
+                      style={{ marginRight: "8px", color: "#4A88FF" }}
+                    />
+                    <div>
+                      <strong style={{ color: "#000000" }}>
+                        {folder.folderName}
+                      </strong>
+                      <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                        {getSelectedItemsCount(folderIndex)} item
+                        {getSelectedItemsCount(folderIndex) !== 1 ? "s" : ""}{" "}
+                        selected
+                      </div>
                     </div>
                   </div>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <button
+                      onClick={() => toggleExpanded(folderIndex)}
+                      style={{
+                        ...toggleButtonStyle,
+                        backgroundColor: "#4A88FF",
+                        color: "#FFFFFF",
+                      }}
+                    >
+                      {expanded[folderIndex] ? " ▲" : " ▼"}
+                    </button>
+                  </div>
                 </div>
-                <button
-                  onClick={() => toggleExpanded(folderIndex)}
-                  style={{ ...toggleButtonStyle, backgroundColor: "#4A88FF", color: "#FFFFFF" }}
-                >
-                  {expanded[folderIndex] ? "Hide Files" : "Show Files"}
-                </button>
                 {expanded[folderIndex] && (
                   <div style={filesContainerStyle}>
                     {folder.files.map((file, fileIndex) => {
-                      const fileUrl = URL.createObjectURL(file); // Use fileUrl for both images and videos
+                      const fileUrl = URL.createObjectURL(file);
                       return (
                         <div
                           key={fileIndex}
                           style={{
                             ...fileItemStyle,
-                            opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
+                            opacity: fileSelections[folderIndex][fileIndex]
+                              ? 1
+                              : 0.4,
                           }}
                         >
                           <input
                             type="checkbox"
-                            checked={fileSelections[folderIndex][fileIndex]}
-                            onChange={() => toggleFileSelection(folderIndex, fileIndex)}
+                            checked={
+                              fileSelections[folderIndex][fileIndex] || false
+                            }
+                            onChange={() =>
+                              toggleFileSelection(folderIndex, fileIndex)
+                            }
                             style={{ marginRight: "8px" }}
                           />
                           {file.type.startsWith("image/") ? (
@@ -185,19 +221,25 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                                 marginRight: "8px",
                                 cursor: "pointer",
                               }}
-                              muted // Mute to avoid autoplay sound
+                              muted
                             >
                               Your browser does not support the video tag.
                             </video>
                           ) : (
-                            <span style={{ marginRight: "8px" }}>{getFileIcon(file)}</span>
+                            <span style={{ marginRight: "8px" }}>
+                              {getFileIcon(file)}
+                            </span>
                           )}
                           <span
                             style={{
                               fontSize: "0.8rem",
                               cursor: "pointer",
-                              color: selectedPreview === fileUrl ? "blue" : "#000000",
-                              fontWeight: selectedPreview === fileUrl ? "bold" : "normal",
+                              color:
+                                selectedPreview === fileUrl
+                                  ? "blue"
+                                  : "#000000",
+                              fontWeight:
+                                selectedPreview === fileUrl ? "bold" : "normal",
                             }}
                             onClick={() => {
                               setSelectedPreview(fileUrl);
@@ -207,7 +249,11 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                             {file.name}
                           </span>
                           <span
-                            style={{ marginLeft: "10px", color: "#3083F9", cursor: "pointer" }}
+                            style={{
+                              marginLeft: "10px",
+                              color: "#3083F9",
+                              cursor: "pointer",
+                            }}
                             onClick={() => handleMediaInfoClick(file)}
                           >
                             Media Info
@@ -229,7 +275,8 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
             <>
               {selectedFolders
                 .flatMap((folder) => folder.files)
-                .find((_, idx) => idx === selectedFileIndex)?.type.startsWith("video/") ? (
+                .find((_, idx) => idx === selectedFileIndex)
+                ?.type.startsWith("video/") ? (
                 <video
                   controls
                   src={selectedPreview}
@@ -256,18 +303,25 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                   }}
                 />
               )}
-              <div style={{ marginTop: "10px", textAlign: "center", color: "#000000" }}>
+              <div
+                style={{
+                  marginTop: "10px",
+                  textAlign: "center",
+                  color: "#000000",
+                }}
+              >
                 <p>
                   <strong>Name:</strong>{" "}
-                  {selectedFolders
-                    .flatMap((folder) => folder.files)
-                    [selectedFileIndex]?.name || "Unknown"}
+                  {selectedFolders.flatMap((folder) => folder.files)[
+                    selectedFileIndex
+                  ]?.name || "Unknown"}
                 </p>
                 <p>
                   <strong>Size:</strong>{" "}
                   {(
-                    (selectedFolders.flatMap((folder) => folder.files)[selectedFileIndex]?.size ||
-                      0) /
+                    (selectedFolders.flatMap((folder) => folder.files)[
+                      selectedFileIndex
+                    ]?.size || 0) /
                     (1024 * 1024)
                   ).toFixed(2)}{" "}
                   MB
@@ -284,17 +338,37 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
               </div>
             </>
           ) : (
-            <p style={{ fontSize: "14px", color: "#000000" }}>Click an image or video to preview</p>
+            <p style={{ fontSize: "14px", color: "#000000" }}>
+              Click an image or video to preview
+            </p>
           )}
         </div>
       </div>
       {/* Modal Buttons */}
-      <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
-        <button onClick={onClose} style={{ ...buttonStyle, backgroundColor: "#4A88FF", color: "#FFFFFF" }}>
-          Close
+      <div style={buttonContainerStyle}>
+        <button
+          onClick={onClose}
+          style={{
+            ...buttonStyle,
+            backgroundColor: "#e8e8e8",
+            color: "black",
+            width: "220px", // Set specific width
+            borderRadius: "20px", // Increased border radius
+          }}
+        >
+          Cancel
         </button>
-        <button onClick={handleFinish} style={{ ...buttonStyle, backgroundColor: "#4A88FF", color: "#FFFFFF" }}>
-          Finish
+        <button
+          onClick={handleFinish}
+          style={{
+            ...buttonStyle,
+            backgroundColor: "#4A88FF",
+            color: "#FFFFFF",
+            width: "220px", // Set specific width
+            borderRadius: "20px", // Increased border radius
+          }}
+        >
+          Create Database
         </button>
       </div>
       {/* Media Info Modal */}
@@ -303,11 +377,17 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
           <div style={modalContentStyle}>
             <h3 style={{ color: "#000000" }}>Media Info</h3>
             <p style={{ color: "#000000" }}>
-              {mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}
+              {mediaInfoFile
+                ? `File Name: ${mediaInfoFile.name}`
+                : "No file selected."}
             </p>
             <button
               onClick={() => setShowMediaInfoModal(false)}
-              style={{ ...buttonStyle, backgroundColor: "#4CAF50", color: "#FFFFFF" }}
+              style={{
+                ...buttonStyle,
+                backgroundColor: "#4CAF50",
+                color: "#FFFFFF",
+              }}
             >
               Close
             </button>
@@ -322,7 +402,11 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
             <p style={{ color: "#000000" }}>I am a modal for open files</p>
             <button
               onClick={() => setShowOpenFileModal(false)}
-              style={{ ...buttonStyle, backgroundColor: "#4CAF50", color: "#FFFFFF" }}
+              style={{
+                ...buttonStyle,
+                backgroundColor: "#4CAF50",
+                color: "#FFFFFF",
+              }}
             >
               Close
             </button>
@@ -340,23 +424,64 @@ const modalStyle = {
   left: "50%",
   transform: "translate(-50%, -50%)",
   padding: "20px",
-  backgroundColor: "#E6F0FA", // Light blue background
+  backgroundColor: "white",
   border: "1px solid #4A88FF",
   borderRadius: "8px",
   zIndex: 1000,
-  width: "800px",
+  width: "900px",
   height: "500px",
-  color: "#000000", // Ensure base text color is black
+  color: "#000000",
+  display: "flex", // Enable flexbox for vertical layout
+  flexDirection: "column", // Stack children vertically
 };
 
-const headerStyle = { display: "flex", alignItems: "center", marginBottom: "10px" };
+const blueBarStyle = {
+  width: "100%",
+  backgroundColor: "#eef2ff", // Light blue from ImportMediaModal
+  borderRadius: "8px 8px 0 0", // Rounded top corners
+  padding: "10px 20px", // No top padding, only bottom and sides
+  display: "flex",
+  alignItems: "flex-start", // Align items to the top
+  position: "relative", // For absolute positioning of the close button
+  minHeight: "40px", // Ensure enough height for content
+};
+
+const closeButtonStyle = {
+  position: "absolute",
+  top: "0", // Pin to the very top
+  right: "0", // Pin to the very right
+  width: "24px",
+  height: "24px",
+  backgroundColor: "white",
+  borderRadius: "50%",
+  border: "none",
+  color: "black",
+  fontSize: "16px",
+  fontWeight: "400",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  cursor: "pointer",
+  padding: "10px",
+  paddingBottom: "10px",  
+  margin: "10px", // Small margin to avoid touching the edge
+};
+
+const headerStyle = {
+  display: "flex",
+  justifyContent: "space-between",
+  alignItems: "center",
+  marginBottom: "10px",
+  width: "100%",
+};
+
 const toggleButtonStyle = {
   padding: "6px 12px",
-  marginBottom: "10px",
   border: "none",
   borderRadius: "4px",
   cursor: "pointer",
 };
+
 const filesContainerStyle = {
   maxHeight: "300px",
   overflowY: "auto",
@@ -365,6 +490,7 @@ const filesContainerStyle = {
   borderRadius: "4px",
   marginBottom: "10px",
 };
+
 const leftPanelStyle = {
   flex: 1,
   padding: "10px",
@@ -372,6 +498,7 @@ const leftPanelStyle = {
   overflowY: "auto",
   maxHeight: "400px",
 };
+
 const rightPanelStyle = {
   flex: 1,
   padding: "10px",
@@ -379,17 +506,30 @@ const rightPanelStyle = {
   flexDirection: "column",
   alignItems: "center",
   justifyContent: "center",
-  backgroundColor: "#F0F8FF", // Slightly darker blue for contrast
+  backgroundColor: "#F0F8FF",
   maxHeight: "400px",
 };
-const fileItemStyle = { display: "flex", alignItems: "center", marginBottom: "8px" };
+
+const fileItemStyle = {
+  display: "flex",
+  alignItems: "center",
+  marginBottom: "8px",
+};
+
 const buttonStyle = {
   padding: "8px 16px",
-  marginRight: "10px",
+  marginLeft: "10px", // Changed from marginRight to marginLeft for right alignment
   border: "none",
-  borderRadius: "4px",
   cursor: "pointer",
 };
+
+const buttonContainerStyle = {
+  marginTop: "auto", // Push to the bottom of the modal
+  display: "flex",
+  justifyContent: "flex-end", // Align buttons to the right
+  padding: "10px 0", // Add some padding for spacing
+};
+
 const modalOverlayStyle = {
   position: "fixed",
   top: 0,
@@ -402,13 +542,14 @@ const modalOverlayStyle = {
   justifyContent: "center",
   zIndex: 1100,
 };
+
 const modalContentStyle = {
-  backgroundColor: "#E6FFE6", // Light green background for sub-modals
+  backgroundColor: "#E6FFE6",
   padding: "20px",
   borderRadius: "8px",
   textAlign: "center",
   border: "1px solid #4CAF50",
-  color: "#000000", // Ensure text color is black
+  color: "#000000",
 };
 
 export default DisplayDataBaseModal;
