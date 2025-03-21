@@ -133,7 +133,9 @@
   margin-left: 15px; /* Reduced from 20px */
   display: flex;
   flex-direction: column;
-  gap: 8px; /* Reduced from 10px */
+  gap: 1px;
+  /* padding-right: 40px;
+  padding-left: 180px; */
 }
 
 /* Plus icon */
