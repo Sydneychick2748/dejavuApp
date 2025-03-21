@@ -65,9 +65,6 @@ import Advanced from "@/components/searchParams/advanced/advanced";
 import "./searchParams.css";
 export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState("Simple");
-  const startSearch = () => {
-    console.log("Look, I am searching!");
-  };
   return (
     <div className="settings">
       {/* <Box className="headerBox">
@@ -109,9 +106,6 @@ export default function SettingsPanel() {
             </div>
           </div>
         </div>
-      </div>
-      <div className="search">
-        <Button variant="solid" size="xl" onClick={startSearch}>Search</Button>
       </div>
     </div>
   );
@@ -172,12 +166,3 @@ export default function SettingsPanel() {
 //     </div>
 //   );
 // }
-
-
-
-
-
-
-
-
-
