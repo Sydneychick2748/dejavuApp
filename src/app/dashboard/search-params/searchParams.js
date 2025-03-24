@@ -85,13 +85,11 @@ import "./searchParams.css";
 export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState("Simple");
 
-  const startSearch = () => {
-    console.log("Look, I am searching!");
-  };
+
 
   return (
     <div className="settings">
-      <Box className="headerBox">
+      {/* <Box className="headerBox">
         <Text className="searchParamsWording">
           Search Parameters...
         </Text>
@@ -100,7 +98,7 @@ export default function SettingsPanel() {
             i
           </Text>
         </Box>
-      </Box>
+      </Box> */}
 
       <div className="container2">
         {/* Left Sidebar */}
@@ -134,9 +132,7 @@ export default function SettingsPanel() {
         </div>
       </div>
       
-      <div className="search">
-        <Button variant="solid" size="xl" onClick={startSearch}>Search</Button>
-      </div>
+      
     </div>
   );
 }

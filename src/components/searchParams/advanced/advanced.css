@@ -58,6 +58,8 @@
 }
 
 .saveParametersText .chakra-button:hover {
-    color: #4A88EF;
+    color: #A9D096;
+    text-decoration: underline;
+    text-decoration-color: #A9D096;
     background-color: white;
 }

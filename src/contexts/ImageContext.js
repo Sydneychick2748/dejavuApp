@@ -27,9 +27,3 @@ export const ImageProvider = ({ children }) => {
     </ImageContext.Provider>
   );
 };
-
-
-
-
-
-
