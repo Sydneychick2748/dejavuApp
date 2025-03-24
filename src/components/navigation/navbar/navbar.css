@@ -1,9 +1,24 @@
 
-body {
+html, body {
     margin: 0;
     padding: 0;
     width: 100%;
-  }
+    height: 100vh; /* Ensure the body fills the viewport height */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+}
+
+/* Ensure the body is a flex container to manage layout */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Ensure the body is at least the viewport height */
+}
+
+/* Main content should take up remaining space */
+main {
+    flex: 1; /* Grow to fill remaining space */
+    width: 100%;
+}
 .header-layout {
     display: flex !important;
     flex-direction: row !important;
