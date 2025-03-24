@@ -1,16 +1,13 @@
 "use client";
-
 import { Text, Box, CheckboxGroup, Fieldset, Button } from "@chakra-ui/react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Slider } from "@/components/ui/slider";
 import React, { useState, useEffect } from 'react';
 import "./advanced.css";
-
 export default function Advanced() {
     const defaultValue = 8;
     const [value, setValue] = useState(defaultValue);
     const [checked, setChecked] = useState(false);
-
     useEffect(() => {
         if (checked) {
             setValue(defaultValue);
@@ -21,17 +18,15 @@ export default function Advanced() {
             }, 100); // Small delay to allow slider animation to complete
         }
     }, [checked]);
-
     const handleSliderChange = (newValue) => {
         if (!checked) {
             setValue(newValue[0]);
         }
     };
-
     return (
         <div className="advancedOptions">
             <div className="resolutionSlider">
-                <Slider 
+                <Slider
                     aria-label='resolution level' 
                     size="lg" 
                     label="Resolution Level" 
@@ -53,7 +48,7 @@ export default function Advanced() {
                         {value: 10, label: "10"},
                         {value: 11, label: "11"},
                         {value: 12, label: "12"}
-                    ]} 
+                    ]}
                     thumbSize={{ width: 0.25, height: 1 }}
                     defaultValue={[defaultValue]}
                     value={[value]}
@@ -66,7 +61,7 @@ export default function Advanced() {
                         <CheckboxGroup name="framework">
                             <div className="firstSetInner">
                                 <Fieldset.Content>
-                                    <Checkbox 
+                                    <Checkbox
                                         _checked={{"& .chakra-checkbox__control": { background: "#4A87FB" }}} 
                                         value="no-rotation"
                                     >No rotation</Checkbox>
@@ -87,7 +82,7 @@ export default function Advanced() {
                     <Fieldset.Root>
                         <CheckboxGroup name="framework">
                             <Fieldset.Content>
-                                <Checkbox 
+                                <Checkbox
                                     _checked={{"& .chakra-checkbox__control": { background: "#4A87FB" }}}  
                                     value="mirrored"
                                 >Mirrored</Checkbox>
@@ -110,7 +105,7 @@ export default function Advanced() {
                         checked={checked}
                         onCheckedChange={(e) => setChecked(!!e.checked)}
                     >Default</Checkbox>
-                    <Button className="saveParametersButton" variant="plain">
+                    <Button variant="plain">
                         Save Parameters
                     </Button>
                 </div>
