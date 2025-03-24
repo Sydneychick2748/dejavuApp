@@ -1,0 +1,16 @@
+/* *****************************Search Button************************* */
+
+.search {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+}
+
+.search .chakra-button {
+    background-color: #4A87FB;
+    color: white;
+    border-radius: 1.5rem;
+    margin-top: 1rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
+}
