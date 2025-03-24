@@ -1,17 +1,15 @@
-"use client";
 
+"use client";
 import { SliderTrack, SliderThumb } from "@chakra-ui/react";
 import { Text, Box } from "@chakra-ui/react";
 import { Slider } from "@/components/ui/slider";
 import { Checkbox } from "@/components/ui/checkbox";
 import React, { useState, useEffect } from 'react';
 import "./simple.css";
-
 export default function Simple() {
     const defaultValue = 70;
     const [value, setValue] = useState(defaultValue);
     const [checked, setChecked] = useState(false);
-
     useEffect(() => {
         if (checked) {
             setValue(defaultValue);
@@ -22,13 +20,11 @@ export default function Simple() {
             }, 100); // Small delay to allow slider animation to complete
         }
     }, [checked]);
-
     const handleSliderChange = (newValue) => {
         if (!checked) {
             setValue(newValue[0]);
         }
     };
-
     return (
         <div className="sliderDiv">
             <div className="fastThoroughSlider">
@@ -38,7 +34,7 @@ export default function Simple() {
                     </Box>
                 </div>
                 <div className="slider">
-                    <Slider 
+                    <Slider
                         aria-label='fast-to-thorough-slider' 
                         size="lg" 
                         variant="solid" 
@@ -59,7 +55,7 @@ export default function Simple() {
                     </Box>
                 </div>
                 <div className="defaultCheckbox">
-                    <Checkbox 
+                    <Checkbox
                         checked={checked}
                         colorPalette="blue"
                         onCheckedChange={(e) => setChecked(!!e.checked)}

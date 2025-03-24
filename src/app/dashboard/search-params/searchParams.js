@@ -1,29 +1,16 @@
 // **************************Showing only active panel*************************
-
 // "use client";
-
-
 // import React, { useState } from 'react';
-
 // import { Box, Text, Button } from "@chakra-ui/react";
-
 // import Simple from "@/components/searchParams/simple/simple";
 // import Advanced from "@/components/searchParams/advanced/advanced";
-
 // import DatabaseResolutionLevel from '@/components/searchParams/databaseResolutionLevel';
-
 // import "./searchParams.css";
-
-
-
 // export default function SettingsPanel() {
 //   const [activeTab, setActiveTab] = useState("Simple");
-
 //   const startSearch = () => {
 //     console.log("Look, I am searching!");
 //   };
-
-
 //   return (
 //     <div className="settings">
 //       <Box className="headerBox">
@@ -36,7 +23,6 @@
 //           </Text>
 //         </Box>
 //       </Box>
-
 //       <div className="container2">
 //       {/* Left Sidebar */}
 //         <div className="sidebar">
@@ -55,7 +41,6 @@
 //             </li>
 //           </ul>
 //         </div>
-
 //         {/* Right Content Box */}
 //         <div className="content2">
 //           {activeTab === "Simple" && <Simple />}
@@ -71,22 +56,15 @@
 //     </div>
 //   );
 // }
-
 // *******************************Below is with both showing***************************
-
 "use client";
-
 import React, { useState } from 'react';
 import { Box, Text, Button } from "@chakra-ui/react";
 import Simple from "@/components/searchParams/simple/simple";
 import Advanced from "@/components/searchParams/advanced/advanced";
 import "./searchParams.css";
-
 export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState("Simple");
-
-
-
   return (
     <div className="settings">
       {/* <Box className="headerBox">
@@ -99,18 +77,17 @@ export default function SettingsPanel() {
           </Text>
         </Box>
       </Box> */}
-
       <div className="container2">
         {/* Left Sidebar */}
         <div className="sidebar">
           <ul>
-            <li 
+            <li
               className={activeTab === "Simple" ? "active" : "inactive"}
               onClick={() => setActiveTab("Simple")}
             >
               Simple
             </li>
-            <li 
+            <li
               className={activeTab === "Advanced" ? "active" : "inactive"}
               onClick={() => setActiveTab("Advanced")}
             >
@@ -118,7 +95,6 @@ export default function SettingsPanel() {
             </li>
           </ul>
         </div>
-
         {/* Right Content Box */}
         <div className="content2">
           <div className="panel-container">
@@ -131,35 +107,19 @@ export default function SettingsPanel() {
           </div>
         </div>
       </div>
-      
-      
     </div>
   );
 }
-
-
 // **************************************Previous with 3 options**************************
-
 // "use client";
-
-
 // import React, { useState } from 'react';
-
 // import { Box, Text, Button } from "@chakra-ui/react";
-
 // import Simple from "@/components/searchParams/simple/simple";
 // import SavedSettings from "@/components/searchParams/saved-settings/saved-settings";
 // import Advanced from "@/components/searchParams/advanced/advanced";
-
 // import "./searchParams.css";
-
-
-
 // export default function SettingsPanel() {
 //   const [activeTab, setActiveTab] = useState("Simple");
-
-
-
 //   return (
 //     <div className="settings">
 //       <Box className="headerBox">
@@ -172,7 +132,6 @@ export default function SettingsPanel() {
 //           </Text>
 //         </Box>
 //       </Box>
-
 //       <div className="container2">
 //       {/* Left Sidebar */}
 //         <div className="sidebar">
@@ -197,7 +156,6 @@ export default function SettingsPanel() {
 //             </li>
 //           </ul>
 //         </div>
-
 //         {/* Right Content Box */}
 //         <div className="content2">
 //           {activeTab === "Simple" && <Simple />}
