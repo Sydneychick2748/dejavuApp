@@ -1,52 +1,66 @@
-
-html, body {
+html,
+body {
     margin: 0;
     padding: 0;
     width: 100%;
-    height: 100vh; /* Ensure the body fills the viewport height */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    height: 100vh;
+    /* Ensure the body fills the viewport height */
+    overflow-x: hidden;
+    /* Prevent horizontal scrolling */
 }
 
 /* Ensure the body is a flex container to manage layout */
 body {
     display: flex;
     flex-direction: column;
-    min-height: 100vh; /* Ensure the body is at least the viewport height */
+    min-height: 100vh;
+    /* Ensure the body is at least the viewport height */
 }
 
 /* Main content should take up remaining space */
 main {
-    flex: 1; /* Grow to fill remaining space */
+    flex: 1;
+    /* Grow to fill remaining space */
     width: 100%;
 }
+
 .header-layout {
     display: flex !important;
     flex-direction: row !important;
     justify-content: space-between;
     font: bolder;
 }
+
 .menu-layout {
     display: flex !important;
     flex-direction: row !important;
-    flex-grow: 1;  /* Reduce the flex-grow to prevent too much expansion */
-    justify-content: flex-end; /* Push items towards the right */
+    flex-grow: 1;
+    /* Reduce the flex-grow to prevent too much expansion */
+    justify-content: flex-end;
+    /* Push items towards the right */
     align-items: center;
-    gap: 40px; /* Add spacing between menu items */
-    margin-right: 40px; /* Space between menu and profile */
+    gap: 40px;
+    /* Add spacing between menu items */
+    margin-right: 40px;
+    /* Space between menu and profile */
 }
+
 .logo-div {
     height: 5vh;
     flex-grow: 1;
     display: flex;
     align-items: center;
 }
+
 .nav-text {
-    margin-left: 15px; /* Adjust spacing between the logo and text */
+    margin-left: 15px;
+    /* Adjust spacing between the logo and text */
     font-size: 1.1rem;
     font-weight: 550;
     color: white;
     transition: color 0.3s ease-in-out;
 }
+
 .profile-layout {
     /* flex-grow: 0; Prevents expansion */
     align-self: center;
