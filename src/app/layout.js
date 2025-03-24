@@ -23,7 +23,7 @@ export default function RootLayout({ children }) {
           <Provider>
           {pathname === '/accounts/create-account' || pathname === '/accounts/login' || pathname === '/accounts/profile' || pathname === '/contact' || pathname === '/dashboard/upload-files' || pathname === '/help' || pathname === '/dashboard' ? <Header2 /> : <Header1 />}
           {children}
-          {pathname === '/help' || pathname === '/contact' ? <Footer2 /> : <Footer1 />}
+          {/* {pathname === '/help' || pathname === '/contact' ? <Footer2 /> : <Footer1 />} */}
           </Provider>
         {/* </div> */}
       </body>

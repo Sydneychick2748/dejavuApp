@@ -442,49 +442,691 @@
 
 
 
-
-
-
-
-
-
-
-
-
-
 "use client";
-import React from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
+import { ImageContext } from "@/contexts/ImageContext"; // Import ImageContext to store frames
+import { FaFolder, FaFileImage, FaFileVideo, FaFileAlt, FaForward, FaBackward, FaSave } from "react-icons/fa";
 
-const DisplayDataBaseModal = ({ onClose, onNext }) => {
+const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
+  // Access ImageContext to store saved frames
+  const { setFinalSelectedImages } = useContext(ImageContext);
+
+  // State to track folder selections (all folders initially checked)
+  const [folderSelections, setFolderSelections] = useState(
+    selectedFolders.reduce((acc, _, index) => {
+      acc[index] = true; // All folders start checked
+      return acc;
+    }, {})
+  );
+
+  // State to track selected files per folder
+  const [fileSelections, setFileSelections] = useState(
+    selectedFolders.reduce((acc, folder, folderIndex) => {
+      acc[folderIndex] = folder.files.reduce((fileAcc, _, fileIndex) => {
+        fileAcc[fileIndex] = true; // All files start checked
+        return fileAcc;
+      }, {});
+      return acc;
+    }, {})
+  );
+
+  // State for media info modal
+  const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
+  const [mediaInfoFile, setMediaInfoFile] = useState(null);
+
+  // State for open file modal
+  const [showOpenFileModal, setShowOpenFileModal] = useState(false);
+
+  // State to track selected preview (image or video)
+  const [selectedPreview, setSelectedPreview] = useState(null);
+  const [selectedFileIndex, setSelectedFileIndex] = useState(null); // Track selected file index
+
+  // State to track video duration and current time for the scrollbar
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null); // Hidden canvas for capturing frames
+
+  // State to store file URLs to prevent regeneration
+  const [fileUrls, setFileUrls] = useState({});
+
+  // State to store saved frames locally (timestamp, data URL, and source file ID)
+  const [savedFrames, setSavedFrames] = useState([]); // [{ timestamp: number, dataUrl: string, file: File, sourceFileId: string }]
+
+  // State to track database name sequence
+  const [databaseCount, setDatabaseCount] = useState(() => {
+    return parseInt(localStorage.getItem("databaseCount") || "1", 10);
+  });
+
+  // Generate file URLs once and store them
+  useEffect(() => {
+    const newFileUrls = {};
+    selectedFolders.forEach((folder, folderIndex) => {
+      folder.files.forEach((file, fileIndex) => {
+        const fileId = `${folderIndex}-${fileIndex}`;
+        if (!fileUrls[fileId]) {
+          const url = URL.createObjectURL(file);
+          newFileUrls[fileId] = url;
+        }
+      });
+    });
+    setFileUrls((prev) => ({ ...prev, ...newFileUrls }));
+
+    // Cleanup URLs on unmount
+    return () => {
+      Object.values(newFileUrls).forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [selectedFolders]);
+
+  // Update localStorage when databaseCount changes
+  useEffect(() => {
+    localStorage.setItem("databaseCount", databaseCount);
+  }, [databaseCount]);
+
+  // Toggles a folder selection and its files
+  const toggleFolderSelection = (folderIndex) => {
+    const isChecked = !folderSelections[folderIndex];
+
+    setFolderSelections((prev) => ({
+      ...prev,
+      [folderIndex]: isChecked,
+    }));
+
+    setFileSelections((prev) => ({
+      ...prev,
+      [folderIndex]: selectedFolders[folderIndex].files.reduce((fileAcc, _, fileIndex) => {
+        fileAcc[fileIndex] = isChecked;
+        return fileAcc;
+      }, {}),
+    }));
+  };
+
+  // Toggles an individual file selection inside a folder
+  const toggleFileSelection = (folderIndex, fileIndex) => {
+    setFileSelections((prev) => ({
+      ...prev,
+      [folderIndex]: {
+        ...prev[folderIndex],
+        [fileIndex]: !prev[folderIndex][fileIndex],
+      },
+    }));
+  };
+
+  // Expands the folders to show files
+  const [expanded, setExpanded] = useState({});
+
+  const toggleExpanded = (folderIndex) => {
+    setExpanded((prev) => ({
+      ...prev,
+      [folderIndex]: !prev[folderIndex],
+    }));
+  };
+
+  // Opens Media Info Modal
+  const handleMediaInfoClick = (file) => {
+    setMediaInfoFile(file);
+    setShowMediaInfoModal(true);
+  };
+
+  // Opens Open File Modal
+  const handleOpenFileClick = () => {
+    setShowOpenFileModal(true);
+  };
+
+  // Function to collect selected files and send them back with database name
+  const handleFinish = () => {
+    const selectedFiles = selectedFolders.flatMap((folder, folderIndex) =>
+      folder.files.filter((_, fileIndex) => fileSelections[folderIndex][fileIndex])
+    );
+
+    // Add saved frames to the final selected images in ImageContext
+    const frameFiles = savedFrames.map((frame) => frame.file);
+    setFinalSelectedImages((prev) => [...prev, ...frameFiles]);
+
+    const databaseName = `database ${String.fromCharCode(65 + databaseCount)}`; // B, C, D, ...
+    setDatabaseCount((prev) => prev + 1); // Increment for next database
+    onNext({ files: selectedFiles, databaseName, savedFrames }); // Pass saved frames to UploadFiles.js
+  };
+
+  // Helper function to get an icon based on file type (for non-preview cases)
+  const getFileIcon = (file) => {
+    if (file.type.startsWith("image/")) return <FaFileImage />;
+    if (file.type.startsWith("video/")) return <FaFileVideo />;
+    return <FaFileAlt />;
+  };
+
+  // Calculate the number of selected items in a folder
+  const getSelectedItemsCount = (folderIndex) => {
+    return Object.values(fileSelections[folderIndex]).filter(Boolean).length;
+  };
+
+  // Handle video metadata loading to get duration
+  const handleVideoLoadedMetadata = () => {
+    if (videoRef.current) {
+      setVideoDuration(videoRef.current.duration);
+      // Set canvas dimensions to match video
+      const canvas = canvasRef.current;
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+    }
+  };
+
+  // Update current time as the video plays
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
+
+  // Handle scrollbar change to seek video
+  const handleSeek = (event) => {
+    const newTime = parseFloat(event.target.value);
+    setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Handle fast-forward (skip forward 5 seconds)
+  const handleFastForward = () => {
+    if (videoRef.current) {
+      const newTime = Math.min(videoRef.current.currentTime + 5, videoDuration);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Handle rewind (skip backward 5 seconds)
+  const handleRewind = () => {
+    if (videoRef.current) {
+      const newTime = Math.max(videoRef.current.currentTime - 5, 0);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  // Format time for display (MM:SS)
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  // Helper function to convert a data URL to a File object
+  const dataURLtoFile = (dataUrl, filename) => {
+    const arr = dataUrl.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+    return new File([u8arr], filename, { type: mime });
+  };
+
+  // Handle saving the current frame
+  const handleSaveFrame = () => {
+    if (!videoRef.current || !canvasRef.current) return;
+
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+
+    // Draw the current video frame onto the canvas
+    context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+    // Convert the canvas content to a data URL (JPEG format)
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.8); // 0.8 is the quality (0 to 1)
+
+    // Create a File object from the data URL
+    const fileName = `frame-${formatTime(currentTime).replace(":", "-")}.jpg`;
+    const frameFile = dataURLtoFile(dataUrl, fileName);
+
+    // Get the source file ID of the current video
+    const sourceFile = selectedFolders
+      .flatMap((folder) => folder.files)
+      [selectedFileIndex];
+    const sourceFileId = `${sourceFile.name}-${sourceFile.lastModified}`;
+
+    // Store the frame with its timestamp and source file ID
+    setSavedFrames((prev) => [
+      ...prev,
+      { timestamp: currentTime, dataUrl, file: frameFile, sourceFileId },
+    ]);
+  };
+
+  // Handle deleting a frame
+  const handleDeleteFrame = (originalIndex) => {
+    setSavedFrames((prev) => prev.filter((_, i) => i !== originalIndex));
+  };
+
   return (
     <div className="modal" style={modalStyle}>
       <h3>Display Database</h3>
-      <p>This is the Display Database modal content.</p>
-      <div style={{ marginTop: "20px" }}>
-        <button 
-          onClick={onClose} 
-          style={{ padding: "8px 16px", marginRight: "10px" }}
-        >
+
+      <div style={{ display: "flex", width: "100%", height: "300px" }}>
+        {/* Left Side - Folders and Files */}
+        <div style={leftPanelStyle}>
+          {selectedFolders && selectedFolders.length > 0 ? (
+            selectedFolders.map((folder, folderIndex) => (
+              <div key={folderIndex} style={{ marginBottom: "10px" }}>
+                <div style={headerStyle}>
+                  <input
+                    type="checkbox"
+                    checked={folderSelections[folderIndex]}
+                    onChange={() => toggleFolderSelection(folderIndex)}
+                    style={{ marginRight: "8px" }}
+                  />
+                  <FaFolder size={32} style={{ marginRight: "8px" }} />
+                  <div>
+                    <strong>{folder.folderName}</strong>
+                    <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                      {getSelectedItemsCount(folderIndex)} item{getSelectedItemsCount(folderIndex) !== 1 ? "s" : ""} selected
+                    </div>
+                  </div>
+                </div>
+
+                <button onClick={() => toggleExpanded(folderIndex)} style={toggleButtonStyle}>
+                  {expanded[folderIndex] ? "Hide Files" : "Show Files"}
+                </button>
+
+                {expanded[folderIndex] && (
+                  <div style={filesContainerStyle}>
+                    {folder.files.map((file, fileIndex) => {
+                      const fileId = `${folderIndex}-${fileIndex}`;
+                      const fileUrl = fileUrls[fileId] || ""; // Use stored URL
+                      return (
+                        <div
+                          key={fileId}
+                          style={{
+                            ...fileItemStyle,
+                            opacity: fileSelections[folderIndex][fileIndex] ? 1 : 0.4,
+                          }}
+                        >
+                          <input
+                            type="checkbox"
+                            checked={fileSelections[folderIndex][fileIndex]}
+                            onChange={() => toggleFileSelection(folderIndex, fileIndex)}
+                            style={{ marginRight: "8px" }}
+                          />
+                          {file.type.startsWith("image/") ? (
+                            <img
+                              src={fileUrl}
+                              alt={file.name}
+                              style={{
+                                maxWidth: "100px",
+                                maxHeight: "100px",
+                                marginRight: "8px",
+                                cursor: "pointer",
+                              }}
+                              onClick={() => {
+                                setSelectedPreview(fileUrl);
+                                setSelectedFileIndex(
+                                  selectedFolders
+                                    .slice(0, folderIndex)
+                                    .reduce((acc, f) => acc + f.files.length, 0) + fileIndex
+                                );
+                              }}
+                            />
+                          ) : file.type.startsWith("video/") ? (
+                            <video
+                              src={fileUrl}
+                              style={{
+                                maxWidth: "100px",
+                                maxHeight: "100px",
+                                marginRight: "8px",
+                                cursor: "pointer",
+                              }}
+                              muted // Mute to avoid autoplay sound
+                            >
+                              Your browser does not support the video tag.
+                            </video>
+                          ) : (
+                            <span style={{ marginRight: "8px" }}>{getFileIcon(file)}</span>
+                          )}
+                          <span
+                            style={{
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              color: selectedPreview === fileUrl ? "blue" : "black",
+                              fontWeight: selectedPreview === fileUrl ? "bold" : "normal",
+                            }}
+                            onClick={() => {
+                              setSelectedPreview(fileUrl);
+                              setSelectedFileIndex(
+                                selectedFolders
+                                  .slice(0, folderIndex)
+                                  .reduce((acc, f) => acc + f.files.length, 0) + fileIndex
+                              );
+                            }}
+                          >
+                            {file.name}
+                          </span>
+                          <span
+                            style={{ marginLeft: "10px", color: "#3083F9", cursor: "pointer" }}
+                            onClick={() => handleMediaInfoClick(file)}
+                          >
+                            Media Info
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))
+          ) : (
+            <p>No folders selected.</p>
+          )}
+        </div>
+
+        {/* Right Side - Image/Video Preview and Details */}
+        <div style={rightPanelStyle}>
+          {selectedPreview ? (
+            <>
+              {selectedFolders
+                .flatMap((folder) => folder.files)
+                .find((_, idx) => idx === selectedFileIndex)?.type.startsWith("video/") ? (
+                <div style={{ width: "100%", height: "70%", position: "relative" }}>
+                  <video
+                    key={selectedPreview} // Ensure video element doesn't remount unnecessarily
+                    ref={videoRef}
+                    src={selectedPreview}
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "contain",
+                      border: "1px solid #ccc",
+                      borderRadius: "5px",
+                    }}
+                    muted // Mute to avoid autoplay sound
+                    onLoadedMetadata={handleVideoLoadedMetadata}
+                    onTimeUpdate={handleTimeUpdate}
+                  >
+                    Your browser does not support the video tag.
+                  </video>
+                  {/* Custom Scrollbar with Fast-Forward, Rewind, and Save Frame Buttons */}
+                  <div style={{ marginTop: "10px", display: "flex", alignItems: "center", gap: "10px" }}>
+                    <button
+                      onClick={handleRewind}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Rewind 5 seconds"
+                    >
+                      <FaBackward size={20} color="#555" />
+                    </button>
+                    <span>{formatTime(currentTime)}</span>
+                    <input
+                      type="range"
+                      min="0"
+                      max={videoDuration || 0}
+                      step="0.1"
+                      value={currentTime}
+                      onChange={handleSeek}
+                      style={{
+                        flex: 1,
+                        cursor: "pointer",
+                      }}
+                    />
+                    <span>{formatTime(videoDuration)}</span>
+                    <button
+                      onClick={handleFastForward}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Fast-forward 5 seconds"
+                    >
+                      <FaForward size={20} color="#555" />
+                    </button>
+                    <button
+                      onClick={handleSaveFrame}
+                      style={{
+                        background: "none",
+                        border: "none",
+                        cursor: "pointer",
+                        padding: "5px",
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                      title="Save frame at current timestamp"
+                    >
+                      <FaSave size={20} color="#555" />
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <img
+                  src={selectedPreview}
+                  alt="Selected Preview"
+                  style={{
+                    width: "100%",
+                    height: "70%",
+                    objectFit: "contain",
+                    border: "1px solid #ccc",
+                    borderRadius: "5px",
+                  }}
+                />
+              )}
+              <div style={{ marginTop: "40px", textAlign: "center" }}>
+                <p>
+                  <strong>Name:</strong>{" "}
+                  {selectedFolders
+                    .flatMap((folder) => folder.files)
+                    [selectedFileIndex]?.name || "Unknown"}
+                </p>
+                <p>
+                  <strong>Size:</strong>{" "}
+                  {(
+                    (selectedFolders.flatMap((folder) => folder.files)[selectedFileIndex]?.size ||
+                      0) /
+                    (1024 * 1024)
+                  ).toFixed(2)}{" "}
+                  MB
+                </p>
+                <p>
+                  <strong>Frame:</strong> N/A
+                </p>
+                <p style={{ color: "#3083F9", cursor: "pointer" }} onClick={handleOpenFileClick}>
+                  Open File
+                </p>
+              </div>
+            </>
+          ) : (
+            <p style={{ fontSize: "14px", color: "#666" }}>Click an image or video to preview</p>
+          )}
+        </div>
+      </div>
+
+      {/* Modal Buttons */}
+      <div style={{ marginTop: "20px", display: "flex", justifyContent: "space-between" }}>
+        <button onClick={onClose} style={buttonStyle}>
           Close
         </button>
-        <button onClick={onNext} style={{ padding: "8px 16px" }}>
+        <button onClick={handleFinish} style={buttonStyle}>
           Finish
         </button>
       </div>
+
+      {/* Media Info Modal */}
+      {showMediaInfoModal && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3>Media Info</h3>
+            <p>I am a modal</p>
+            <button onClick={() => setShowMediaInfoModal(false)} style={buttonStyle}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Open File Modal */}
+      {showOpenFileModal && (
+        <div style={modalOverlayStyle}>
+          <div style={modalContentStyle}>
+            <h3>Open File</h3>
+            {selectedFolders
+              .flatMap((folder) => folder.files)
+              [selectedFileIndex]?.type.startsWith("video/") ? (
+              <>
+                <p>Frames saved for this video:</p>
+                {savedFrames.length > 0 ? (
+                  <div style={{ maxHeight: "300px", overflowY: "auto", marginTop: "10px" }}>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                      {savedFrames
+                        .map((frame, originalIndex) => ({ frame, originalIndex })) // Keep track of original index
+                        .filter(
+                          ({ frame }) =>
+                            frame.sourceFileId ===
+                            `${selectedFolders
+                              .flatMap((folder) => folder.files)
+                              [selectedFileIndex]?.name}-${selectedFolders
+                              .flatMap((folder) => folder.files)
+                              [selectedFileIndex]?.lastModified}`
+                        )
+                        .map(({ frame, originalIndex }) => (
+                          <div key={originalIndex} style={{ textAlign: "center", position: "relative" }}>
+                            <img
+                              src={frame.dataUrl}
+                              alt={`Saved frame at ${formatTime(frame.timestamp)}`}
+                              style={{
+                                width: "100px",
+                                height: "100px",
+                                objectFit: "cover",
+                                borderRadius: "4px",
+                              }}
+                            />
+                            <p style={{ fontSize: "0.8rem", color: "#555" }}>
+                              {formatTime(frame.timestamp)}
+                            </p>
+                            <button
+                              onClick={() => handleDeleteFrame(originalIndex)} // Use original index
+                              style={{
+                                position: "absolute",
+                                top: "5px",
+                                right: "5px",
+                                background: "rgba(255, 0, 0, 0.7)",
+                                border: "none",
+                                borderRadius: "4px",
+                                width: "20px",
+                                height: "20px",
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                cursor: "pointer",
+                                color: "white",
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                                padding: "0",
+                              }}
+                              title="Delete frame"
+                            >
+                              X
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+                ) : (
+                  <p style={{ fontSize: "0.9rem", color: "#666" }}>No frames saved for this video.</p>
+                )}
+              </>
+            ) : (
+              <p>No frames available for images.</p>
+            )}
+            <button onClick={() => setShowOpenFileModal(false)} style={buttonStyle}>
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Hidden canvas for capturing frames */}
+      <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
 };
 
+// Styles
 const modalStyle = {
   position: "fixed",
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
   padding: "20px",
-  backgroundColor: "white",
+  backgroundColor: "#fff",
   border: "1px solid #ccc",
   borderRadius: "8px",
   zIndex: 1000,
+  width: "800px",
+  height: "500px",
+};
+
+const headerStyle = { display: "flex", alignItems: "center", marginBottom: "10px" };
+const toggleButtonStyle = { padding: "6px 12px", marginBottom: "10px" };
+const filesContainerStyle = {
+  maxHeight: "300px",
+  overflowY: "auto",
+  border: "1px solid #ddd",
+  padding: "10px",
+  borderRadius: "4px",
+  marginBottom: "10px",
+};
+
+const leftPanelStyle = {
+  flex: 1,
+  padding: "10px",
+  borderRight: "1px solid #ddd",
+  overflowY: "auto",
+  maxHeight: "400px",
+};
+
+const rightPanelStyle = {
+  flex: 1,
+  padding: "10px",
+  display: "flex",
+  flexDirection: "column",
+  alignItems: "center",
+  justifyContent: "center",
+  backgroundColor: "#f9f9f9",
+  maxHeight: "400px",
+};
+
+const fileItemStyle = { display: "flex", alignItems: "center", marginBottom: "8px" };
+const buttonStyle = { padding: "8px 16px", marginRight: "10px" };
+
+const modalOverlayStyle = {
+  position: "fixed",
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+  backgroundColor: "rgba(0, 0, 0, 0.5)",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "center",
+  zIndex: 1100,
+};
+
+const modalContentStyle = {
+  backgroundColor: "#fff",
+  padding: "20px",
+  borderRadius: "8px",
+  textAlign: "center",
+  maxWidth: "600px",
+  width: "100%",
 };
 
 export default DisplayDataBaseModal;
