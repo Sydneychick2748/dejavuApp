@@ -6,20 +6,24 @@
     align-items: center;
     padding: 1%;
 }
+
 .searchParamsWording {
     color: white;
     font: bold;
     font-size: 2rem;
 }
+
 .infoBox {
     background-color: white;
     border-radius: 0.2rem;
     padding: 2%;
     font-style: italic;
 }
+
 .infoLetter {
     color: #4888F0
 }
+
 /* **************************Showing each option only when active**************** */
 /* .container2 {
     display: flex;
@@ -67,17 +71,20 @@
     display: flex;
     background-color: #E7E9EF;
 }
+
 .sidebar {
     width: 25%;
     padding: 5px 0px 5px 5px;
     margin-right: 0px;
 }
+
 .sidebar ul {
     list-style: none;
     padding: 0;
     margin: 0;
     height: 100%;
 }
+
 .sidebar li {
     padding: 10px;
     cursor: pointer;
@@ -87,53 +94,65 @@
     color: #333;
     display: block;
 }
+
 .sidebar li:hover {
     background: white;
 }
+
 .sidebar li.active {
     background: white;
     color: #007BFF;
     opacity: 1;
     pointer-events: auto;
 }
+
 .sidebar li.inactive {
     opacity: 0.5;
     background-color: #E7E9EF;
     pointer-events: auto;
 }
+
 .sidebar li:nth-child(1) {
     height: 20%;
     padding-left: 1rem;
 }
+
 .sidebar li:nth-child(2) {
     height: 80%;
     padding-top: 2rem;
     padding-left: 1rem;
 }
+
 .content2 {
     width: 75%;
     padding: 5px 5px 5px 0px;
 }
+
 .panel-container {
     position: relative;
     height: 100%;
     width: 100%;
 }
+
 .panel {
     transition: opacity 0.3s ease;
 }
+
 .panel:nth-child(1) {
     height: 20%;
 }
+
 .panel:nth-child(2) {
     height: 80%;
 }
+
 .panel.inactive {
     opacity: 0.5;
     background-color: #E7E9EF;
     pointer-events: none;
     padding: 1rem;
 }
+
 .panel.active {
     opacity: 1;
     background-color: white;
@@ -141,6 +160,7 @@
     padding: 1rem;
     border-radius: 0rem 0.5rem 0.5rem 0rem;
 }
+
 .panel {
     display: block;
 }
