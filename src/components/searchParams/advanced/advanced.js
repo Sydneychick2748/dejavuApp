@@ -110,7 +110,7 @@ export default function Advanced() {
                         checked={checked}
                         onCheckedChange={(e) => setChecked(!!e.checked)}
                     >Default</Checkbox>
-                    <Button variant="plain">
+                    <Button className="saveParametersButton" variant="plain">
                         Save Parameters
                     </Button>
                 </div>

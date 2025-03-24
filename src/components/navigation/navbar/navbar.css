@@ -1,3 +1,9 @@
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+}
+
 .header-layout {
     display: flex !important;
     flex-direction: row !important;
@@ -8,17 +14,34 @@
 .menu-layout {
     display: flex !important;
     flex-direction: row !important;
-    flex-grow: 17;
-    justify-content: space-evenly;
+    flex-grow: 1;
+    /* Reduce the flex-grow to prevent too much expansion */
+    justify-content: flex-end;
+    /* Push items towards the right */
     align-items: center;
+    gap: 40px;
+    /* Add spacing between menu items */
+    margin-right: 40px;
+    /* Space between menu and profile */
 }
 
 .logo-div {
-    height: 2vh;
+    height: 5vh;
     flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.nav-text {
+    margin-left: 15px;
+    /* Adjust spacing between the logo and text */
+    font-size: 1.1rem;
+    font-weight: 550;
+    color: white;
+    transition: color 0.3s ease-in-out;
 }
 
 .profile-layout {
-    flex-grow: 1;
-    align-self: flex-start;
+    /* flex-grow: 0; Prevents expansion */
+    align-self: center;
 }
