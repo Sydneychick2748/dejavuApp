@@ -1,3 +1,5 @@
+"use client"
+
 "use client";
 import React, { useState } from "react";
 import { Flex, Box } from "@chakra-ui/react";
@@ -6,12 +8,12 @@ import SearchParams from "./search-params/searchParams";
 import UploadFiles from "./upload-files/UploadFiles";
 import SearchButton from "@/components/searchButton";
 import { ImageProvider } from "@/contexts/ImageContext";
+
+import SearchButton from "@/components/searchButton/searchButton";
 import "./dashboard.css";
 import "../globals.css";
-
 export default function Dashboard() {
   const [activeBox, setActiveBox] = useState(null);
-
   return (
     <ImageProvider>
       <Flex justify="flex-end" p={1} gap={2} w="100vw">
@@ -68,11 +70,11 @@ export default function Dashboard() {
           <UploadFiles />
         </Box>
         {/* Right Section (Search & Parameters) */}
-        <Flex direction="column" flex="0 0 60%" gap={4}>
+        <Flex direction="column" flex="0 0 59%" gap={4}>
           {/* Top Right (Search for Image) */}
           <Box
             className="searchForBox"
-            flex={{ base: "0 0 100%", lg: "0 0 40%" }}
+            flex={{ base: "0 0 100%", lg: "0 0 31%" }}
             w="100%"
             maxW="100%"
             bg={activeBox === "searchFor" ? "#E7EAEE" : "#F1F1F1"}
@@ -82,7 +84,6 @@ export default function Dashboard() {
             onMouseEnter={() => setActiveBox("searchFor")}
             onMouseLeave={() => setActiveBox(null)}
           >
-            {/* Header with Buttons */}
             <Flex
               align="center"
               justify="space-between"
@@ -95,8 +96,7 @@ export default function Dashboard() {
               borderTopLeftRadius="10px"
               transition="background 0.3s ease"
             >
-            
-              <Box> Search For...</Box>
+              <Box>Search For...</Box>
               <Flex gap={2}>
                 <Box
                   as="button"
@@ -135,23 +135,33 @@ export default function Dashboard() {
             <SearchFor />
           </Box>
           {/* Bottom Right (Search Parameters) */}
-          <Box bg="white" p={4} borderRadius="lg" shadow="md">
           <Box
-            className="uploadSearchWithin"
-            width="100%"
-            bg={activeBox === "upload" ? "#0B2856" : "#D6D6D6"}
-            p="14px 20px"
-            height="52px"
-            fontSize="16px"
-            fontWeight="600"
-            color="white"
-            borderTopRightRadius="10px"
-            borderTopLeftRadius="10px"
+            className="searchParamsBox"
+            flex="1"
+            bg={activeBox === "searchParams" ? "#E7EAEE" : "#F1F1F1"}
+            borderRadius="lg"
+            shadow="md"
             transition="background 0.3s ease"
+            onMouseEnter={() => setActiveBox("searchParams")}
+            onMouseLeave={() => setActiveBox(null)}
           >
-            Search Params...
-          </Box>
-            <SearchParams />
+            <Box
+              width="100%"
+              bg={activeBox === "searchParams" ? "#0B2856" : "#D6D6D6"}
+              p="14px 20px"
+              height="52px"
+              fontSize="16px"
+              fontWeight="600"
+              color="white"
+              borderTopRightRadius="10px"
+              borderTopLeftRadius="10px"
+              transition="background 0.3s ease"
+            >
+              Search Parameters
+            </Box>
+            <Box p={4}>
+              <SearchParams />
+            </Box>
           </Box>
           <SearchButton />
         </Flex>
