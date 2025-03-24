@@ -23,6 +23,22 @@ export default function ImageSelectModal({ isOpen, onClose }) {
       <button onClick={onClose} style={{ marginTop: "10px", padding: "10px" }}>
         Close
       </button>
+      <h3>Select an Image</h3>
+      <p>This is a simple modal that opens when clicking the `+` box.</p>
+      <button onClick={onClose} style={{ marginTop: "10px", padding: "10px" }}>
+        Close
+      </button>
+      <h3>Select an Image</h3>
+      <p>This is a simple modal that opens when clicking the `+` box.</p>
+      <button onClick={onClose} style={{ marginTop: "10px", padding: "10px" }}>
+        Close
+      </button>
+      <h3>Select an Image</h3>
+      <p>This is a simple modal that opens when clicking the `+` box.</p>
+      <button onClick={onClose} style={{ marginTop: "10px", padding: "10px" }}>
+        Close
+      </button>
+      
     </div>
   );
 }
