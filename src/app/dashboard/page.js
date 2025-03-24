@@ -6,7 +6,6 @@ import { Flex, Box } from "@chakra-ui/react";
 import SearchFor from "./search-for/searchFor";
 import SearchParams from "./search-params/searchParams";
 import UploadFiles from "./upload-files/UploadFiles";
-import SearchButton from "@/components/searchButton";
 import { ImageProvider } from "@/contexts/ImageContext";
 
 import SearchButton from "@/components/searchButton/searchButton";
