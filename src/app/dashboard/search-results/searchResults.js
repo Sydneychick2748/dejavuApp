@@ -23,29 +23,62 @@ const SearchResults = ({ onReturn }) => {
   const [isGridView, setIsGridView] = useState(false);
   const toggleView = () => setIsGridView((prev) => !prev);
 
+  const fileInputRef = React.useRef(null);
+
+  const handleUploadClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
+  const handleFileChange = (event) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      console.log("Selected files:", files);
+      // You can do something with the files here
+    }
+  };
+
   return (
     <Box className="searchResultsContainer">
       <Box className="searchResultsLeft">
         <Box className="searchResultsContentleft">
           <Box className="headerContent">
             <Box className="leftSection">
-              <Image
-                src="/images/logos/LeftCaret.png"
-                alt="Left arrow"
-                className="headerImage"
-              />
+              <button className="leftCaretButton" onClick={onReturn}>
+                <Image
+                  src="/images/logos/LeftCaret.png"
+                  alt="Left arrow"
+                  className="headerImage"
+                />
+              </button>
               <Text className="headerTitle">Search Results</Text>
             </Box>
             <Text className="headerCenter">[No parameters set]</Text>
             <Box className="rightSection">
               <button className="headerButton bookmarkButton buttonIcon"></button>
-              <button className="headerButton uploadButton buttonIcon"></button>
+              <button
+                className="headerButton uploadButton buttonIcon"
+                onClick={handleUploadClick}
+              ></button>
+              <input
+                type="file"
+                ref={fileInputRef}
+                style={{ display: "none" }}
+                onChange={handleFileChange}
+                multiple
+                accept="image/*,video/*" // adjust as needed
+              />
             </Box>
           </Box>
 
           <Box className="leftContentContainer">
             {
-              <Box className="searchImageToggleContainer">
+              <Box
+                className={`searchImageToggleContainer ${
+                  isSearchImagesExpanded ? "expanded" : ""
+                }`}
+              >
                 <Box
                   className={`toggleHeader ${
                     isSearchImagesExpanded ? "expanded" : ""
@@ -63,16 +96,23 @@ const SearchResults = ({ onReturn }) => {
                     )}
                   </Box>
                 </Box>
+
                 {isSearchImagesExpanded && (
                   <Box className="toggleContent">
-                    {/* You can populate this with dynamic content later */}
+                    {/* Expanded content goes here */}
                   </Box>
                 )}
-              </Box> /* <Text className="contentText">Left Div Content</Text> */
+              </Box>
             }
 
+            {isSearchImagesExpanded && <Box className="searchImageSpacer" />}
+
             {
-              <Box className="allMatchesToggleContainer">
+              <Box
+                className={`allMatchesToggleContainer ${
+                  isMatchesExpanded ? "expanded" : ""
+                }`}
+              >
                 <Box
                   className={`toggleHeader ${
                     isMatchesExpanded ? "expanded" : ""
@@ -86,13 +126,16 @@ const SearchResults = ({ onReturn }) => {
                     {isMatchesExpanded ? <FaChevronUp /> : <FaChevronDown />}
                   </Box>
                 </Box>
+
                 {isMatchesExpanded && (
                   <Box className="toggleContent">
-                    {/* You can populate this with dynamic content later */}
+                    {/* Matches content goes here */}
                   </Box>
                 )}
-              </Box> /* <Text className="contentText">Left Div Content</Text> */
+              </Box>
             }
+
+            {isMatchesExpanded && <Box className="allMatchesSpacer" />}
 
             {/* Scrollable section under All Matches */}
             <Box className="matchesListContainer">
@@ -177,11 +220,21 @@ const SearchResults = ({ onReturn }) => {
                 </Box>
               </Box>
 
-              <Box className="matchesScrollArea">
-                {/* Sample scroll content */}
+              <Box
+                className={`matchesScrollArea ${
+                  isGridView ? "gridView" : "listView"
+                }`}
+              >
                 {[...Array(40)].map((_, index) => (
                   <Box key={index} className="matchItem">
-                    {/* Match #{index + 1} */}
+                    <Image
+                      src={`/images/sample/sample${(index % 5) + 1}.jpg`} // Sample images for demonstration
+                      alt={`Sample ${index}`}
+                      className="matchImage"
+                    />
+                    {!isGridView && (
+                      <Text className="matchLabel">Match #{index + 1}</Text>
+                    )}
                   </Box>
                 ))}
               </Box>
@@ -194,6 +247,29 @@ const SearchResults = ({ onReturn }) => {
             <Text className="rightHeaderTitle">Image Registration</Text>
           </Box>
           <Box className="rightContentContainer">
+            <Box className="imageArea">
+              {/* Placeholder for image/canvas if needed */}
+              <div className="checkboxBottomRight">
+                <label className="filterItem">
+                  <input type="checkbox" />
+                  Show Matching Area
+                </label>
+              </div>
+            </Box>
+
+            <div className="sliderWrapper">
+              <input type="range" className="frameSlider" />
+            </div>
+
+            <div className="registrationActions">
+              <button className="objectFamilyBtn">Add to Object Family</button>
+            </div>
+
+            <div className="bottomMetaBar">
+              <span className="filenameText">filename.mp4</span>
+              <span className="frameText">Frame # / #</span>
+              <span className="moreOptions">More Options</span>
+            </div>
             {/* <Text className="contentText">Right Div Content</Text> */}
           </Box>
         </Box>
