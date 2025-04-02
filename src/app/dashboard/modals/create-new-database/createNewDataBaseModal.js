@@ -1,60 +1,75 @@
+
 "use client";
 import React, { useState, useRef } from "react";
-import { FaInfoCircle, FaCloudUploadAlt, FaFolder } from "react-icons/fa";
+import { FaInfoCircle, FaCloudUploadAlt, FaFolder, FaFolderOpen } from "react-icons/fa";
 
 const CreateNewDataBaseModal = ({ onClose, onNext }) => {
   const [databaseName, setDatabaseName] = useState("");
   const [databaseNameError, setDatabaseNameError] = useState("");
-  const [selectedFolders, setSelectedFolders] = useState([]);
+  const [selectedFolders, setSelectedFolders] = useState([]); // Now includes subfolders
   const [showInfoMessage, setShowInfoMessage] = useState(false);
   const folderInputRef = useRef(null);
 
-  // Handle folder selection
   const handleFolderChange = (event) => {
     const files = Array.from(event.target.files);
-    if (files.length > 0) {
-      const folderMap = new Map();
+    if (files.length === 0) return;
 
-      // Group files by their top-level folder
-      files.forEach((file) => {
-        const folderName = file.webkitRelativePath.split("/")[0];
-        if (!folderMap.has(folderName)) {
-          folderMap.set(folderName, []);
+    // Build a nested folder structure
+    const folderTree = { name: "", subFolders: new Map() };
+
+    files.forEach((file) => {
+      if (!file.type.startsWith("image/") && !file.type.startsWith("video/")) return;
+
+      const pathParts = file.webkitRelativePath.split("/");
+      pathParts.pop(); // Remove the file name
+      let currentLevel = folderTree.subFolders;
+
+      // Traverse or create the folder hierarchy
+      pathParts.forEach((part, index) => {
+        if (!currentLevel.has(part)) {
+          currentLevel.set(part, { name: part, subFolders: new Map(), files: [] });
         }
-        if (file.type.startsWith("image/") || file.type.startsWith("video/")) {
-          folderMap.get(folderName).push(file);
+        if (index === pathParts.length - 1) {
+          // Last part of the path, add the file
+          currentLevel.get(part).files.push(file);
+        } else {
+          // Move deeper into the hierarchy
+          currentLevel = currentLevel.get(part).subFolders;
         }
       });
 
-      const newFolders = [];
-      folderMap.forEach((folderFiles, folderName) => {
-        if (folderFiles.length > 0) {
-          newFolders.push({ folderName, files: folderFiles });
-        }
-      });
-
-      if (newFolders.length > 0) {
-        setSelectedFolders((prev) => {
-          const existingNames = new Set(prev.map((f) => f.folderName));
-          const uniqueNewFolders = newFolders.filter(
-            (f) => !existingNames.has(f.folderName)
-          );
-          return [...prev, ...uniqueNewFolders];
-        });
-        console.log("Updated selected folders:", [...selectedFolders, ...newFolders]);
-      } else {
-        alert("No images or videos found in the selected folders.");
+      // Set the top-level folder name (first part of the path)
+      if (pathParts.length > 0 && !folderTree.name) {
+        folderTree.name = pathParts[0];
       }
+    });
+
+    // Convert Map to array for easier rendering
+    const convertMapToArray = (map) =>
+      Array.from(map.values()).map((folder) => ({
+        ...folder,
+        subFolders: convertMapToArray(folder.subFolders),
+      }));
+
+    const newFolders = convertMapToArray(folderTree.subFolders);
+    if (newFolders.length === 0) {
+      alert("No images or videos found in the selected folders.");
+      return;
     }
+
+    setSelectedFolders((prev) => {
+      const existingNames = new Set(prev.map((f) => f.name));
+      const uniqueNewFolders = newFolders.filter((f) => !existingNames.has(f.name));
+      return [...prev, ...uniqueNewFolders];
+    });
+
     event.target.value = "";
   };
 
-  // Trigger folder input click
   const handleUploadClick = () => {
     folderInputRef.current?.click();
   };
 
-  // Proceed to next modal
   const handleNextClick = () => {
     if (!databaseName.trim()) {
       setDatabaseNameError("You need to name your database.");
@@ -72,8 +87,9 @@ const CreateNewDataBaseModal = ({ onClose, onNext }) => {
       mainFolder: {
         name: databaseName.trim(),
         subFolders: selectedFolders.map((folder) => ({
-          name: folder.folderName,
+          name: folder.name,
           files: folder.files,
+          subFolders: folder.subFolders, // Include nested subfolders
         })),
       },
     };
@@ -85,6 +101,25 @@ const CreateNewDataBaseModal = ({ onClose, onNext }) => {
   const toggleInfoMessage = () => {
     setShowInfoMessage((prev) => !prev);
   };
+
+  // Calculate folder and file counts recursively
+  const calculateFolderStats = (folders) => {
+    let folderCount = folders.length;
+    let fileCount = 0;
+
+    folders.forEach((folder) => {
+      fileCount += folder.files.length;
+      if (folder.subFolders && folder.subFolders.length > 0) {
+        const subStats = calculateFolderStats(folder.subFolders);
+        folderCount += subStats.folderCount;
+        fileCount += subStats.fileCount;
+      }
+    });
+
+    return { folderCount, fileCount };
+  };
+
+  const stats = calculateFolderStats(selectedFolders);
 
   return (
     <div className="modal" style={modalStyle}>
@@ -198,19 +233,28 @@ const CreateNewDataBaseModal = ({ onClose, onNext }) => {
               Uploaded Folders ({selectedFolders.length})
             </h4>
             <div style={folderContainerStyle}>
-              {selectedFolders.map((folder, index) => (
-                <div key={`folder-${index}`} style={summaryStyle}>
-                  <FaFolder size={32} style={{ marginRight: "8px", color: "#007BFF" }} />
-                  <div>
+              {selectedFolders.map((folder, index) => {
+                const subStats = calculateFolderStats(folder.subFolders);
+                return (
+                  <div key={`folder-${index}`} style={summaryStyle}>
+                    <FaFolder size={32} style={{ marginRight: "8px", color: "#FFD700" }} />
                     <div>
-                      <strong>{folder.folderName}</strong>
-                    </div>
-                    <div style={{ fontSize: "0.9rem", color: "#555" }}>
-                      {folder.files.length} file{folder.files.length !== 1 ? "s" : ""} (images/videos)
+                      <div>
+                        <strong>{folder.name}</strong>
+                      </div>
+                      <div style={{ fontSize: "0.9rem", color: "#555", display: "flex", alignItems: "center" }}>
+                        {folder.subFolders.length > 0 && (
+                          <>
+                            <FaFolderOpen size={16} style={{ marginRight: "4px", color: "#007BFF" }} />
+                            {folder.subFolders.length} subfolder{folder.subFolders.length !== 1 ? "s" : ""}, 
+                          </>
+                        )}
+                        {folder.files.length + subStats.fileCount} file{(folder.files.length + subStats.fileCount) !== 1 ? "s" : ""} (images/videos)
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         )}
@@ -236,9 +280,9 @@ const modalStyle = {
   zIndex: 1000,
   display: "block",
   width: "600px",
-  height: "500px", // Fixed height
+  height: "500px",
   boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
-  overflow: "hidden", // Prevent modal scrolling
+  overflow: "hidden",
 };
 
 const headerStyle = {
@@ -256,7 +300,7 @@ const contentStyle = {
   color: "black",
   display: "flex",
   flexDirection: "column",
-  height: "calc(100% - 40px)", // Adjust for header height
+  height: "calc(100% - 40px)",
 };
 
 const uploadButtonStyle = {
@@ -275,15 +319,15 @@ const uploadButtonStyle = {
 
 const folderListStyle = {
   margin: "10px 0",
-  flex: "1 1 auto", // Grow to fill available space
-  minHeight: 0, // Allow shrinking
+  flex: "1 1 auto",
+  minHeight: 0,
   display: "flex",
   flexDirection: "column",
 };
 
 const folderContainerStyle = {
-  flex: "1 1 auto", // Fill available space in folderList
-  overflowY: "auto", // Scrollable folder list
+  flex: "1 1 auto",
+  overflowY: "auto",
   border: "1px solid #ddd",
   borderRadius: "4px",
   padding: "10px",
