@@ -2168,6 +2168,8 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
     const hoverStyle = { color: "#0056D2" }; // Dark blue on hover
     const clickedStyle = { color: "#003087" }; // Keep the clicked style
 
+const hoveredIcon = "blue"
+
     const iconStyle = {
       ...baseStyle,
       ...(hoveredIcon === iconId ? hoverStyle : {}), // Apply hover style if hovered
