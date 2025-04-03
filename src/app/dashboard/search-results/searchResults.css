@@ -1,0 +1,873 @@
+Reset default margins and ensure box-sizing * {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.searchResultsContainer {
+  width: 100vw;
+  height: 100vh;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+}
+
+/* .searchResultsLeft {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  height: 85vh;
+  max-width: 100vw;
+  gap: 20px;
+  margin-top: 16px;
+} */
+
+.searchResultsLeft {
+  display: flex;
+  justify-content: center; /* center children */
+  align-items: stretch;
+  width: 100%;
+  height: 85vh;
+  gap: 20px;
+  margin-top: 16px;
+}
+
+/* Right side (image registration) */
+.searchResultsContentRight {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 10px;
+}
+
+/* 
+.searchResultsContentleft,
+.searchResultsContentRight {
+  width: 50vw;
+  height: 100%;
+  background-color: #ffffff;
+  position: relative;
+} */
+
+.searchResultsContentleft,
+.searchResultsContentRight {
+  width: 49vw; /* or try a fixed width like 500px */
+  /* max-width: 550px;
+  min-width: 300px; */
+  height: 100%;
+  background-color: #ffffff;
+  position: relative;
+}
+
+.searchResultsContentleft::before,
+.searchResultsContentRight::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  background-color: #d1d5db;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  transition: background-color 0.3s ease;
+  z-index: 0;
+}
+
+.searchResultsContentleft:hover::before,
+.searchResultsContentRight:hover::before {
+  background-color: #4a88ff;
+}
+
+.searchResultsContentRight:hover .contentContainer {
+  background-color: #d9dff7;
+}
+
+.headerContent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 8px;
+  z-index: 1;
+}
+
+.leftSection {
+  display: flex;
+  align-items: center;
+}
+
+.headerImage {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
+.headerTitle,
+.rightHeaderTitle {
+  font-size: 1.25rem;
+  font-weight: 500;
+  color: white;
+}
+
+.headerCenter {
+  font-size: 0.875rem;
+  color: white;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.leftContentContainer,
+.rightContentContainer {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-bottom-left-radius: 8px;
+  border-bottom-right-radius: 8px;
+  border-top: 0;
+  background-color: #f2f2f2; /* Default background color */
+  transition: background-color 0.3s ease;
+}
+
+/* Change left and right contentContainer background color on hover */
+.searchResultsContentleft:hover .leftContentContainer {
+  background-color: #eef2ff;
+}
+
+/* Change rightContentContainer background on hover */
+.searchResultsContentRight:hover .rightContentContainer {
+  background-color: #eef2ff;
+}
+
+.contentText {
+  margin-top: 0;
+}
+
+/* Right Section Styles */
+.rightSection {
+  display: flex;
+  flex-wrap: wrap;
+  /* gap: 0px; */
+}
+
+.headerButton {
+  width: 50px;
+  height: 50px;
+  border: none;
+  border-radius: 50%;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.buttonIcon {
+  width: 30px;
+  height: 30px;
+  /* padding: 0px; */
+}
+
+/* Apply the background overlay when the entire div is hovered */
+.searchResultsContentleft:hover {
+  background-color: #eef2ff;
+}
+
+/* Bookmark Button */
+.bookmarkButton {
+  background-image: url("/images/logos/Bookmark Search Results.png");
+}
+
+/* Change bookmark button image when the entire div is hovered */
+.searchResultsContentleft:hover .bookmarkButton {
+  background-image: url("/images/logos/BookMarkHover.png");
+}
+
+/* Upload Button */
+.uploadButton {
+  background-image: url("/images/logos/uploadIcon.png");
+}
+
+/* Change upload button image when the entire div is hovered */
+.searchResultsContentleft:hover .uploadButton {
+  background-image: url("/images/logos/uploadIconHover.png");
+}
+
+/* Toggle Section */
+.searchImageToggleContainer {
+  margin-top: 0px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.2s ease;
+  position: relative;
+  z-index: 10;
+}
+
+.searchImageToggleContainer.expanded {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  border-radius: 12px;
+  padding: 0 16px;
+  margin-right: 15px;
+  margin-left: 17px;
+  margin-top: 20px;
+  /* width: auto; */
+}
+
+/* Give it enough height to visually cover All Matches */
+.searchImageToggleContainer.expanded .toggleContent {
+  min-height: 35px; /* adjust as needed */
+}
+
+/* Hover on entire container */
+.searchImageToggleContainer:hover,
+.allMatchesToggleContainer:hover {
+  background-color: #ffffff;
+}
+
+.searchImageToggleContainer:not(.expanded) {
+  margin-bottom: 10px;
+}
+
+.searchImageSpacer {
+  height: 20px; /* Adjust this to match your expanded height visually */
+  width: 100%;
+}
+
+.allMatchesToggleContainer {
+  margin-top: 10px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+  transition: background-color 0.2s ease;
+}
+
+.allMatchesToggleContainer.expanded {
+  position: absolute;
+  top: 80px; /* set this to visually sit below the All Search Images bar */
+  left: 0;
+  right: 0;
+  z-index: 9;
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 0 16px;
+  margin-left: 17px;
+  margin-right: 15px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+}
+
+.allMatchesSpacer {
+  height: 20px; /* adjust this to match your expanded overlay visually */
+  width: 100%;
+}
+
+.toggleHeader {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 12px 12px 12px 0;
+  border-radius: 12px;
+}
+
+.toggleLabel {
+  font-size: 1rem;
+  font-weight: 500;
+  color: #1a2a42;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toggleDivider {
+  color: #c9ccd0; /* Tailwind's gray-400 or use #808080 for plain gray */
+  font-weight: normal;
+}
+
+.toggleHeader:hover .toggleLabel::before,
+.toggleHeader.expanded .toggleLabel::before {
+  border-color: #4a88ff;
+}
+
+/* Real blue radio button look */
+.toggleLabel::before {
+  content: "";
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  padding: 2px; /* acts as the border */
+  background-clip: content-box;
+  background-color: #4a88ff; /* blue fill */
+  border: 2px solid #d1d5db; /* gray border */
+  transition: border-color 0.2s ease;
+}
+
+/* Caret icon */
+.caretIcon {
+  margin-left: auto;
+  font-size: 18px;
+  color: #cbd5e0;
+  transition: color 0.2s ease;
+  display: flex;
+  align-items: center;
+}
+
+/* Turn caret blue on hover or active */
+.toggleHeader:hover .caretIcon,
+.toggleHeader:active .caretIcon {
+  color: #4a88ff;
+}
+
+.toggleContent {
+  padding: 12px 0 16px;
+  font-size: 0.8rem;
+  color: #4a5568;
+  border-radius: 0 0 12px 12px;
+  background-color: transparent;
+}
+
+/* Div under All Matches */
+.matchesListContainer {
+  margin-top: 16px;
+  padding: 0 16px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  height: 550px; /* Set desired height */
+  overflow: hidden;
+}
+
+.matchesHeader {
+  display: flex;
+  align-items: center;
+  padding: 12px 16px;
+  border-bottom: 1px solid #e2e8f0;
+  font-size: 1rem;
+  gap: 12px; /* spacing between #results and input */
+}
+
+.resultsLabel {
+  font-size: medium;
+  font-weight: 550;
+  color: #1a2a42;
+  white-space: nowrap;
+}
+
+/* Lookup Input */
+.lookupInputContainer {
+  display: flex;
+  align-items: center;
+  background-color: #f4f4f4;
+  border-radius: 999px;
+  padding: 4px 12px;
+  height: 32px;
+  border: 1px solid #e2e8f0;
+  gap: 6px;
+}
+
+.lookupInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 0.8rem;
+  color: #1a2a42;
+  width: 90px;
+}
+
+/* Icon from react-icons */
+.searchInputIcon {
+  font-size: 14px;
+  color: #a0aec0;
+}
+
+.lookupInputContainer:hover .searchInputIcon {
+  color: #4a88ff;
+}
+
+/* Sort Button Container */
+.sortButton {
+  display: flex;
+  align-items: center;
+  padding: 4px 12px;
+  background-color: #f4f4f4;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  height: 32px;
+  transition: background-color 0.2s ease;
+  gap: 8px;
+}
+
+.sortButton:hover .sortLabel {
+  color: #4a88ff;
+}
+
+/* Text Label */
+.sortLabel {
+  font-weight: 500;
+  font-size: 0.9rem;
+  color: #1a2a42;
+  white-space: nowrap;
+  width: 100px;
+  border-radius: 5px;
+}
+
+/* Carets Layout */
+.caretGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: center;
+  justify-content: center;
+  color: gray;
+}
+
+.sortCaretUp {
+  font-size: 9px;
+}
+
+.sortCaretDown {
+  font-size: 10px;
+}
+
+/* Separate Hover Colors */
+.sortCaretUp:hover {
+  color: #4a88ff;
+}
+
+.sortCaretDown:hover {
+  color: #4a88ff;
+}
+
+.filterButton:hover,
+.sortButton:hover {
+  background-color: #e5e7eb; /* Tailwind's gray-200 (slightly darker gray) */
+}
+
+/* Shared button style */
+.filterButton {
+  display: flex;
+  align-items: center;
+  background-color: #f4f4f4;
+  border: none;
+  border-radius: 8px;
+  padding: 6px 8px; /* Reduce left/right padding from 10px to 8px */
+  gap: 2px;
+  cursor: pointer;
+  height: 32px;
+  /* border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0; */
+}
+
+.filterLabel {
+  font-size: 0.8rem;
+  margin-left: -50px;
+  color: #1a2a42;
+  width: 170px;
+}
+
+.filterCaret {
+  font-size: 12px;
+  color: #cbd5e0;
+}
+
+.filterDropdownWrapper {
+  position: relative;
+}
+
+.filterDropdown {
+  position: absolute;
+  top: 78%; /* Slightly below the button */
+  left: 0;
+  background-color: #f2f2f2;
+  /* border: 1px solid #d1d5db; */
+  border-top: none;
+  border-radius: 8px;
+  padding: 8px 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  width: 148px;
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  padding-left: 5px;
+  margin-left: 1px;
+}
+
+.filterDropdown:hover {
+  background-color: #e5e5e5; /* or #e0e0e0 — tweak to your liking */
+}
+
+/* On hover - whole item turns soft blue and border turns blue */
+.filterItem:hover {
+  background-color: #4a88ff; /* darker grey on hover */
+  color: #1a2a42; /* keep text consistent */
+}
+
+/* Style the checkbox itself */
+.filterItem input[type="checkbox"] {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #3f4042;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+/* Hover state: blue background */
+.filterItem input[type="checkbox"]:hover {
+  background-color: transparent;
+  border-color: #4a88ff;
+}
+
+/* Filter row */
+.filterItem {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  color: #1a2a42;
+  padding: 6px 8px;
+  gap: 8px;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+  cursor: pointer;
+}
+
+/* Checkbox */
+.filterItem input[type="checkbox"] {
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border: 2px solid #cbd5e0;
+  border-radius: 4px;
+  background-color: transparent;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+  position: relative;
+}
+
+.filterItem input[type="checkbox"]:checked::after {
+  content: "";
+  position: absolute;
+  top: 1px;
+  left: 4px;
+  width: 3px;
+  height: 7px;
+  border: solid #4a88ff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Checked state */
+.filterItem input[type="checkbox"]:checked {
+  background-color: transparent;
+  border-color: #4a88ff;
+}
+
+/* Indent children under 'All Images' or 'All Video' */
+.filterChildItem {
+  padding-left: 24px; /* Adjust indentation depth */
+}
+
+/* Hover: Only change text and checkbox */
+.filterItem:hover {
+  background-color: transparent; /* ✅ Removes the blue */
+  color: #4a88ff; /* ✅ Only text turns blue */
+}
+
+/* Group Frames with checkbox */
+.groupFramesToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #f4f4f4;
+  padding: 6px 20px;
+  border-radius: 8px;
+  height: 32px;
+  cursor: pointer;
+  width: 150px;
+}
+
+.groupFramesToggle:hover {
+  background-color: #e5e7eb; /* Slightly darker grey */
+}
+
+.groupCheckbox {
+  display: none;
+}
+
+.groupFramesToggle:hover .checkboxUI {
+  border-color: #4a88ff;
+}
+
+.groupCheckbox:checked + .checkboxUI::after {
+  content: "";
+  position: absolute;
+  top: 2px;
+  left: 5px;
+  width: 4px;
+  height: 8px;
+  border: solid #4a88ff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+/* Custom checkbox UI */
+.checkboxUI {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 2px solid #cbd5e0;
+  background-color: white;
+  transition: border-color 0.2s ease;
+  background-color: transparent;
+}
+
+.groupCheckbox:checked + .checkboxUI {
+  background-color: transparent;
+  border-color: #4a88ff;
+}
+
+.groupLabel {
+  font-size: 0.8rem;
+  color: #1a2a42;
+  width: 100px;
+  transition: color 0.2s ease;
+}
+
+.groupFramesToggle:hover .groupLabel {
+  color: #4a88ff;
+}
+
+/* View Toggle */
+.viewToggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* background-color: #f4f4f4; */
+  padding: 6px 10px;
+  border-radius: 8px;
+  height: 32px;
+  cursor: pointer;
+}
+
+.viewIcon {
+  font-size: 35px;
+  color: #cbd5e0;
+  transition: color 0.2s ease;
+}
+
+.viewIcon:hover {
+  color: #4a88ff;
+}
+
+.matchesScrollArea {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 10px;
+  overflow-y: auto;
+  padding: 8px;
+  flex-grow: 1;
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #cbd5e0 transparent; /* Firefox */
+
+  /* For Chrome, Edge, Safari */
+}
+
+.matchesScrollArea::-webkit-scrollbar {
+  width: 8px;
+}
+
+.matchesScrollArea::-webkit-scrollbar-thumb {
+  background-color: #cbd5e0;
+  border-radius: 6px;
+}
+
+.matchesScrollArea::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.matchItem {
+  padding: 8px;
+  font-size: 0.9rem;
+  color: #2d3748;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.matchItem:last-child {
+  border-bottom: none;
+}
+
+.matchesScrollArea.gridView {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 12px;
+}
+
+.matchItem {
+  background-color: #f0f0f0;
+
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px;
+  font-size: 0.9rem;
+  color: #2d3748;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.matchImage {
+  width: 100%;
+  max-height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+
+.matchLabel {
+  margin-top: 6px;
+  font-size: 14px;
+  text-align: center;
+}
+
+/***************************** Right side (image registration) **********************************************/
+
+.imageArea {
+  position: relative;
+  background-color: white;
+  border: 1px solid #ccc;
+  height: 500px;
+  border-radius: 6px;
+  margin: 0 5px;
+}
+
+.checkboxBottomRight {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+.filterItem {
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  color: #333;
+  gap: 5px;
+}
+
+.sliderWrapper {
+  padding: 0 10px;
+}
+
+.frameSlider {
+  width: 100%;
+  appearance: none;
+  height: 6px;
+  background: #ccc;
+  border-radius: 5px;
+  outline: none;
+  transition: background 0.3s ease;
+}
+
+.frameSlider::-webkit-slider-thumb {
+  appearance: none;
+  height: 18px;
+  width: 18px;
+  background: #888;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+.sliderLabels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding: 5px 4px;
+    font-size: 15px;
+    color: #b3b3b3;
+  }
+  
+  .sliderLabelLeft {
+    text-align: left;
+  }
+  
+  .sliderLabelRight {
+    text-align: right;
+  }
+
+.registrationActions {
+  text-align: right;
+  padding: 10px 10px;
+  
+}
+
+.objectFamilyBtn {
+  background-color: #007bff;
+  color: white;
+  padding: 2px 30px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.bottomMetaBar {
+  /* display: flex; */
+  /* justify-content: space-between; */
+  background-color: #ffffff;
+  border-radius: 6px;
+  padding: 5px 10px;
+  margin: 0 10px;
+  font-size: 12px;
+  color: #666;
+  height: 100px;
+}
+
+.bottomMetaTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    font-size: 15px;
+    color: #666;
+  }
+  
+  .bottomMetaLine {
+    height: 2px;
+    background-color: #eeeeee;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 20px;
+  }
+
+.moreOptions {
+  color: #007bff;
+  cursor: pointer;
+  white-space: nowrap;
+}
