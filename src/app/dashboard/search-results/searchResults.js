@@ -10,7 +10,7 @@ import {
 } from "react-icons/fa";
 import "./searchResults.css";
 
-const SearchResults = ({ onReturn }) => {
+const SearchResults = ({ onReturn, showImages }) => {
   const [isSearchImagesExpanded, setSearchImagesExpanded] = useState(false);
   const [isMatchesExpanded, setMatchesExpanded] = useState(false);
 
@@ -225,18 +225,24 @@ const SearchResults = ({ onReturn }) => {
                   isGridView ? "gridView" : "listView"
                 }`}
               >
-                {[...Array(40)].map((_, index) => (
-                  <Box key={index} className="matchItem">
-                    <Image
-                      src={`/images/sample/sample${(index % 5) + 1}.jpg`} // Sample images for demonstration
-                      alt={`Sample ${index}`}
-                      className="matchImage"
-                    />
-                    {!isGridView && (
-                      <Text className="matchLabel">Match #{index + 1}</Text>
-                    )}
-                  </Box>
-                ))}
+                {!showImages ? (
+                  <Text className="placeholderText">
+                    Click Search to show results.
+                  </Text>
+                ) : (
+                  [...Array(40)].map((_, index) => (
+                    <Box key={index} className="matchItem">
+                      <Image
+                        src={`/images/sample/sample${(index % 5) + 1}.jpg`}
+                        alt={`Sample ${index}`}
+                        className="matchImage"
+                      />
+                      {!isGridView && (
+                        <Text className="matchLabel">Match #{index + 1}</Text>
+                      )}
+                    </Box>
+                  ))
+                )}
               </Box>
             </Box>
           </Box>

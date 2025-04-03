@@ -27,7 +27,8 @@ export default function Dashboard() {
   return (
     <ImageProvider>
       {showResults ? (
-        <Results onReturn={handleReturn} />
+        <Results onReturn={handleReturn} showImages={showResults} />
+
       ) : (
         <>
           <Flex justify="flex-end" p={1} gap={2} w="100vw">

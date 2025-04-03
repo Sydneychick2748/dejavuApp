@@ -796,12 +796,15 @@ Reset default margins and ensure box-sizing * {
 }
 
 .frameSlider::-webkit-slider-thumb {
-  appearance: none;
-  height: 18px;
-  width: 18px;
-  background: #888;
-  border-radius: 50%;
-  cursor: pointer;
+    appearance: none;
+    height: 32px;           /* Taller dot */
+    width: 12px;            /* Slightly narrower than height */
+    background: #4a88ff;    /* Nice vibrant blue */
+    border-radius: 6px;     /* Rounded pill shape */
+    cursor: pointer;
+    margin-top: -2px;      /* Align vertically with track */
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.2); /* optional depth */
+    border: none;
 }
 
 .sliderLabels {
@@ -871,3 +874,11 @@ Reset default margins and ensure box-sizing * {
   cursor: pointer;
   white-space: nowrap;
 }
+
+/* .placeholderText {
+    font-size: 14px;
+    color: #999;
+    text-align: center;
+    margin-top: 20px;
+  } */
+  
