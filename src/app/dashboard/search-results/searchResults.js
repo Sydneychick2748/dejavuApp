@@ -258,6 +258,10 @@ const SearchResults = ({ onReturn }) => {
             </Box>
 
             <div className="sliderWrapper">
+              <div className="sliderLabels">
+                <span className="sliderLabelLeft">Search Image</span>
+                <span className="sliderLabelRight">Matched Image</span>
+              </div>
               <input type="range" className="frameSlider" />
             </div>
 
@@ -266,9 +270,12 @@ const SearchResults = ({ onReturn }) => {
             </div>
 
             <div className="bottomMetaBar">
-              <span className="filenameText">filename.mp4</span>
-              <span className="frameText">Frame # / #</span>
-              <span className="moreOptions">More Options</span>
+              <div className="bottomMetaTop">
+                <span className="filenameText">filename.mp4</span>
+                <span className="frameText">Frame # / #</span>
+                <span className="moreOptions">More Options</span>
+              </div>
+              <div className="bottomMetaLine"></div>
             </div>
             {/* <Text className="contentText">Right Div Content</Text> */}
           </Box>
