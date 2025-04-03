@@ -429,7 +429,7 @@ Reset default margins and ensure box-sizing * {
   font-size: 0.9rem;
   color: #1a2a42;
   white-space: nowrap;
-  width: 120px;
+  width: 100px;
   border-radius: 5px;
 }
 
@@ -481,10 +481,10 @@ Reset default margins and ensure box-sizing * {
 }
 
 .filterLabel {
-  font-size: 0.9rem;
+  font-size: 0.8rem;
   margin-left: -50px;
   color: #1a2a42;
-  width: 180px;
+  width: 170px;
 }
 
 .filterCaret {
@@ -507,7 +507,7 @@ Reset default margins and ensure box-sizing * {
   padding: 8px 12px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  width: 159px;
+  width: 148px;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   padding-left: 5px;
@@ -609,7 +609,7 @@ Reset default margins and ensure box-sizing * {
   border-radius: 8px;
   height: 32px;
   cursor: pointer;
-  width: 220px;
+  width: 150px;
 }
 
 .groupFramesToggle:hover {
@@ -654,7 +654,7 @@ Reset default margins and ensure box-sizing * {
 }
 
 .groupLabel {
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: #1a2a42;
   width: 100px;
   transition: color 0.2s ease;
@@ -804,24 +804,42 @@ Reset default margins and ensure box-sizing * {
   cursor: pointer;
 }
 
+.sliderLabels {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    padding: 5px 4px;
+    font-size: 15px;
+    color: #b3b3b3;
+  }
+  
+  .sliderLabelLeft {
+    text-align: left;
+  }
+  
+  .sliderLabelRight {
+    text-align: right;
+  }
+
 .registrationActions {
   text-align: right;
-  padding: 0 10px;
+  padding: 10px 10px;
+  
 }
 
 .objectFamilyBtn {
   background-color: #007bff;
   color: white;
-  padding: 6px 12px;
-  border-radius: 5px;
+  padding: 2px 30px;
+  border-radius: 8px;
   border: none;
   cursor: pointer;
   font-size: 14px;
 }
 
 .bottomMetaBar {
-  display: flex;
-  justify-content: space-between;
+  /* display: flex; */
+  /* justify-content: space-between; */
   background-color: #ffffff;
   border-radius: 6px;
   padding: 5px 10px;
@@ -830,6 +848,23 @@ Reset default margins and ensure box-sizing * {
   color: #666;
   height: 100px;
 }
+
+.bottomMetaTop {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    font-size: 15px;
+    color: #666;
+  }
+  
+  .bottomMetaLine {
+    height: 2px;
+    background-color: #eeeeee;
+    border-radius: 4px;
+    width: 100%;
+    margin-top: 20px;
+  }
 
 .moreOptions {
   color: #007bff;
