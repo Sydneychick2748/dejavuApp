@@ -1124,8 +1124,6 @@
 //   padding: "0", // No padding
 //   transition: "background-color 0.3s ease", // Smooth background transition
 // };
-
-// export default DisplayDataBaseModal;
 "use client";
 import React, { useState, useEffect, useRef, useContext } from "react";
 import { ImageContext } from "@/contexts/ImageContext";
@@ -1499,7 +1497,7 @@ const DisplayDataBaseModal = ({ onClose, onNext, selectedFolders }) => {
                     >
                       Your browser does not support the video tag.
                     </video> {/* Video preview */}
-                    {/* Custom Scrollbar with Fast-Forward and Rewind Buttons */}
+                    {/* Custom Scrollbar with Fast-Forward, Rewind, and Slider */}
                     <div style={videoControlsStyle}>
                       <button
                         onClick={handleRewind}
