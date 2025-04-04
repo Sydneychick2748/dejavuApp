@@ -164,3 +164,8 @@
 .panel {
     display: block;
 }
+
+.saveParametersText .chakra-button {
+    color: rgb(85, 174, 85);
+    padding: 0rem;
+}
