@@ -16,3 +16,153 @@ body{
     padding-left: 4rem;
     padding-right: 4rem;
 }
+
+/* Modal styles */
+.video-frame-modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    border-radius: 8px;
+    z-index: 1000;
+    width: 600px;
+    height: 400px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 15px rgba(0, 0, 123, 0.2);
+  }
+  
+  .video-frame-modal-header {
+    width: 100%;
+    background-color: #EEF2FF;
+    border-radius: 8px 8px 0 0;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 40px;
+  }
+  
+  .video-frame-modal-header h3 {
+    color: black;
+    margin: 0;
+    font-size: 15px;
+  }
+  
+  .video-frame-modal-close {
+    width: 24px;
+    height: 24px;
+    background-color: white;
+    border-radius: 50%;
+    border: none;
+    color: black;
+    font-size: 16px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    padding: 0;
+    transition: background-color 0.3s ease;
+  }
+  
+  .video-frame-modal-content {
+    display: flex;
+    flex: 1;
+    padding: 10px;
+    flex-direction: column;
+    background-color: #F9FBFF;
+  }
+  
+  .video-frame-modal-video-section {
+    width: 100%;
+    height: 200px;
+    position: relative;
+  }
+  
+  .video-frame-modal-video-section video {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 5px;
+  }
+  
+  .video-frame-modal-controls {
+    margin-top: 10px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    width: 100%;
+  }
+  
+  .video-frame-modal-controls button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    color: #007BFF;
+    transition: color 0.3s ease;
+  }
+  
+  .video-frame-modal-controls span {
+    color: #000000;
+    font-size: 12px;
+  }
+  
+  .video-frame-modal-controls input[type="range"] {
+    flex: 1;
+    cursor: pointer;
+    accent-color: #007BFF;
+  }
+  
+  .video-frame-modal-frames {
+    max-height: 110px; /* Adjusted to fit within modal height */
+    overflow-y: auto;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  
+  .video-frame-modal-frame {
+    text-align: center;
+  }
+  
+  .video-frame-modal-frame img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .video-frame-modal-frame p {
+    font-size: 0.7rem;
+    color: #555;
+    margin: 2px 0 0 0;
+  }
+  
+  .video-frame-modal-footer {
+    margin-top: auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 10px 20px;
+  }
+  
+  /* Reusing existing action-button class */
+  .action-button {
+    padding: 8px 16px;
+    border: none;
+    cursor: pointer;
+    background-color: #E0E7FF;
+    color: #0056D2;
+    border-radius: 20px;
+    transition: background-color 0.3s ease;
+  }
+  
+  .action-button:hover {
+    background-color: #D1D9E6;
+  }
