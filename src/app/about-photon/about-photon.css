@@ -1,0 +1,13 @@
+body {
+    color: black
+}
+
+ul li {
+    display: list-item !important;
+    list-style-type: disc;
+}
+
+h1 {
+    font-size: large !important;
+    font-weight: 900 !important;
+}
