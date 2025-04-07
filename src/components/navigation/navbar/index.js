@@ -88,6 +88,7 @@ export default Navbar;
 
 
 
+
 // THIS IS ORIGINAL HEADER FROM OUR FIGMA 
 
 // import React from "react";
@@ -144,3 +145,4 @@ export default Navbar;
 //   );
 // };
 // export default Navbar;
+
