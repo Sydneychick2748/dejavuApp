@@ -4,20 +4,16 @@ body {
     padding: 0;
     width: 100%;
     height: 100vh;
-    /* Ensure the body fills the viewport height */
     overflow-x: hidden;
     /* Prevent horizontal scrolling */
 }
 
-/* Ensure the body is a flex container to manage layout */
 body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    /* Ensure the body is at least the viewport height */
 }
 
-/* Main content should take up remaining space */
 main {
     flex: 1;
     /* Grow to fill remaining space */
@@ -45,11 +41,49 @@ main {
     /* Space between menu and profile */
 }
 
+.logo-and-caret {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
 .logo-div {
     height: 5vh;
     flex-grow: 1;
     display: flex;
     align-items: center;
+    padding: 2rem;
+    margin-right: 1rem;
+}
+
+.dropdown-content {
+    display: flex;
+    flex-direction: column;
+    background-color: #0B2856;
+    border-radius: 1rem;
+    position: absolute;
+    top: 6rem;
+    left: 1rem;
+    z-index: 10;
+    margin-top: 0.5rem;
+    padding: 1rem;
+    font-family: inherit;
+    /* Important for vertical align on mobile phones */
+    margin: 0;
+    /* Important for vertical align on mobile phones */
+}
+
+.dropdown-item {
+    display: block;
+    /* Make links block-level to fill the container */
+    color: white;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+}
+
+.dropdown-content hr {
+    border-top: 1px solid #2D5CB6;
+    margin: 10px 0;
 }
 
 .nav-text {
@@ -61,7 +95,77 @@ main {
     transition: color 0.3s ease-in-out;
 }
 
-.profile-layout {
-    /* flex-grow: 0; Prevents expansion */
-    align-self: center;
+.menu-item {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    padding: 1rem;
 }
+
+.logo-div:hover,
+.dropdown-item:hover,
+.menu-item:hover {
+    background-color: #4A87FB;
+    border-radius: 1rem;
+}
+
+
+
+/* THIS IS FROM THE ORIGINAL FIGMA 
+
+html,
+body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100vh;
+    overflow-x: hidden;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+main {
+    flex: 1;
+    width: 100%;
+}
+
+.header-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-between;
+    font: bolder;
+}
+
+.menu-layout {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-grow: 1;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 40px;
+    margin-right: 40px;
+}
+
+.logo-div {
+    height: 5vh;
+    flex-grow: 1;
+    display: flex;
+    align-items: center;
+}
+
+.nav-text {
+    margin-left: 15px;
+    font-size: 1.1rem;
+    font-weight: 550;
+    color: white;
+    transition: color 0.3s ease-in-out;
+}
+
+.profile-layout {
+    align-self: center;
+} */
