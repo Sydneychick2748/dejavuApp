@@ -1,9 +1,12 @@
+
+
 "use client";
 import React, { useContext, useState, useRef, useEffect, useMemo } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
-import { FaPlus, FaTimes, FaUpload } from "react-icons/fa";
+import { FaPlus, FaTimes } from "react-icons/fa";
 import { Box } from "@chakra-ui/react";
+import ImageUploadModal from "./ImageUploadModal"; // Import the new modal
 import "./searchFor.css";
 
 // Composite the image onto a white background at 500×500.
@@ -60,19 +63,6 @@ async function convertRedMaskToBinary(maskDataUrl) {
     img.onerror = (err) => reject(err);
     img.src = maskDataUrl;
   });
-}
-
-// Helper function to convert a data URL to a File object
-function dataURLtoFile(dataUrl, filename) {
-  const arr = dataUrl.split(",");
-  const mime = arr[0].match(/:(.*?);/)[1];
-  const bstr = atob(arr[1]);
-  let n = bstr.length;
-  const u8arr = new Uint8Array(n);
-  while (n--) {
-    u8arr[n] = bstr.charCodeAt(n);
-  }
-  return new File([u8arr], filename, { type: mime });
 }
 
 // Memoized BoxItem component to prevent unnecessary re-renders
@@ -199,8 +189,11 @@ const BoxItem = React.memo(({ box, handleOpenModal, handleIsolateSubject, openMa
 export default function SearchFor() {
   const { finalSelectedImages, fileFrames, selectedFileInfo } = useContext(ImageContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedModalImage, setSelectedModalImage] = useState(null);
-  const [selectedFile, setSelectedFile] = useState(null);
+  const [currentBoxId, setCurrentBoxId] = useState(null);
+  const [response, setResponse] = useState("");
+  const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
+  const [showFileInfoModal, setShowFileInfoModal] = useState(false);
+  const [showOpenFileModal, setShowOpenFileModal] = useState(false);
   const [boxes, setBoxes] = useState([
     {
       id: Date.now(),
@@ -214,13 +207,6 @@ export default function SearchFor() {
       fileType: "",
     },
   ]);
-  const [response, setResponse] = useState("");
-  const [isMaskEditorOpen, setIsMaskEditorOpen] = useState(false);
-  const [currentBoxId, setCurrentBoxId] = useState(null);
-  const [showFileInfoModal, setShowFileInfoModal] = useState(false);
-  const [showOpenFileModal, setShowOpenFileModal] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState([]);
-  const [selectedImagePreview, setSelectedImagePreview] = useState(null);
   const [lastProcessedFile, setLastProcessedFile] = useState(null);
   const canvasRef = useRef(null);
 
@@ -383,41 +369,25 @@ export default function SearchFor() {
     console.log(`Opening modal for box ${boxId}`);
   };
 
-  const handleCloseModal = (boxId) => {
-    console.log("handleCloseModal called with boxId:", boxId);
-    console.log("selectedModalImage:", selectedModalImage);
-    console.log("selectedFile:", selectedFile);
-    console.log("Current boxes:", boxes);
-    if (selectedModalImage && selectedFile) {
+  const handleCloseModal = (boxId, imageInfo) => {
+    if (imageInfo) {
       setBoxes((prevBoxes) => {
         const newBoxes = JSON.parse(JSON.stringify(prevBoxes));
         const boxIndex = newBoxes.findIndex((box) => box.id === boxId);
         if (boxIndex !== -1) {
           newBoxes[boxIndex] = {
             ...newBoxes[boxIndex],
-            selectedImage: selectedModalImage,
-            fileName: selectedFile.name,
-            fileSize: selectedFile.size,
-            fileType: selectedFile.type,
+            selectedImage: imageInfo.fileUrl,
+            imageUrl: imageInfo.fileUrl,
+            baseImageUrl: imageInfo.fileUrl,
+            fileName: imageInfo.fileName,
+            fileSize: imageInfo.fileSize,
+            fileType: imageInfo.fileType,
+            imgWidth: 0,
+            imgHeight: 0,
           };
-        } else {
-          console.error(`Box with ID ${boxId} not found in boxes!`);
-        }
-        console.log(
-          `Setting selectedImage for box ${boxId} to: ${selectedModalImage}`
-        );
-        console.log(
-          `Selected file for box ${boxId}: ${selectedFile.name}, ${selectedFile.size} bytes`
-        );
-        return newBoxes;
-      });
-      if (!selectedFile.type.startsWith("video/") && !selectedFile.name.startsWith("Frame_")) {
-        handleImageComposite(selectedModalImage, boxId);
-      }
-      setBoxes((prevBoxes) => {
-        const newBoxes = [
-          ...JSON.parse(JSON.stringify(prevBoxes)),
-          {
+          // Add a new empty + box at the end
+          newBoxes.push({
             id: Date.now(),
             selectedImage: null,
             imageUrl: null,
@@ -427,46 +397,25 @@ export default function SearchFor() {
             fileName: "",
             fileSize: 0,
             fileType: "",
-          },
-        ];
+          });
+        } else {
+          console.error(`Box with ID ${boxId} not found in boxes!`);
+        }
         console.log(
-          `Closed modal for box ${boxId}, new box added with ID ${Date.now()}. Current boxes:`,
-          newBoxes
+          `Setting selectedImage for box ${boxId} to: ${imageInfo.fileUrl}`
+        );
+        console.log(
+          `Selected file for box ${boxId}: ${imageInfo.fileName}, ${imageInfo.fileSize} bytes`
         );
         return newBoxes;
       });
+      if (!imageInfo.fileType.startsWith("video/") && !imageInfo.fileName.startsWith("Frame_")) {
+        handleImageComposite(imageInfo.fileUrl, boxId);
+      }
     } else {
-      console.warn(
-        "No image selected! selectedModalImage or selectedFile is null."
-      );
+      console.warn("No image selected!");
     }
     setIsModalOpen(false);
-    setSelectedModalImage(null);
-    setSelectedFile(null);
-    setUploadedImages([]);
-    setSelectedImagePreview(null);
-  };
-
-  const handleImageUploadModal = (event) => {
-    const files = Array.from(event.target.files).filter((file) =>
-      file.type.startsWith("image/")
-    );
-    const newImages = files.map((file) => ({
-      file,
-      url: URL.createObjectURL(file),
-    }));
-    setUploadedImages((prev) => [...prev, ...newImages]);
-    if (newImages.length > 0 && !selectedImagePreview) {
-      setSelectedImagePreview(newImages[0].url);
-      setSelectedModalImage(newImages[0].url);
-      setSelectedFile(newImages[0].file);
-    }
-  };
-
-  const handleSelectImage = (image) => {
-    setSelectedImagePreview(image.url);
-    setSelectedModalImage(image.url);
-    setSelectedFile(image.file);
   };
 
   const handleIsolateSubject = async (boxId) => {
@@ -678,76 +627,10 @@ export default function SearchFor() {
         </div>
       )}
       {isModalOpen && (
-        <div style={modalStyle}>
-          <div style={blueBarStyle}>
-            <h3 style={{ color: "black", margin: 0, fontSize: 15 }}>
-              Select a Search Image
-            </h3>
-            <button
-              onClick={() => handleCloseModal(currentBoxId)}
-              style={modalOpenButtonStyle}
-            >
-              ×
-            </button>
-          </div>
-          <div style={modalContentStyle}>
-            <div style={modalLeftPanelStyle}>
-              <label style={uploadButtonStyle}>
-                <FaUpload /> Upload Image
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageUploadModal}
-                  style={{ display: "none" }}
-                />
-              </label>
-              {uploadedImages.length > 0 ? (
-                uploadedImages.map((image, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      padding: "5px",
-                      cursor: "pointer",
-                      backgroundColor: selectedImagePreview === image.url ? "#E0E7FF" : "transparent",
-                      color: selectedImagePreview === image.url ? "#0056D2" : "#000",
-                    }}
-                    onClick={() => handleSelectImage(image)}
-                  >
-                    {image.file.name}
-                  </div>
-                ))
-              ) : (
-                <p style={{ color: "#000", marginTop: "10px" }}>
-                  No images uploaded yet.
-                </p>
-              )}
-            </div>
-            <div style={modalRightPanelStyle}>
-              {selectedImagePreview ? (
-                <img
-                  src={selectedImagePreview}
-                  alt="Selected Image"
-                  style={{ maxWidth: "100%", maxHeight: "80%", objectFit: "contain", borderRadius: "5px" }}
-                />
-              ) : (
-                <p style={{ color: "#000" }}>Select an image to preview</p>
-              )}
-            </div>
-          </div>
-          <div style={buttonContainerStyle}>
-            <button onClick={() => handleCloseModal(currentBoxId)} style={cancelButtonStyle}>
-              Cancel
-            </button>
-            <button
-              onClick={() => handleCloseModal(currentBoxId)}
-              style={openButtonStyle}
-              disabled={!selectedImagePreview}
-            >
-              Open
-            </button>
-          </div>
-        </div>
+        <ImageUploadModal
+          onClose={() => setIsModalOpen(false)}
+          onSelect={(imageInfo) => handleCloseModal(currentBoxId, imageInfo)}
+        />
       )}
       {isMaskEditorOpen && (
         <div style={maskEditorOverlayStyle}>
@@ -817,126 +700,6 @@ export default function SearchFor() {
   );
 }
 
-// Modal Styles
-const modalStyle = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  backgroundColor: "white",
-  borderRadius: "8px",
-  zIndex: 1000,
-  width: "900px",
-  height: "500px",
-  display: "flex",
-  flexDirection: "column",
-  boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
-};
-
-const blueBarStyle = {
-  width: "100%",
-  backgroundColor: "#EEF2FF",
-  borderRadius: "8px 8px 0 0",
-  padding: "10px 20px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  minHeight: "40px",
-};
-
-const modalContentStyle = {
-  display: "flex",
-  flex: 1,
-  padding: "10px",
-};
-
-const modalLeftPanelStyle = {
-  flex: 1,
-  padding: "10px",
-  overflowY: "auto",
-  borderRight: "1px solid #ddd",
-};
-
-const modalRightPanelStyle = {
-  flex: 1,
-  padding: "10px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  backgroundColor: "#F9FBFF",
-};
-
-const modalOpenButtonStyle = {
-  width: "24px",
-  height: "24px",
-  backgroundColor: "white",
-  borderRadius: "50%",
-  border: "none",
-  color: "black",
-  fontSize: "16px",
-  fontWeight: "400",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  padding: 0,
-  transition: "background-color 0.3s ease",
-};
-
-const uploadButtonStyle = {
-  padding: "8px 16px",
-  border: "none",
-  cursor: "pointer",
-  backgroundColor: "#E0E7FF",
-  color: "#0056D2",
-  borderRadius: "20px",
-  display: "flex",
-  alignItems: "center",
-  gap: "5px",
-  transition: "background-color 0.3s ease",
-};
-
-const openButtonStyle = {
-  padding: "8px 16px",
-  marginLeft: "10px",
-  border: "none",
-  cursor: "pointer",
-  backgroundColor: "#007BFF",
-  color: "#FFFFFF",
-  width: "220px",
-  borderRadius: "20px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  lineHeight: "1",
-  paddingTop: "6px",
-  transition: "background-color 0.3s ease",
-};
-
-const cancelButtonStyle = {
-  padding: "8px 16px",
-  marginLeft: "10px",
-  border: "none",
-  cursor: "pointer",
-  backgroundColor: "#E8E8E8",
-  color: "black",
-  width: "220px",
-  borderRadius: "20px",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  lineHeight: "1",
-  paddingTop: "6px",
-  transition: "background-color 0.3s ease",
-};
-
-const buttonContainerStyle = {
-  marginTop: "auto",
-  display: "flex",
-  justifyContent: "flex-end",
-  padding: "10px 20px",
-};
-
 // Nested Modal Styles (File Info and Open File)
 const nestedModalOverlayStyle = {
   position: "fixed",
@@ -963,6 +726,17 @@ const nestedModalContentStyle = {
 const nestedModalBodyStyle = {
   padding: "20px",
   color: "black",
+};
+
+const blueBarStyle = {
+  width: "100%",
+  backgroundColor: "#EEF2FF",
+  borderRadius: "8px 8px 0 0",
+  padding: "10px 20px",
+  display: "flex",
+  alignItems: "center",
+  justifyContent: "space-between",
+  minHeight: "40px",
 };
 
 const nestedModalCloseButtonStyle = {
