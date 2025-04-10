@@ -64,3 +64,12 @@ node_modules/
 backend/sam_vit_h_4b8939.pth
 backend/segmented_output.png
 
+# Virtual environments
+myenv/
+venv/
+env/
+backend-env/
+
+# Python cache files
+__pycache__/
+*.pyc
