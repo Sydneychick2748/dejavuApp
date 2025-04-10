@@ -198,6 +198,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
 
       </div>
     </div>
+    </div>
   );
 });
 
@@ -736,5 +737,6 @@ const UploadFiles = React.memo(() => {
     </div>
   );
 });
+
 
 export default UploadFiles;
