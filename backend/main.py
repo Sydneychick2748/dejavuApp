@@ -23,7 +23,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
     allow_credentials=True,
+
     allow_methods=["GET", "POST", "DELETE"],
+
     allow_headers=["*"],
 )
 
@@ -66,10 +68,17 @@ def remove_background_rembg(input_path: str, output_path: str) -> str:
         raise ValueError(f"Error in background removal: {e}")
 
 def ensure_solid_background(frame_path: str) -> str:
+
+    """
+    Ensure the frame has a solid white background using OpenCV.
+    """
+
     try:
         img = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)
         if img is None:
             raise ValueError("Failed to read frame image.")
+
+
 
         if len(img.shape) == 3 and img.shape[2] == 4:
             white_bg = np.ones((img.shape[0], img.shape[1], 3), dtype=np.uint8) * 255
@@ -78,6 +87,8 @@ def ensure_solid_background(frame_path: str) -> str:
                 white_bg[:, :, c] = (white_bg[:, :, c] * (1 - alpha) + img[:, :, c] * alpha).astype(np.uint8)
             cv2.imwrite(frame_path, white_bg)
         else:
+
+
             cv2.imwrite(frame_path, img)
         return frame_path
     except Exception as e:
@@ -234,12 +245,16 @@ async def extract_frames(
                     )
                     ffmpeg.run(stream, capture_stderr=True)
 
+                    # Post-process the frame to ensure a solid background
+
                     ensure_solid_background(str(frame_filename))
 
                     frame_stat = os.stat(frame_filename)
                     frame_info = {
                         "timestamp": ts,
+
                         "frame_number": int(ts * frame_rate) + 1,  # Start counting from 1
+
                         "size_bytes": frame_stat.st_size,
                         "resolution": f"{metadata['width']}x{metadata['height']}",
                         "url": f"http://localhost:8000/frames/{video_id}/frame_{ts:.3f}.jpg"
@@ -249,6 +264,7 @@ async def extract_frames(
                     print(f"Failed to extract frame at timestamp {ts}: {e.stderr.decode()}")
                     continue
         else:
+
             # Extract all frames of the video
             num_frames_to_extract = total_frames  # Extract all frames, no cap
             if total_frames <= 0:
@@ -257,20 +273,15 @@ async def extract_frames(
             frame_interval = 1  # Extract every frame
             frame_indices = [i for i in range(num_frames_to_extract)]
 
+
             for i, frame_index in enumerate(frame_indices):
                 frame_filename = frame_output_dir / f"frame_{i:03d}.jpg"
                 try:
-                    stream = ffmpeg.input(str(transcoded_video))
-                    stream = ffmpeg.output(
-                        stream,
-                        str(frame_filename),
-                        vf=f"select='eq(n\\,{frame_index})'",
-                        vframes=1,
-                        format="image2",
-                        update=1,
-                        strict=-2
-                    )
-                    ffmpeg.run(stream, capture_stderr=True)
+
+                    # Extract frame by frame number
+
+                    
+
 
                     ensure_solid_background(str(frame_filename))
 
@@ -278,6 +289,7 @@ async def extract_frames(
                     frame_info = {
                         "timestamp": frame_index / frame_rate,
                         "frame_number": frame_index + 1,  # Start counting from 1
+
                         "size_bytes": frame_stat.st_size,
                         "resolution": f"{metadata['width']}x{metadata['height']}",
                         "url": f"http://localhost:8000/frames/{video_id}/frame_{i:03d}.jpg"
@@ -307,12 +319,17 @@ async def save_frame(
     frame_data: UploadFile = File(...)
 ):
     try:
+
         saved_frame_dir = Path(SAVED_FRAMES_DIR) / video_id
         saved_frame_dir.mkdir(parents=True, exist_ok=True)
+
 
         frame_filename = saved_frame_dir / f"saved_frame_{timestamp:.3f}.jpg"
         with frame_filename.open("wb") as buffer:
             shutil.copyfileobj(frame_data.file, buffer)
+
+
+        # Post-process the frame to ensure a solid background
 
         ensure_solid_background(str(frame_filename))
 
@@ -351,12 +368,15 @@ async def get_saved_frames(video_id: str):
             }
             frames.append(frame_info)
 
+
         frames.sort(key=lambda x: x["timestamp"])
+
         return JSONResponse(content={"frames": frames})
     except Exception as e:
         print("Error in /get-saved-frames endpoint:")
         traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
 
 @app.delete("/delete-frame/{video_id}/{timestamp}")
 async def delete_frame(video_id: str, timestamp: float):
@@ -376,6 +396,7 @@ async def delete_frame(video_id: str, timestamp: float):
         print("Error in /delete-frame endpoint:")
         traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
 
 @app.post("/save-database")
 async def save_database(

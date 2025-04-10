@@ -2,6 +2,7 @@
 
 
 
+
 import React, { useState, useEffect, useRef } from "react";
 import { FaBackward, FaForward, FaTimes, FaPlusCircle } from "react-icons/fa";
 
@@ -21,6 +22,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       videoRef.current.src = fileUrl;
       videoRef.current.load();
       console.log("Video reloaded with src =", fileUrl);
+
       videoRef.current.addEventListener("loadedmetadata", handleVideoLoadedMetadata);
       videoRef.current.addEventListener("timeupdate", handleTimeUpdate);
     }
@@ -30,7 +32,9 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         videoRef.current.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
+
   }, [fileUrl]);
+
 
   const handleVideoLoadedMetadata = () => {
     if (videoRef.current) {
@@ -38,17 +42,20 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       const canvas = canvasRef.current;
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
+
       setResolution(`${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
       // Estimate total frames (assuming 30 fps for simplicity; can be adjusted if frame rate is available)
       const frameRate = 30;
       setTotalFrames(Math.floor(videoRef.current.duration * frameRate));
       console.log("Video loaded: duration =", videoRef.current.duration, "readyState =", videoRef.current.readyState);
+
     }
   };
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
+
       console.log("Time updated: currentTime =", videoRef.current.currentTime);
     }
   };
@@ -105,13 +112,16 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       console.log("Rewind: newTime =", newTime);
     } else {
       console.error("videoRef.current is not available for rewind");
+
     }
   };
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
+<
     return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+
   };
 
   const dataURLtoFile = (dataUrl, filename) => {
@@ -153,10 +163,13 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       fileUrl: frame.url,
       fileName: frame.fileName,
       file: frame.file,
+
       fileType: "image/jpeg",
     });
     onClose();
   };
+
+
 
   return (
     <div
@@ -168,8 +181,10 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         backgroundColor: "white",
         borderRadius: "8px",
         zIndex: 1000,
+
         width: "800px",
         height: "500px",
+
         display: "flex",
         flexDirection: "column",
         boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
@@ -188,7 +203,9 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         }}
       >
         <h3 style={{ color: "black", margin: 0, fontSize: "15px" }}>
+
           Select a Frame from {file.name} (Total Frames: {totalFrames})
+
         </h3>
         <button
           onClick={onClose}
@@ -209,7 +226,9 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
             transition: "background-color 0.3s ease",
           }}
         >
+
           <FaTimes size={16} />
+
         </button>
       </div>
       <div
@@ -222,6 +241,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
           overflow: "hidden",
         }}
       >
+
         <div
           style={{
             width: "100%",
@@ -388,6 +408,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
           <p style={{ margin: "0 0 5px 0" }}>{`Resolution: ${resolution}`}</p>
           <p style={{ margin: "0 0 5px 0" }}>{`Duration: ${formatTime(videoDuration)}`}</p>
         </div>
+
         <button
           onClick={onClose}
           style={{
