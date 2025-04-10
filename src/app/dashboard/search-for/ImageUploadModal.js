@@ -1,4 +1,5 @@
 
+
 // import React, { useState, useEffect } from "react";
 // import { FaUpload } from "react-icons/fa";
 // import imageUploadState from "./imageUploadState"; // Import the global state
@@ -269,14 +270,17 @@ import imageUploadState from "./imageUploadState"; // Import the global state
 // Modal for uploading images only
 const ImageUploadModal = ({ onClose, onSelect }) => {
   const [uploadedImages, setUploadedImages] = useState(imageUploadState.getUploadedImages());
+
   const [selectedImagePreview, setSelectedImagePreview] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState(""); // Add state for error message
+
 
   // Sync local state with global state on mount
   useEffect(() => {
     setUploadedImages(imageUploadState.getUploadedImages());
   }, []);
+
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files).filter((file) =>
@@ -297,11 +301,13 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
       url: URL.createObjectURL(file),
     }));
 
+
     // Update global state
     imageUploadState.addUploadedImages(newImages);
 
     // Update local state to reflect the change
     setUploadedImages(imageUploadState.getUploadedImages());
+
   };
 
   const handleSelectImage = (image) => {
@@ -312,7 +318,9 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
   const handleConfirm = () => {
     if (selectedFile) {
       onSelect({
+
         file: selectedFile, // Pass the actual File object
+
         fileUrl: selectedImagePreview,
         fileName: selectedFile.name,
         fileSize: selectedFile.size,
@@ -427,6 +435,7 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
               <div
                 key={index}
                 style={{
+
                   padding: "8px 10px",
                   margin: "5px 0",
                   cursor: "pointer",
@@ -455,6 +464,7 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
                 <span style={{ flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {image.file.name}
                 </span>
+
               </div>
             ))
           ) : (
@@ -477,6 +487,7 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
             <img
               src={selectedImagePreview}
               alt="Selected Image"
+
               style={{
                 maxWidth: "100%",
                 maxHeight: "300px", // Fixed max height for preview
@@ -484,6 +495,7 @@ const ImageUploadModal = ({ onClose, onSelect }) => {
                 objectFit: "contain",
                 borderRadius: "5px",
               }}
+
             />
           ) : (
             <p style={{ color: "#000" }}>Select an image to preview</p>
