@@ -1,4 +1,5 @@
 
+
 // "use client";
 // import React, { useState } from "react";
 // import { Flex, Box, Button } from "@chakra-ui/react";
@@ -192,6 +193,7 @@
 // }
 
 
+
 "use client";
 import React, { useState } from "react";
 import { Flex, Box, Button } from "@chakra-ui/react";
@@ -205,6 +207,8 @@ import "../globals.css";
 import "./dashboard.css";
 
 export default function Dashboard() {
+
+
   const [showResults, setShowResults] = useState(false);
 
   const startSearch = () => {
@@ -251,16 +255,20 @@ export default function Dashboard() {
             <Box
               className="uploadFilesBox"
               flex="0 0 40%"
+
               bg="#F1F1F1"
               borderRadius="lg"
               shadow="md"
               transition="background 0.3s ease"
               _hover={{ bg: "#E7EAEE" }}
+
             >
               <Box
                 className="uploadSearchWithin"
                 width="100%"
+
                 bg="#D6D6D6"
+
                 p="14px 20px"
                 height="52px"
                 fontSize="16px"
@@ -269,7 +277,9 @@ export default function Dashboard() {
                 borderTopRightRadius="10px"
                 borderTopLeftRadius="10px"
                 transition="background 0.3s ease"
+
                 _hover={{ bg: "#0B2856" }}
+
               >
                 Search Within...
               </Box>
@@ -283,16 +293,20 @@ export default function Dashboard() {
                 flex={{ base: "0 0 100%", lg: "0 0 31%" }}
                 w="100%"
                 maxW="100%"
+
                 bg="#F1F1F1"
                 borderRadius="lg"
                 shadow="md"
                 transition="background 0.3s ease"
                 _hover={{ bg: "#E7EAEE" }}
+
               >
                 <Flex
                   align="center"
                   justify="space-between"
+
                   bg="#D6D6D6"
+
                   p="10px 20px"
                   fontSize="16px"
                   fontWeight="600"
@@ -300,7 +314,9 @@ export default function Dashboard() {
                   borderTopRightRadius="10px"
                   borderTopLeftRadius="10px"
                   transition="background 0.3s ease"
+
                   _hover={{ bg: "#0B2856" }}
+
                 >
                   <Box>Search For...</Box>
                   <Flex gap={2}>
@@ -308,7 +324,9 @@ export default function Dashboard() {
                       as="button"
                       bg="white"
                       fontWeight={300}
+
                       color="#808080"
+
                       border="1px solid white"
                       borderRadius="8px"
                       p="4px 8px"
@@ -324,13 +342,17 @@ export default function Dashboard() {
                       as="button"
                       bg="white"
                       fontWeight={300}
+
                       color="#808080"
+
                       border="1px solid white"
                       borderRadius="8px"
                       p="4px 8px"
                       _hover={{
                         bg: "white",
+
                         color: "#4A88FF",
+
                       }}
                       onClick={() => console.log("Object Library clicked")}
                     >
@@ -344,6 +366,7 @@ export default function Dashboard() {
               <Box
                 className="searchParamsBox"
                 flex="1"
+
                 bg="#F1F1F1"
                 borderRadius="lg"
                 shadow="md"
@@ -353,6 +376,7 @@ export default function Dashboard() {
                 <Box
                   width="100%"
                   bg="#D6D6D6"
+
                   p="14px 20px"
                   height="52px"
                   fontSize="16px"
@@ -361,7 +385,9 @@ export default function Dashboard() {
                   borderTopRightRadius="10px"
                   borderTopLeftRadius="10px"
                   transition="background 0.3s ease"
+
                   _hover={{ bg: "#0B2856" }}
+
                 >
                   Search Parameters
                 </Box>
@@ -381,4 +407,7 @@ export default function Dashboard() {
       )}
     </ImageProvider>
   );
+
 }
+
+

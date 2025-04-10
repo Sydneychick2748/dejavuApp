@@ -1,11 +1,15 @@
 
+
 "use client";
 import React, { useState, useContext, useEffect, useCallback, useRef, useMemo } from "react";
+
 import CreateNewDataBaseModal from "../modals/create-new-database/createNewDataBaseModal";
 import ImportMediaModal from "../modals/create-new-database/importMediaModal";
 import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
 import VideoFrameModal from "./VideoFrameModal";
+
 import ImageUploadModal from "../search-for/ImageUploadModal";
+
 import { ImageContext } from "@/contexts/ImageContext";
 import {
   FaPlus,
@@ -24,6 +28,7 @@ import { Box } from "@chakra-ui/react";
 import "./uploadFiles.css";
 
 // Memoized GalleryItem component to prevent unnecessary re-renders
+
 const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExpanded, frameData, videoMetadata, handleImageClick, handleVideoClick, handleMediaInfoClick, handleExpandFrames, formatFrameNumber, formatTime }) => {
   const actualFrameCount = frameData[fileId] ? frameData[fileId].length : 0; // Use the actual number of frames extracted
 
@@ -56,6 +61,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
     return null;
   }, [fileUrl, file.type]);
 
+
   return (
     <div
       className="gallery-item"
@@ -68,6 +74,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
       }}
       style={{ cursor: "pointer", transition: "all 0.3s ease", width: "220px" }}
     >
+
       <div className="gallery-item-index">
         {file.type.startsWith("video/") && frameData[fileId] ? `1-${actualFrameCount}` : `${index + 1} of ${arrLength}`}
       </div>
@@ -77,6 +84,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
         ) : file.type.startsWith("video/") ? (
           <>
             {videoElement}
+
             {isExpanded && (
               <div
                 className="gallery-item-frames"
@@ -96,6 +104,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
                     <div
                       key={frameIndex}
                       className="gallery-item-frame"
+
                       style={{ 
                         display: "flex", 
                         alignItems: "center", 
@@ -103,6 +112,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
                         width: "100%", 
                         justifyContent: "space-between" 
                       }}
+
                       onClick={(e) => {
                         e.stopPropagation();
                         handleImageClick({
@@ -113,6 +123,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
                         });
                       }}
                     >
+
                       <div style={{ display: "flex", alignItems: "center" }}>
                         <span style={{ marginRight: "10px", fontSize: "12px", fontWeight: "bold" }}>
                           {String(frame.frame_number).padStart(3, "0")}
@@ -137,6 +148,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
                         >
                           IMAGE INFO
                         </span>
+
                       </div>
                     </div>
                   ))
@@ -149,7 +161,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
             )}
           </>
         ) : null}
-      </div>
+
       <div className="gallery-item-details" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <div className="gallery-item-name" style={{ display: "flex", flexDirection: "column" }}>
           <span style={{ fontSize: "12px", color: "#000" }}>{file.name}</span>
@@ -183,6 +195,7 @@ const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExp
             </span>
           )}
         </div>
+
       </div>
     </div>
   );
@@ -193,8 +206,10 @@ const UploadFiles = React.memo(() => {
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
   const [showPlusModal, setShowPlusModal] = useState(false);
+
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [pendingImages, setPendingImages] = useState([]);
+
   const [folderSelections, setFolderSelections] = useState([]);
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [databases, setDatabases] = useState([]);
@@ -204,11 +219,13 @@ const UploadFiles = React.memo(() => {
   const [expandedFrames, setExpandedFrames] = useState({});
   const [frameData, setFrameData] = useState({});
   const [showVideoFrameModal, setShowVideoFrameModal] = useState(false);
+
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
   const [videoId, setVideoId] = useState(null);
   const [videoMetadata, setVideoMetadata] = useState({}); // Object to store metadata by fileId
+
 
   const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages, setSelectedFileInfo } = useContext(ImageContext);
   const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]);
@@ -217,6 +234,7 @@ const UploadFiles = React.memo(() => {
   const [isAscending, setIsAscending] = useState(true);
   const [isGridView, setIsGridView] = useState(false);
   const [isCreateButtonClicked, setIsCreateButtonClicked] = useState(false);
+
 
   // Cache file URLs to prevent recreation on every render
   const fileUrlCache = useRef(new Map());
@@ -263,15 +281,18 @@ const UploadFiles = React.memo(() => {
   }, [setSelectedFileInfo]);
 
   const handleVideoClick = useCallback(async (file) => {
+
     setIsVideoLoading(true);
     try {
       const fileUrl = getFileUrl(file);
+
       const formData = new FormData();
       formData.append("file", file);
       const response = await fetch("http://localhost:8000/extract-frames/", {
         method: "POST",
         body: formData,
       });
+
 
       if (!response.ok) {
         throw new Error("Failed to extract frames");
@@ -283,14 +304,17 @@ const UploadFiles = React.memo(() => {
         ...prev,
         [fileId]: data.video_metadata,
       }));
+
       setVideoId(data.video_id);
       setSelectedVideo(file);
       setSelectedVideoUrl(fileUrl);
       setShowVideoFrameModal(true);
     } catch (error) {
       console.error("Error extracting frames:", error);
+
     } finally {
       setIsVideoLoading(false);
+
     }
   }, []);
 
@@ -307,6 +331,7 @@ const UploadFiles = React.memo(() => {
   const handleDisplayDbNext = useCallback((data) => {
     const newDatabase = {
       name: data.databaseName,
+
       files: [...data.files, ...pendingImages],
     };
     setDatabases((prev) => [...prev, newDatabase]);
@@ -315,6 +340,7 @@ const UploadFiles = React.memo(() => {
     setShowDisplayDbModal(false);
     setPendingImages([]);
   }, [databases, pendingImages]);
+
 
   const handleDeleteDatabase = useCallback((index) => {
     setDatabases((prev) => prev.filter((_, i) => i !== index));
@@ -358,6 +384,7 @@ const UploadFiles = React.memo(() => {
             throw new Error("Invalid frames data received from server");
           }
 
+
           // Use the actual number of frames extracted
           const frames = data.frames.map((frame, index) => ({
             ...frame,
@@ -373,6 +400,7 @@ const UploadFiles = React.memo(() => {
             [fileId]: data.video_metadata,
           }));
           console.log(`Frames extracted for ${file.name}:`, frames);
+
         } catch (error) {
           console.error("Error fetching frames:", error.message);
           setFrameData((prev) => ({
@@ -395,6 +423,7 @@ const UploadFiles = React.memo(() => {
   const formatTime = useCallback((time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
+
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }, []);
 
@@ -424,6 +453,7 @@ const UploadFiles = React.memo(() => {
     } else {
       console.error("No database selected to add the image to.");
     }
+
   };
 
   return (
@@ -460,6 +490,7 @@ const UploadFiles = React.memo(() => {
         </Box>
       )}
       <div className="main-container">
+
         {/* Top Navigation Bar - Always Visible */}
         <div className="top-navigation">
           <div className="search-container">
@@ -532,6 +563,7 @@ const UploadFiles = React.memo(() => {
         </div>
 
         {/* Center Buttons - Only Visible When No Database */}
+
         {databases.length === 0 && !showCreateDbModal && !showImportMediaModal && !showDisplayDbModal && !showPlusModal && (
           <div className="center-buttons">
             <button className="action-button open-database">Open a Database</button>
@@ -570,7 +602,9 @@ const UploadFiles = React.memo(() => {
               setShowCreateDbModal(false);
               setShowImportMediaModal(true);
             }}
+
             existingDatabaseNames={existingDatabaseNames}
+
           />
         )}
         {showImportMediaModal && (
@@ -597,7 +631,9 @@ const UploadFiles = React.memo(() => {
             <h3 className="gallery-title">Final Gallery</h3>
             <div className="gallery-items" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {databases[selectedDatabaseIndex].files.map((file, index) => {
+
                 const fileUrl = getFileUrl(file);
+
                 const fileId = `${file.name}-${file.lastModified}`;
                 const isExpanded = expandedFrames[fileId] || false;
                 return (
@@ -610,7 +646,9 @@ const UploadFiles = React.memo(() => {
                     fileId={fileId}
                     isExpanded={isExpanded}
                     frameData={frameData}
+
                     videoMetadata={videoMetadata}
+
                     handleImageClick={handleImageClick}
                     handleVideoClick={handleVideoClick}
                     handleMediaInfoClick={handleMediaInfoClick}
@@ -647,6 +685,7 @@ const UploadFiles = React.memo(() => {
             </div>
           </div>
         )}
+
         {isVideoLoading && (
           <div
             style={{
@@ -665,17 +704,22 @@ const UploadFiles = React.memo(() => {
           </div>
         )}
         {showVideoFrameModal && selectedVideo && selectedVideoUrl && (
+
           <VideoFrameModal
             file={selectedVideo}
             fileUrl={selectedVideoUrl}
             videoId={videoId}
+
             videoMetadata={videoMetadata}
+
             onClose={() => {
               setShowVideoFrameModal(false);
               setSelectedVideo(null);
               setSelectedVideoUrl(null);
               setVideoId(null);
+
               setVideoMetadata({});
+
             }}
             onFrameSelect={(frameInfo) => {
               handleImageClick(frameInfo);

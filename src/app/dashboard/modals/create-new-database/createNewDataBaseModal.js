@@ -1,3 +1,4 @@
+
 "use client";
 import React, { useState, useRef, useEffect } from "react";
 import { FaInfoCircle, FaCloudUploadAlt, FaFolder, FaFolderOpen } from "react-icons/fa";
@@ -13,6 +14,7 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
   useEffect(() => {
     console.log("Existing database names:", existingDatabaseNames);
   }, [existingDatabaseNames]);
+
 
   const handleFolderChange = (event) => {
     const files = Array.from(event.target.files);
@@ -85,6 +87,7 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
       return;
     }
 
+
     // Check for duplicate name
     if (existingDatabaseNames.includes(databaseName.trim().toLowerCase())) {
       setDatabaseNameError("Database name already exists. Please choose a unique name.");
@@ -95,12 +98,15 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
 
     const databaseData = {
       databaseName: databaseName.trim(),
+
       mainFolder: {
         name: databaseName.trim(),
         subFolders: selectedFolders.map((folder) => ({
           name: folder.name,
           files: folder.files,
+
           subFolders: folder.subFolders,
+
         })),
       },
     };
@@ -132,6 +138,7 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
 
   const stats = calculateFolderStats(selectedFolders);
 
+
   // Check if the database name is a duplicate
   const isDuplicateName = databaseName.trim() && existingDatabaseNames.includes(databaseName.trim().toLowerCase());
   const hasValidationError = !databaseName.trim() || isDuplicateName;
@@ -162,7 +169,9 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
               value={databaseName}
               onChange={(e) => {
                 setDatabaseName(e.target.value);
+
                 // Clear errors when the user types
+
                 if (databaseNameError && e.target.value.trim()) {
                   setDatabaseNameError("");
                 }
@@ -227,11 +236,13 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
               {databaseNameError}
             </div>
           )}
+
           {isDuplicateName && !databaseNameError && (
             <div style={{ color: "#FF4444", fontSize: "12px", marginTop: "5px" }}>
               Database name already exists. Please choose a unique name.
             </div>
           )}
+
         </div>
 
         <div style={{ margin: "10px 0", textAlign: "center" }}>
@@ -286,6 +297,7 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
         )}
 
         <div style={buttonContainerStyle}>
+
           <button
             onClick={handleNextClick}
             style={{
@@ -295,6 +307,7 @@ const CreateNewDataBaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
             }}
             disabled={hasValidationError}
           >
+
             Create Database
           </button>
         </div>
