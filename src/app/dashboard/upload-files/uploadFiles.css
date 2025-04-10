@@ -491,6 +491,7 @@
 /* .media-info-modal-close {
   padding: 5px 10px;
   cursor: pointer;
+
 } */
 
 /* uploadFiles.css */
@@ -514,3 +515,4 @@
 .gallery-item-expand-frames:hover {
   color: #0056D2; /* Slightly darker blue on hover */
 }
+
