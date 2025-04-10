@@ -1,48 +1,26 @@
-import React, { useState, useEffect, useRef } from "react";
-import { FaBackward, FaForward, FaSave, FaCheck, FaTimes } from "react-icons/fa";
 
-// Modal for video frame selection
-const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => {
+
+
+
+import React, { useState, useEffect, useRef } from "react";
+import { FaBackward, FaForward, FaTimes, FaPlusCircle } from "react-icons/fa";
+
+// Modal for video playback with a scroll bar
+const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [savedFrames, setSavedFrames] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [totalFrames, setTotalFrames] = useState(0);
+  const [resolution, setResolution] = useState("N/A");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
-  const debounceTimer = useRef(null); // For debouncing fetch
-
-  // Preload the video URL and fetch saved frames with debouncing
-  useEffect(() => {
-    setIsLoading(true);
-    const fetchSavedFrames = async () => {
-      try {
-        const response = await fetch(`http://localhost:8000/get-saved-frames/${videoId}`);
-        const data = await response.json();
-        if (data.frames) {
-          setSavedFrames(data.frames);
-        }
-      } catch (error) {
-        console.error("Error fetching saved frames:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    // Debounce the fetch request to avoid multiple rapid calls
-    if (debounceTimer.current) {
-      clearTimeout(debounceTimer.current);
-    }
-    debounceTimer.current = setTimeout(fetchSavedFrames, 100);
-
-    return () => {
-      if (debounceTimer.current) {
-        clearTimeout(debounceTimer.current);
-      }
-    };
-  }, [videoId]);
+  const [isHovered, setIsHovered] = useState(false);
 
   useEffect(() => {
     if (videoRef.current) {
+      videoRef.current.src = fileUrl;
+      videoRef.current.load();
+      console.log("Video reloaded with src =", fileUrl);
       videoRef.current.addEventListener("loadedmetadata", handleVideoLoadedMetadata);
       videoRef.current.addEventListener("timeupdate", handleTimeUpdate);
     }
@@ -52,7 +30,7 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
         videoRef.current.removeEventListener("timeupdate", handleTimeUpdate);
       }
     };
-  }, []);
+  }, [fileUrl]);
 
   const handleVideoLoadedMetadata = () => {
     if (videoRef.current) {
@@ -60,43 +38,80 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
       const canvas = canvasRef.current;
       canvas.width = videoRef.current.videoWidth;
       canvas.height = videoRef.current.videoHeight;
+      setResolution(`${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
+      // Estimate total frames (assuming 30 fps for simplicity; can be adjusted if frame rate is available)
+      const frameRate = 30;
+      setTotalFrames(Math.floor(videoRef.current.duration * frameRate));
+      console.log("Video loaded: duration =", videoRef.current.duration, "readyState =", videoRef.current.readyState);
     }
   };
 
   const handleTimeUpdate = () => {
     if (videoRef.current) {
       setCurrentTime(videoRef.current.currentTime);
+      console.log("Time updated: currentTime =", videoRef.current.currentTime);
     }
   };
 
-  const handleSeek = (event) => {
-    const newTime = parseFloat(event.target.value);
+  const ensureVideoReady = async () => {
+    if (videoRef.current && videoRef.current.readyState < 2) {
+      console.log("Waiting for video to be ready...");
+      await new Promise((resolve) => {
+        videoRef.current.addEventListener("canplay", resolve, { once: true });
+      });
+      console.log("Video ready: readyState =", videoRef.current.readyState);
+    }
+  };
+
+  const handleSeek = async (e) => {
+    const newTime = parseFloat(e.target.value);
     setCurrentTime(newTime);
     if (videoRef.current) {
+      if (videoRef.current.readyState < 2) {
+        console.log("Waiting for video to be ready...");
+        await new Promise((resolve) => {
+          videoRef.current.addEventListener("canplay", resolve, { once: true });
+        });
+        console.log("Video ready: readyState =", videoRef.current.readyState);
+      }
       videoRef.current.currentTime = newTime;
+      videoRef.current.pause();
+      console.log("Range input: newTime =", newTime);
+    } else {
+      console.error("videoRef.current is not available for seek");
     }
   };
 
-  const handleFastForward = () => {
+  const handleFastForward = async () => {
     if (videoRef.current) {
-      const newTime = Math.min(videoRef.current.currentTime + 5, videoDuration);
+      const newTime = Math.min(currentTime + 5, videoDuration);
       setCurrentTime(newTime);
+      await ensureVideoReady();
       videoRef.current.currentTime = newTime;
+      videoRef.current.pause();
+      console.log("Fast-forward: newTime =", newTime);
+    } else {
+      console.error("videoRef.current is not available for fast-forward");
     }
   };
 
-  const handleRewind = () => {
+  const handleRewind = async () => {
     if (videoRef.current) {
-      const newTime = Math.max(videoRef.current.currentTime - 5, 0);
+      const newTime = Math.max(currentTime - 5, 0);
       setCurrentTime(newTime);
+      await ensureVideoReady();
       videoRef.current.currentTime = newTime;
+      videoRef.current.pause();
+      console.log("Rewind: newTime =", newTime);
+    } else {
+      console.error("videoRef.current is not available for rewind");
     }
   };
 
   const formatTime = (time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+    return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   const dataURLtoFile = (dataUrl, filename) => {
@@ -122,55 +137,25 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
     const fileName = `frame-${formatTime(currentTime).replace(":", "-")}.jpg`;
     const frameFile = dataURLtoFile(dataUrl, fileName);
 
-    // Save the frame to the backend
-    try {
-      const formData = new FormData();
-      formData.append("video_id", videoId);
-      formData.append("timestamp", currentTime);
-      formData.append("frame_data", frameFile, fileName);
+    const frameInfo = {
+      url: dataUrl,
+      timestamp: currentTime,
+      fileName: fileName,
+      file: frameFile,
+    };
 
-      const response = await fetch("http://localhost:8000/save-frame/", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to save frame");
-      }
-
-      const data = await response.json();
-      setSavedFrames((prev) => [...prev, data.frame]);
-    } catch (error) {
-      console.error("Error saving frame:", error);
-    }
+    setSavedFrames((prev) => [...prev, frameInfo]);
+    console.log("Frame saved:", frameInfo);
   };
 
-  const handleFrameSelect = (frame) => {
+  const handleFrameClick = (frame) => {
     onFrameSelect({
       fileUrl: frame.url,
-      fileName: `Frame_${formatTime(frame.timestamp)}`,
-      fileSize: frame.size_bytes,
+      fileName: frame.fileName,
+      file: frame.file,
       fileType: "image/jpeg",
     });
     onClose();
-  };
-
-  const handleDeleteFrame = async (timestamp) => {
-    try {
-      // Send a DELETE request to the backend to remove the frame
-      const response = await fetch(`http://localhost:8000/delete-frame/${videoId}/${timestamp}`, {
-        method: "DELETE",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to delete frame");
-      }
-
-      // Update the local state to remove the frame
-      setSavedFrames((prev) => prev.filter((frame) => frame.timestamp !== timestamp));
-    } catch (error) {
-      console.error("Error deleting frame:", error);
-    }
   };
 
   return (
@@ -183,8 +168,8 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
         backgroundColor: "white",
         borderRadius: "8px",
         zIndex: 1000,
-        width: "600px",
-        height: "400px",
+        width: "800px",
+        height: "500px",
         display: "flex",
         flexDirection: "column",
         boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
@@ -203,7 +188,7 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
         }}
       >
         <h3 style={{ color: "black", margin: 0, fontSize: "15px" }}>
-          Select a Frame from {file.name}
+          Select a Frame from {file.name} (Total Frames: {totalFrames})
         </h3>
         <button
           onClick={onClose}
@@ -224,7 +209,7 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
             transition: "background-color 0.3s ease",
           }}
         >
-          ×
+          <FaTimes size={16} />
         </button>
       </div>
       <div
@@ -237,233 +222,172 @@ const VideoFrameModal = ({ file, fileUrl, videoId, onClose, onFrameSelect }) => 
           overflow: "hidden",
         }}
       >
-        {isLoading ? (
-          <div
+        <div
+          style={{
+            width: "100%",
+            height: "50%", // Reduced height to make room for info at the bottom
+            position: "relative",
+          }}
+        >
+          <video
+            ref={videoRef}
+            src={fileUrl}
             style={{
-              flex: 1,
+              width: "100%",
+              height: "100%",
+              objectFit: "contain",
+              borderRadius: "5px",
+              transform: "rotate(180deg)",
+            }}
+            muted
+          >
+            Your browser does not support the video tag.
+          </video>
+        </div>
+        <div
+          style={{
+            marginTop: "10px",
+            display: "flex",
+            alignItems: "center",
+            gap: "10px",
+            width: "100%",
+            padding: "5px 0",
+          }}
+        >
+          <button
+            onClick={handleRewind}
+            title="Rewind 5 seconds"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "5px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "center",
-              fontSize: "14px",
-              color: "#666",
+              color: "#007BFF",
+              transition: "color 0.3s ease",
             }}
           >
-            Loading...
-          </div>
-        ) : (
-          <>
-            <div
-              style={{
-                width: "100%",
-                height: "200px",
-                position: "relative",
-              }}
-            >
-              <video
-                ref={videoRef}
-                src={fileUrl}
-                style={{
-                  width: "100%",
-                  height: "100%",
-                  objectFit: "contain",
-                  borderRadius: "5px",
-                }}
-                muted
-              >
-                Your browser does not support the video tag.
-              </video>
+            <FaBackward size={20} />
+          </button>
+          <input
+            type="range"
+            min="0"
+            max={videoDuration || 0}
+            step="0.1"
+            value={currentTime}
+            onChange={handleSeek}
+            style={{
+              flex: 1,
+              cursor: "pointer",
+              accentColor: "#007BFF",
+            }}
+          />
+          <button
+            onClick={handleFastForward}
+            title="Fast-forward 5 seconds"
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              color: "#007BFF",
+              transition: "color 0.3s ease",
+            }}
+          >
+            <FaForward size={20} />
+          </button>
+          <button
+            onClick={handleSaveFrame}
+            title="Save frame at current timestamp"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              padding: "5px",
+              display: "flex",
+              alignItems: "center",
+              color: isHovered ? "#90EE90" : "#32CD32",
+              transition: "color 0.3s ease",
+            }}
+          >
+            <FaPlusCircle size={20} />
+          </button>
+        </div>
+        <div
+          style={{
+            marginTop: "10px",
+            padding: "10px",
+            border: "1px solid #ddd",
+            borderRadius: "5px",
+            maxHeight: "110px", // Reduced height to make room for info at the bottom
+            overflowX: "auto",
+            overflowY: "hidden",
+            whiteSpace: "nowrap",
+            backgroundColor: "#fff",
+          }}
+        >
+          {savedFrames.length > 0 ? (
+            savedFrames.map((frame, index) => (
               <div
+                key={index}
                 style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "10px",
-                  width: "100%",
-                  padding: "5px 0",
-                }}
-              >
-                <button
-                  onClick={handleRewind}
-                  title="Rewind 5 seconds"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    color: "#007BFF",
-                    transition: "color 0.3s ease",
-                  }}
-                >
-                  <FaBackward size={16} />
-                </button>
-                <span style={{ color: "#000000", fontSize: "12px" }}>{formatTime(currentTime)}</span>
-                <input
-                  type="range"
-                  min="0"
-                  max={videoDuration || 0}
-                  step="0.1"
-                  value={currentTime}
-                  onChange={handleSeek}
-                  style={{
-                    flex: 1,
-                    cursor: "pointer",
-                    accentColor: "#007BFF",
-                  }}
-                />
-                <span style={{ color: "#000000", fontSize: "12px" }}>{formatTime(videoDuration)}</span>
-                <button
-                  onClick={handleFastForward}
-                  title="Fast-forward 5 seconds"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    color: "#007BFF",
-                    transition: "color 0.3s ease",
-                  }}
-                >
-                  <FaForward size={16} />
-                </button>
-                <button
-                  onClick={handleSaveFrame}
-                  title="Save frame at current timestamp"
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    padding: "5px",
-                    display: "flex",
-                    alignItems: "center",
-                    color: "#007BFF",
-                    transition: "color 0.3s ease",
-                  }}
-                >
-                  <FaSave size={16} />
-                </button>
-              </div>
-            </div>
-            {savedFrames.length > 0 ? (
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  maxHeight: "100px",
-                  overflowY: "auto",
-                  marginTop: "10px",
-                  gap: "10px",
-                  padding: "5px 0",
-                  flexWrap: "wrap",
-                }}
-              >
-                {savedFrames.map((frame, index) => (
-                  <div
-                    key={index}
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      position: "relative",
-                      padding: "5px",
-                    }}
-                  >
-                    <img
-                      src={frame.url}
-                      alt={`Saved frame at ${formatTime(frame.timestamp)}`}
-                      style={{
-                        width: "60px",
-                        height: "60px",
-                        objectFit: "cover",
-                        borderRadius: "4px",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleFrameSelect(frame)}
-                    />
-                    <span
-                      style={{
-                        fontSize: "0.7rem",
-                        color: "#555",
-                        marginLeft: "5px",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {formatTime(frame.timestamp)}
-                    </span>
-                    <button
-                      onClick={() => handleFrameSelect(frame)}
-                      title="Select this frame"
-                      style={{
-                        position: "absolute",
-                        top: "5px",
-                        right: "25px",
-                        backgroundColor: "#007BFF",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        transition: "background-color 0.3s ease",
-                      }}
-                    >
-                      <FaCheck size={12} />
-                    </button>
-                    <button
-                      onClick={() => handleDeleteFrame(frame.timestamp)}
-                      title="Delete this frame"
-                      style={{
-                        position: "absolute",
-                        top: "5px",
-                        right: "5px",
-                        backgroundColor: "#FF0000",
-                        color: "white",
-                        border: "none",
-                        borderRadius: "50%",
-                        width: "20px",
-                        height: "20px",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        cursor: "pointer",
-                        fontSize: "12px",
-                        transition: "background-color 0.3s ease",
-                      }}
-                    >
-                      <FaTimes size={12} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p
-                style={{
-                  fontSize: "12px",
-                  color: "#666",
-                  marginTop: "10px",
+                  display: "inline-block",
+                  position: "relative",
+                  marginRight: "10px",
                   textAlign: "center",
                 }}
+                onClick={() => handleFrameClick(frame)}
               >
-                No frames saved yet. Use the "Save Frame" button to capture frames.
-              </p>
-            )}
-          </>
-        )}
+                <img
+                  src={frame.url}
+                  alt={`Saved frame at ${formatTime(frame.timestamp)}`}
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    objectFit: "cover",
+                    borderRadius: "4px",
+                    cursor: "pointer",
+                  }}
+                />
+                <span
+                  style={{
+                    display: "block",
+                    fontSize: "0.7rem",
+                    color: "#555",
+                    marginTop: "5px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {formatTime(frame.timestamp)}
+                </span>
+              </div>
+            ))
+          ) : (
+            <p style={{ fontSize: "12px", color: "#666", textAlign: "center" }}>
+              No frames saved yet.
+            </p>
+          )}
+        </div>
       </div>
       <div
         style={{
-          marginTop: "auto",
-          display: "flex",
-          justifyContent: "flex-end",
           padding: "10px 20px",
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
       >
+        <div style={{ fontSize: "12px", color: "#666" }}>
+          <p style={{ margin: "0 0 5px 0" }}>{file ? `File Name: ${file.name}` : "No file selected."}</p>
+          <p style={{ margin: "0 0 5px 0" }}>{`File Size: ${((file?.size || 0) / (1024 * 1024)).toFixed(2)} MB`}</p>
+          <p style={{ margin: "0 0 5px 0" }}>{`Resolution: ${resolution}`}</p>
+          <p style={{ margin: "0 0 5px 0" }}>{`Duration: ${formatTime(videoDuration)}`}</p>
+        </div>
         <button
           onClick={onClose}
           style={{

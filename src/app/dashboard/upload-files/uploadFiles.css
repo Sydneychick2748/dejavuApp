@@ -492,3 +492,25 @@
   padding: 5px 10px;
   cursor: pointer;
 } */
+
+/* uploadFiles.css */
+
+/* Add button hover effect */
+.add-button {
+  background-color: #ccc;
+  transition: background-color 0.3s ease;
+}
+
+.add-button:enabled:hover {
+  background-color: #2E7D32;
+}
+
+/* Expand Frames link hover effect */
+.gallery-item-expand-frames {
+  color: #007BFF;
+  transition: color 0.3s ease;
+}
+
+.gallery-item-expand-frames:hover {
+  color: #0056D2; /* Slightly darker blue on hover */
+}
