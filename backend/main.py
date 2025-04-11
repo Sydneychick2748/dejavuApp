@@ -1,4 +1,7 @@
 
+
+
+
 # from fastapi import FastAPI, File, UploadFile, Form
 # from fastapi.middleware.cors import CORSMiddleware
 # from fastapi.responses import FileResponse, JSONResponse
@@ -23,9 +26,7 @@
 #     CORSMiddleware,
 #     allow_origins=["http://localhost:3000"],
 #     allow_credentials=True,
-
 #     allow_methods=["GET", "POST", "DELETE"],
-
 #     allow_headers=["*"],
 # )
 
@@ -68,17 +69,10 @@
 #         raise ValueError(f"Error in background removal: {e}")
 
 # def ensure_solid_background(frame_path: str) -> str:
-
-#     """
-#     Ensure the frame has a solid white background using OpenCV.
-#     """
-
 #     try:
 #         img = cv2.imread(frame_path, cv2.IMREAD_UNCHANGED)
 #         if img is None:
 #             raise ValueError("Failed to read frame image.")
-
-
 
 #         if len(img.shape) == 3 and img.shape[2] == 4:
 #             white_bg = np.ones((img.shape[0], img.shape[1], 3), dtype=np.uint8) * 255
@@ -87,8 +81,6 @@
 #                 white_bg[:, :, c] = (white_bg[:, :, c] * (1 - alpha) + img[:, :, c] * alpha).astype(np.uint8)
 #             cv2.imwrite(frame_path, white_bg)
 #         else:
-
-
 #             cv2.imwrite(frame_path, img)
 #         return frame_path
 #     except Exception as e:
@@ -245,16 +237,12 @@
 #                     )
 #                     ffmpeg.run(stream, capture_stderr=True)
 
-#                     # Post-process the frame to ensure a solid background
-
 #                     ensure_solid_background(str(frame_filename))
 
 #                     frame_stat = os.stat(frame_filename)
 #                     frame_info = {
 #                         "timestamp": ts,
-
 #                         "frame_number": int(ts * frame_rate) + 1,  # Start counting from 1
-
 #                         "size_bytes": frame_stat.st_size,
 #                         "resolution": f"{metadata['width']}x{metadata['height']}",
 #                         "url": f"http://localhost:8000/frames/{video_id}/frame_{ts:.3f}.jpg"
@@ -264,7 +252,6 @@
 #                     print(f"Failed to extract frame at timestamp {ts}: {e.stderr.decode()}")
 #                     continue
 #         else:
-
 #             # Extract all frames of the video
 #             num_frames_to_extract = total_frames  # Extract all frames, no cap
 #             if total_frames <= 0:
@@ -273,15 +260,20 @@
 #             frame_interval = 1  # Extract every frame
 #             frame_indices = [i for i in range(num_frames_to_extract)]
 
-
 #             for i, frame_index in enumerate(frame_indices):
 #                 frame_filename = frame_output_dir / f"frame_{i:03d}.jpg"
 #                 try:
-
-#                     # Extract frame by frame number
-
-                    
-
+#                     stream = ffmpeg.input(str(transcoded_video))
+#                     stream = ffmpeg.output(
+#                         stream,
+#                         str(frame_filename),
+#                         vf=f"select='eq(n\\,{frame_index})'",
+#                         vframes=1,
+#                         format="image2",
+#                         update=1,
+#                         strict=-2
+#                     )
+#                     ffmpeg.run(stream, capture_stderr=True)
 
 #                     ensure_solid_background(str(frame_filename))
 
@@ -289,7 +281,6 @@
 #                     frame_info = {
 #                         "timestamp": frame_index / frame_rate,
 #                         "frame_number": frame_index + 1,  # Start counting from 1
-
 #                         "size_bytes": frame_stat.st_size,
 #                         "resolution": f"{metadata['width']}x{metadata['height']}",
 #                         "url": f"http://localhost:8000/frames/{video_id}/frame_{i:03d}.jpg"
@@ -319,17 +310,12 @@
 #     frame_data: UploadFile = File(...)
 # ):
 #     try:
-
 #         saved_frame_dir = Path(SAVED_FRAMES_DIR) / video_id
 #         saved_frame_dir.mkdir(parents=True, exist_ok=True)
-
 
 #         frame_filename = saved_frame_dir / f"saved_frame_{timestamp:.3f}.jpg"
 #         with frame_filename.open("wb") as buffer:
 #             shutil.copyfileobj(frame_data.file, buffer)
-
-
-#         # Post-process the frame to ensure a solid background
 
 #         ensure_solid_background(str(frame_filename))
 
@@ -368,15 +354,12 @@
 #             }
 #             frames.append(frame_info)
 
-
 #         frames.sort(key=lambda x: x["timestamp"])
-
 #         return JSONResponse(content={"frames": frames})
 #     except Exception as e:
 #         print("Error in /get-saved-frames endpoint:")
 #         traceback.print_exc()
 #         return JSONResponse(content={"error": str(e)}, status_code=500)
-
 
 # @app.delete("/delete-frame/{video_id}/{timestamp}")
 # async def delete_frame(video_id: str, timestamp: float):
@@ -396,7 +379,6 @@
 #         print("Error in /delete-frame endpoint:")
 #         traceback.print_exc()
 #         return JSONResponse(content={"error": str(e)}, status_code=500)
-
 
 # @app.post("/save-database")
 # async def save_database(
@@ -450,9 +432,80 @@
 #             shutil.rmtree(temp_dir, ignore_errors=True)
 #         return JSONResponse(content={"error": str(e)}, status_code=500)
 
+# # New endpoint to extract metadata using ffprobe
+# @app.post("/extract-metadata")
+# async def extract_metadata(file: UploadFile = File(...)):
+#     try:
+#         # Save the uploaded file temporarily
+#         video_id = str(uuid.uuid4())
+#         base_filename = os.path.basename(file.filename)
+#         video_path = Path(UPLOAD_FOLDER) / f"{video_id}_{base_filename}"
+#         with video_path.open("wb") as buffer:
+#             shutil.copyfileobj(file.file, buffer)
+
+#         # Use ffmpeg.probe to extract metadata
+#         probe = ffmpeg.probe(str(video_path))
+#         format_data = probe.get("format", {})
+#         streams = probe.get("streams", [])
+#         video_stream = next((s for s in streams if s.get("codec_type") == "video"), {})
+#         audio_stream = next((s for s in streams if s.get("codec_type") == "audio"), {})
+
+#         # Extract creation time (recording date)
+#         creation_time = format_data.get("tags", {}).get("creation_time") or \
+#                         video_stream.get("tags", {}).get("creation_time") or \
+#                         audio_stream.get("tags", {}).get("creation_time") or \
+#                         None
+
+#         # Extract duration
+#         duration = float(format_data.get("duration", 0))
+
+#         # Extract frame rate and calculate total frames
+#         frame_rate_str = video_stream.get("r_frame_rate", "30/1")
+#         frame_rate = eval(frame_rate_str) if frame_rate_str else 30
+#         total_frames = int(duration * frame_rate)
+
+#         # Extract resolution
+#         resolution = f"{video_stream.get('height', 'N/A')}p" if video_stream.get("height") else "N/A"
+
+#         # Extract file size (in bytes)
+#         file_size = int(format_data.get("size", 0))
+
+#         # Extract video codec
+#         video_codec = video_stream.get("codec_name", "N/A")
+
+#         # Extract audio codec
+#         audio_codec = audio_stream.get("codec_name", "N/A")
+
+#         # Extract bit rate
+#         bit_rate = format_data.get("bit_rate")
+#         bit_rate = f"{int(bit_rate) // 1000} kbps" if bit_rate else "N/A"
+
+#         # Extract file format
+#         file_format = format_data.get("format_name", "N/A")
+
+#         # Clean up the temporary file
+#         video_path.unlink()
+
+#         return JSONResponse(content={
+#             "creationTime": creation_time,
+#             "duration": duration,
+#             "totalFrames": total_frames,
+#             "resolution": resolution,
+#             "fileSize": file_size,
+#             "videoCodec": video_codec,
+#             "audioCodec": audio_codec,
+#             "bitRate": bit_rate,
+#             "fileFormat": file_format,
+#         })
+#     except Exception as e:
+#         print("Error in /extract-metadata endpoint:")
+#         traceback.print_exc()
+#         return JSONResponse(content={"error": str(e)}, status_code=500)
+
 # if __name__ == "__main__":
 #     import uvicorn
 #     uvicorn.run(app, host="127.0.0.1", port=8000)
+
 
 
 from fastapi import FastAPI, File, UploadFile, Form
@@ -620,13 +673,16 @@ async def get_video_metadata(video_path):
     try:
         probe = ffmpeg.probe(str(video_path), select_streams="v:0")
         video_stream = probe["streams"][0]
+        duration = float(probe["format"]["duration"])
+        frame_rate = eval(video_stream["r_frame_rate"])
+        total_frames = int(video_stream.get("nb_frames", duration * frame_rate))
         return {
-            "duration": float(probe["format"]["duration"]),
-            "frame_rate": eval(video_stream["r_frame_rate"]),
+            "duration": duration,
+            "frame_rate": frame_rate,
             "width": video_stream["width"],
             "height": video_stream["height"],
             "codec": video_stream["codec_name"],
-            "total_frames": int(video_stream.get("nb_frames", 0))
+            "total_frames": total_frames
         }
     except Exception as e:
         raise Exception(f"Error probing video: {str(e)}")
@@ -662,7 +718,7 @@ async def extract_frames(
                 color_primaries="bt709",
                 preset="fast"
             )
-            ffmpeg.run(stream, capture_stderr=True)
+            ffmpeg.run(stream, capture_stderr=True, overwrite_output=True)
         except ffmpeg.Error as e:
             print(f"Error transcoding video: {e.stderr.decode()}")
             raise Exception(f"Failed to transcode video: {e.stderr.decode()}")
@@ -688,7 +744,7 @@ async def extract_frames(
                         update=1,
                         strict=-2
                     )
-                    ffmpeg.run(stream, capture_stderr=True)
+                    ffmpeg.run(stream, capture_stderr=True, overwrite_output=True)
 
                     ensure_solid_background(str(frame_filename))
 
@@ -705,43 +761,47 @@ async def extract_frames(
                     print(f"Failed to extract frame at timestamp {ts}: {e.stderr.decode()}")
                     continue
         else:
-            # Extract all frames of the video
-            num_frames_to_extract = total_frames  # Extract all frames, no cap
-            if total_frames <= 0:
-                raise Exception("Total frames is invalid")
+            # Extract all frames using a single FFmpeg command
+            frame_pattern = frame_output_dir / "frame_%04d.jpg"
+            try:
+                stream = ffmpeg.input(str(transcoded_video))
+                stream = ffmpeg.output(
+                    stream,
+                    str(frame_pattern),
+                    vf="fps=fps={}".format(frame_rate),  # Extract at the video's frame rate
+                    format="image2",
+                    start_number=1,
+                    strict=-2
+                )
+                ffmpeg.run(stream, capture_stderr=True, overwrite_output=True)
 
-            frame_interval = 1  # Extract every frame
-            frame_indices = [i for i in range(num_frames_to_extract)]
+                # Collect frame information
+                frame_files = sorted(frame_output_dir.glob("frame_*.jpg"))
+                total_extracted_frames = len(frame_files)
+                if total_extracted_frames == 0:
+                    raise Exception("No frames were extracted from the video")
 
-            for i, frame_index in enumerate(frame_indices):
-                frame_filename = frame_output_dir / f"frame_{i:03d}.jpg"
-                try:
-                    stream = ffmpeg.input(str(transcoded_video))
-                    stream = ffmpeg.output(
-                        stream,
-                        str(frame_filename),
-                        vf=f"select='eq(n\\,{frame_index})'",
-                        vframes=1,
-                        format="image2",
-                        update=1,
-                        strict=-2
-                    )
-                    ffmpeg.run(stream, capture_stderr=True)
+                for i, frame_file in enumerate(frame_files, start=1):
+                    if i > total_frames:  # Ensure we don't exceed the total frame count
+                        break
+                    try:
+                        ensure_solid_background(str(frame_file))
+                        frame_stat = os.stat(frame_file)
+                        frame_info = {
+                            "timestamp": (i - 1) / frame_rate,
+                            "frame_number": i,
+                            "size_bytes": frame_stat.st_size,
+                            "resolution": f"{metadata['width']}x{metadata['height']}",
+                            "url": f"http://localhost:8000/frames/{video_id}/{frame_file.name}"
+                        }
+                        frames.append(frame_info)
+                    except Exception as e:
+                        print(f"Failed to process frame {i}: {str(e)}")
+                        continue
 
-                    ensure_solid_background(str(frame_filename))
-
-                    frame_stat = os.stat(frame_filename)
-                    frame_info = {
-                        "timestamp": frame_index / frame_rate,
-                        "frame_number": frame_index + 1,  # Start counting from 1
-                        "size_bytes": frame_stat.st_size,
-                        "resolution": f"{metadata['width']}x{metadata['height']}",
-                        "url": f"http://localhost:8000/frames/{video_id}/frame_{i:03d}.jpg"
-                    }
-                    frames.append(frame_info)
-                except ffmpeg.Error as e:
-                    print(f"Failed to extract frame at index {frame_index}: {e.stderr.decode()}")
-                    continue
+            except ffmpeg.Error as e:
+                print(f"Failed to extract frames: {e.stderr.decode()}")
+                raise Exception(f"Failed to extract frames: {e.stderr.decode()}")
 
         video_path.unlink()
         transcoded_video.unlink()
@@ -883,6 +943,76 @@ async def save_database(
         print(f"Error saving database: {e}")
         if temp_dir.exists():
             shutil.rmtree(temp_dir, ignore_errors=True)
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+# Add the /extract-metadata endpoint
+@app.post("/extract-metadata")
+async def extract_metadata(file: UploadFile = File(...)):
+    try:
+        # Save the uploaded file temporarily
+        video_id = str(uuid.uuid4())
+        base_filename = os.path.basename(file.filename)
+        video_path = Path(UPLOAD_FOLDER) / f"{video_id}_{base_filename}"
+        with video_path.open("wb") as buffer:
+            shutil.copyfileobj(file.file, buffer)
+
+        # Use ffmpeg.probe to extract metadata
+        probe = ffmpeg.probe(str(video_path))
+        format_data = probe.get("format", {})
+        streams = probe.get("streams", [])
+        video_stream = next((s for s in streams if s.get("codec_type") == "video"), {})
+        audio_stream = next((s for s in streams if s.get("codec_type") == "audio"), {})
+
+        # Extract creation time (recording date)
+        creation_time = format_data.get("tags", {}).get("creation_time") or \
+                        video_stream.get("tags", {}).get("creation_time") or \
+                        audio_stream.get("tags", {}).get("creation_time") or \
+                        None
+
+        # Extract duration
+        duration = float(format_data.get("duration", 0))
+
+        # Extract frame rate and calculate total frames
+        frame_rate_str = video_stream.get("r_frame_rate", "30/1")
+        frame_rate = eval(frame_rate_str) if frame_rate_str else 30
+        total_frames = int(duration * frame_rate)
+
+        # Extract resolution
+        resolution = f"{video_stream.get('height', 'N/A')}p" if video_stream.get("height") else "N/A"
+
+        # Extract file size (in bytes)
+        file_size = int(format_data.get("size", 0))
+
+        # Extract video codec
+        video_codec = video_stream.get("codec_name", "N/A")
+
+        # Extract audio codec
+        audio_codec = audio_stream.get("codec_name", "N/A")
+
+        # Extract bit rate
+        bit_rate = format_data.get("bit_rate")
+        bit_rate = f"{int(bit_rate) // 1000} kbps" if bit_rate else "N/A"
+
+        # Extract file format
+        file_format = format_data.get("format_name", "N/A")
+
+        # Clean up the temporary file
+        video_path.unlink()
+
+        return JSONResponse(content={
+            "creationTime": creation_time,
+            "duration": duration,
+            "totalFrames": total_frames,
+            "resolution": resolution,
+            "fileSize": file_size,
+            "videoCodec": video_codec,
+            "audioCodec": audio_codec,
+            "bitRate": bit_rate,
+            "fileFormat": file_format,
+        })
+    except Exception as e:
+        print("Error in /extract-metadata endpoint:")
+        traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 if __name__ == "__main__":

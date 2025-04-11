@@ -1,15 +1,15 @@
 
 
 import React, { useState, useEffect, useRef } from "react";
-import { FaBackward, FaForward, FaTimes, FaPlusCircle } from "react-icons/fa";
+import { FaBackward, FaForward, FaTimes, FaPlusCircle, FaInfoCircle } from "react-icons/fa";
 
-// Modal for video playback with a scroll bar
 const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
   const [videoDuration, setVideoDuration] = useState(0);
   const [currentTime, setCurrentTime] = useState(0);
   const [savedFrames, setSavedFrames] = useState([]);
   const [totalFrames, setTotalFrames] = useState(0);
   const [resolution, setResolution] = useState("N/A");
+  const [showInfo, setShowInfo] = useState(false); // State for info tooltip
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -39,8 +39,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       canvas.height = videoRef.current.videoHeight;
 
       setResolution(`${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
-      // Estimate total frames (assuming 30 fps for simplicity; can be adjusted if frame rate is available)
-      const frameRate = 30;
+      const frameRate = 30; // Assuming 30 fps; adjust if frame rate is available
       setTotalFrames(Math.floor(videoRef.current.duration * frameRate));
       console.log("Video loaded: duration =", videoRef.current.duration, "readyState =", videoRef.current.readyState);
     }
@@ -68,11 +67,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
     setCurrentTime(newTime);
     if (videoRef.current) {
       if (videoRef.current.readyState < 2) {
-        console.log("Waiting for video to be ready...");
-        await new Promise((resolve) => {
-          videoRef.current.addEventListener("canplay", resolve, { once: true });
-        });
-        console.log("Video ready: readyState =", videoRef.current.readyState);
+        await ensureVideoReady();
       }
       videoRef.current.currentTime = newTime;
       videoRef.current.pause();
@@ -114,6 +109,10 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
     return `${minutes < 10 ? "0" : ""}${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
+  const formatFrameNumber = (index) => {
+    return `Frame ${String(index + 1).padStart(3, "0")}`; // e.g., "Frame 001"
+  };
+
   const dataURLtoFile = (dataUrl, filename) => {
     const arr = dataUrl.split(",");
     const mime = arr[0].match(/:(.*?);/)[1];
@@ -134,7 +133,8 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
     const context = canvas.getContext("2d");
     context.drawImage(video, 0, 0, canvas.width, canvas.height);
     const dataUrl = canvas.toDataURL("image/jpeg", 0.8);
-    const fileName = `frame-${formatTime(currentTime).replace(":", "-")}.jpg`;
+    const frameNumber = savedFrames.length + 1; // Incremental frame number
+    const fileName = `frame-${frameNumber}-${formatTime(currentTime).replace(":", "-")}.jpg`;
     const frameFile = dataURLtoFile(dataUrl, fileName);
 
     const frameInfo = {
@@ -142,6 +142,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       timestamp: currentTime,
       fileName: fileName,
       file: frameFile,
+      frameNumber: frameNumber, // Store frame number
     };
 
     setSavedFrames((prev) => [...prev, frameInfo]);
@@ -156,6 +157,10 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
       fileType: "image/jpeg",
     });
     onClose();
+  };
+
+  const toggleInfo = () => {
+    setShowInfo((prev) => !prev);
   };
 
   return (
@@ -190,27 +195,35 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         <h3 style={{ color: "black", margin: 0, fontSize: "15px" }}>
           Select a Frame from {file.name} (Total Frames: {totalFrames})
         </h3>
-        <button
-          onClick={onClose}
-          style={{
-            width: "24px",
-            height: "24px",
-            backgroundColor: "white",
-            borderRadius: "50%",
-            border: "none",
-            color: "black",
-            fontSize: "16px",
-            fontWeight: "400",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            padding: 0,
-            transition: "background-color 0.3s ease",
-          }}
-        >
-          <FaTimes size={16} />
-        </button>
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <FaInfoCircle
+            size={16}
+            style={{ cursor: "pointer", color: "#007BFF" }}
+            onClick={toggleInfo}
+            title="Frame Selection Info"
+          />
+          <button
+            onClick={onClose}
+            style={{
+              width: "24px",
+              height: "24px",
+              backgroundColor: "white",
+              borderRadius: "50%",
+              border: "none",
+              color: "black",
+              fontSize: "16px",
+              fontWeight: "400",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              cursor: "pointer",
+              padding: 0,
+              transition: "background-color 0.3s ease",
+            }}
+          >
+            <FaTimes size={16} />
+          </button>
+        </div>
       </div>
       <div
         style={{
@@ -225,7 +238,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         <div
           style={{
             width: "100%",
-            height: "50%", // Reduced height to make room for info at the bottom
+            height: "50%",
             position: "relative",
           }}
         >
@@ -237,7 +250,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
               height: "100%",
               objectFit: "contain",
               borderRadius: "5px",
-              transform: "rotate(180deg)",
+              // Removed transform: rotate(180deg) to fix upside-down videos
             }}
             muted
           >
@@ -320,11 +333,10 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
         </div>
         <div
           style={{
-            marginTop: "10px",
             padding: "10px",
             border: "1px solid #ddd",
             borderRadius: "5px",
-            maxHeight: "110px", // Reduced height to make room for info at the bottom
+            maxHeight: "110px",
             overflowX: "auto",
             overflowY: "hidden",
             whiteSpace: "nowrap",
@@ -345,7 +357,7 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
               >
                 <img
                   src={frame.url}
-                  alt={`Saved frame at ${formatTime(frame.timestamp)}`}
+                  alt={`Saved frame ${formatFrameNumber(index)} at ${formatTime(frame.timestamp)}`}
                   style={{
                     width: "60px",
                     height: "60px",
@@ -354,17 +366,29 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
                     cursor: "pointer",
                   }}
                 />
-                <span
-                  style={{
-                    display: "block",
-                    fontSize: "0.7rem",
-                    color: "#555",
-                    marginTop: "5px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {formatTime(frame.timestamp)}
-                </span>
+                <div style={{ marginTop: "5px" }}>
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: "0.7rem",
+                      color: "#000",
+                      fontWeight: "bold",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatFrameNumber(index)}
+                  </span>
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: "0.7rem",
+                      color: "#555",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {formatTime(frame.timestamp)}
+                  </span>
+                </div>
               </div>
             ))
           ) : (
@@ -403,6 +427,28 @@ const VideoFrameModal = ({ file, fileUrl, onClose, onFrameSelect }) => {
           Cancel
         </button>
       </div>
+      {showInfo && (
+        <div
+          style={{
+            position: "absolute",
+            top: "50px",
+            right: "50px",
+            backgroundColor: "#fff",
+            border: "1px solid #ddd",
+            borderRadius: "5px",
+            padding: "10px",
+            boxShadow: "0 2px 10px rgba(0, 0, 0, 0.1)",
+            zIndex: 1001,
+            fontSize: "12px",
+            color: "#333",
+            maxWidth: "200px",
+          }}
+        >
+          <p style={{ margin: 0 }}>
+            Choose a frame to use: Click on the + icon to save your frame, then click on a frame you wish to view.
+          </p>
+        </div>
+      )}
       <canvas ref={canvasRef} style={{ display: "none" }} />
     </div>
   );
