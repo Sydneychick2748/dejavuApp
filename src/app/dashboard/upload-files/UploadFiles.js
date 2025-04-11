@@ -1,5 +1,6 @@
 
 
+
 "use client";
 import React, { useState, useContext, useEffect, useCallback, useRef, useMemo } from "react";
 
@@ -9,6 +10,7 @@ import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseM
 import VideoFrameModal from "./VideoFrameModal";
 
 import ImageUploadModal from "../search-for/ImageUploadModal";
+import { generateUniqueId } from "@/utils/idGenerator"; // Import the global ID generator
 
 import { ImageContext } from "@/contexts/ImageContext";
 import {
@@ -28,189 +30,220 @@ import { Box } from "@chakra-ui/react";
 import "./uploadFiles.css";
 
 // Memoized GalleryItem component to prevent unnecessary re-renders
+const GalleryItem = React.memo(
+  ({
+    file,
+    fileUrl,
+    index,
+    arrLength,
+    fileId,
+    isExpanded,
+    frameData,
+    videoMetadata,
+    handleImageClick,
+    handleVideoClick,
+    handleMediaInfoClick,
+    handleExpandFrames,
+    formatFrameNumber,
+    formatTime,
+  }) => {
+    const actualFrameCount = frameData[fileId] ? frameData[fileId].length : 0;
 
-const GalleryItem = React.memo(({ file, index, arrLength, fileUrl, fileId, isExpanded, frameData, videoMetadata, handleImageClick, handleVideoClick, handleMediaInfoClick, handleExpandFrames, formatFrameNumber, formatTime }) => {
-  const actualFrameCount = frameData[fileId] ? frameData[fileId].length : 0; // Use the actual number of frames extracted
-
-  // Memoize the video element to prevent re-renders unless fileUrl changes
-  const videoElement = useMemo(() => {
-    if (file.type.startsWith("video/")) {
+    // Memoize the video element to prevent re-renders unless fileUrl changes
+    const videoElement = useMemo(() => {
+      // Validate file and file.type
+      if (file && file.type && typeof file.type === "string" && file.type.startsWith("video/") && fileUrl) {
+        return (
+          <div style={{ position: "relative", width: "200px", height: "200px" }}>
+            <video
+              src={fileUrl}
+              className="gallery-video"
+              muted
+              style={{ width: "100%", height: "100%", objectFit: "cover" }}
+            >
+              Your browser does not support the video tag.
+            </video>
+            <FaFilm
+              style={{
+                position: "absolute",
+                bottom: "10px",
+                left: "10px",
+                color: "white",
+                fontSize: "24px",
+                zIndex: 1,
+              }}
+            />
+          </div>
+        );
+      }
       return (
-        <div style={{ position: "relative", width: "200px", height: "200px" }}>
-          <video
-            src={fileUrl}
-            className="gallery-video"
-            muted
-            style={{ width: "100%", height: "100%", objectFit: "cover" }}
-          >
-            Your browser does not support the video tag.
-          </video>
-          <FaFilm
-            style={{
-              position: "absolute",
-              bottom: "10px",
-              left: "10px",
-              color: "white",
-              fontSize: "24px",
-              zIndex: 1,
-            }}
-          />
+        <div style={{ width: "200px", height: "200px", backgroundColor: "#ccc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <p style={{ color: "#666", fontSize: "12px" }}>Video unavailable</p>
+        </div>
+      );
+    }, [fileUrl, file]);
+
+    // Validate file before rendering
+    if (!file || !file.name || !file.type) {
+      return (
+        <div style={{ width: "220px", height: "300px", backgroundColor: "#ccc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+          <p style={{ color: "#666", fontSize: "12px" }}>Invalid file</p>
         </div>
       );
     }
-    return null;
-  }, [fileUrl, file.type]);
 
-
-  return (
-    <div
-      className="gallery-item"
-      onClick={() => {
-        if (file.type.startsWith("video/")) {
-          handleVideoClick(file);
-        } else {
-          handleImageClick(file);
-        }
-      }}
-      style={{ cursor: "pointer", transition: "all 0.3s ease", width: "220px" }}
-    >
-
-      <div className="gallery-item-index">
-        {file.type.startsWith("video/") && frameData[fileId] ? `1-${actualFrameCount}` : `${index + 1} of ${arrLength}`}
-      </div>
-      <div className="gallery-item-media" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
-        {file.type.startsWith("image/") ? (
-          <img src={fileUrl} alt={file.name} className="gallery-image" style={{ width: "200px", height: "200px", objectFit: "cover" }} onError={(e) => console.error("Image failed to load:", fileUrl)} />
-        ) : file.type.startsWith("video/") ? (
-          <>
-            {videoElement}
-
-            {isExpanded && (
-              <div
-                className="gallery-item-frames"
-                style={{
-                  marginTop: "10px",
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: "5px",
-                  alignItems: "center",
-                  height: "200px",
-                  overflowY: "auto",
-                  transition: "height 0.3s ease",
-                }}
-              >
-                {frameData[fileId] && frameData[fileId].length > 0 ? (
-                  frameData[fileId].map((frame, frameIndex) => (
-                    <div
-                      key={frameIndex}
-                      className="gallery-item-frame"
-
-                      style={{ 
-                        display: "flex", 
-                        alignItems: "center", 
-                        cursor: "pointer", 
-                        width: "100%", 
-                        justifyContent: "space-between" 
-                      }}
-
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleImageClick({
-                          fileUrl: frame.url,
-                          fileName: `Frame_${frame.frame_number}`,
-                          fileSize: 0,
-                          fileType: "image/jpeg",
-                        });
-                      }}
-                    >
-
-                      <div style={{ display: "flex", alignItems: "center" }}>
-                        <span style={{ marginRight: "10px", fontSize: "12px", fontWeight: "bold" }}>
-                          {String(frame.frame_number).padStart(3, "0")}
-                        </span>
-                        <img
-                          src={frame.url}
-                          alt={`Frame ${String(frame.frame_number).padStart(3, "0")}`}
-                          className="gallery-frame-image"
-                          style={{ width: "50px", height: "50px", objectFit: "cover" }}
-                        />
-                      </div>
-                      <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-                        <span style={{ fontSize: "12px", color: "#000" }}>
-                          {file.name} Frame_{String(frame.frame_number).padStart(3, "0")}
-                        </span>
-                        <span
-                          style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleMediaInfoClick(file);
-                          }}
-                        >
-                          IMAGE INFO
-                        </span>
-
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p className="gallery-no-frames" style={{ fontSize: "12px" }}>
-                    {frameData[fileId] === undefined ? "Loading frames..." : "No frames available."}
-                  </p>
-                )}
+    return (
+      <div
+        className="gallery-item"
+        onClick={() => {
+          if (file.type && file.type.startsWith("video/")) {
+            handleVideoClick(file);
+          } else {
+            handleImageClick(file);
+          }
+        }}
+        style={{ cursor: "pointer", transition: "all 0.3s ease", width: "220px" }}
+      >
+        <div className="gallery-item-index">
+          {file.type && file.type.startsWith("video/") && frameData[fileId] ? `1-${actualFrameCount}` : `${index + 1} of ${arrLength}`}
+        </div>
+        <div className="gallery-item-media" style={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center" }}>
+          {file.type && file.type.startsWith("image/") ? (
+            fileUrl ? (
+              <img src={fileUrl} alt={file.name} className="gallery-image" style={{ width: "200px", height: "200px", objectFit: "cover" }} onError={(e) => console.error("Image failed to load:", fileUrl)} />
+            ) : (
+              <div style={{ width: "200px", height: "200px", backgroundColor: "#ccc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <p style={{ color: "#666", fontSize: "12px" }}>Image unavailable</p>
               </div>
-            )}
-          </>
-        ) : null}
+            )
+          ) : file.type && file.type.startsWith("video/") ? (
+            <>
+              {videoElement}
 
-      <div className="gallery-item-details" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <div className="gallery-item-name" style={{ display: "flex", flexDirection: "column" }}>
-          <span style={{ fontSize: "12px", color: "#000" }}>{file.name}</span>
-          {file.type.startsWith("video/") && videoMetadata && videoMetadata[fileId] && (
-            <span style={{ fontSize: "12px", color: "#000" }}>
-              {formatTime(videoMetadata[fileId].duration)} | {actualFrameCount} frames
-            </span>
+              {isExpanded && (
+                <div
+                  className="gallery-item-frames"
+                  style={{
+                    marginTop: "10px",
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: "5px",
+                    alignItems: "center",
+                    height: "200px",
+                    overflowY: "auto",
+                    transition: "height 0.3s ease",
+                  }}
+                >
+                  {frameData[fileId] && frameData[fileId].length > 0 ? (
+                    frameData[fileId].map((frame, frameIndex) => (
+                      <div
+                        key={frameIndex}
+                        className="gallery-item-frame"
+                        style={{ 
+                          display: "flex", 
+                          alignItems: "center", 
+                          cursor: "pointer", 
+                          width: "100%", 
+                          justifyContent: "space-between" 
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleImageClick({
+                            fileUrl: frame.url,
+                            fileName: `Frame_${frame.frame_number}`,
+                            fileSize: 0,
+                            fileType: "image/jpeg",
+                          });
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                          <span style={{ marginRight: "10px", fontSize: "12px", fontWeight: "bold" }}>
+                            {String(frame.frame_number).padStart(3, "0")}
+                          </span>
+                          <img
+                            src={frame.url}
+                            alt={`Frame ${String(frame.frame_number).padStart(3, "0")}`}
+                            className="gallery-frame-image"
+                            style={{ width: "50px", height: "50px", objectFit: "cover" }}
+                          />
+                        </div>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+                          <span style={{ fontSize: "12px", color: "#000" }}>
+                            {file.name} Frame_{String(frame.frame_number).padStart(3, "0")}
+                          </span>
+                          <span
+                            style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleMediaInfoClick(file);
+                            }}
+                          >
+                            IMAGE INFO
+                          </span>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="gallery-no-frames" style={{ fontSize: "12px" }}>
+                      {frameData[fileId] === undefined ? "Loading frames..." : "No frames available."}
+                    </p>
+                  )}
+                </div>
+              )}
+            </>
+          ) : (
+            <div style={{ width: "200px", height: "200px", backgroundColor: "#ccc", display: "flex", alignItems: "center", justifyContent: "center" }}>
+              <p style={{ color: "#666", fontSize: "12px" }}>Unsupported file type</p>
+            </div>
           )}
-        </div>
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
-          <span
-            className="gallery-item-media-info"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleMediaInfoClick(file);
-            }}
-            style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
-          >
-            Media Info
-          </span>
-          {file.type.startsWith("video/") && (
-            <span
-              className="gallery-item-expand-frames"
-              onClick={(e) => {
-                e.stopPropagation();
-                handleExpandFrames(file);
-              }}
-              style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
-            >
-              {isExpanded ? "Collapse frames" : "Expand Frames"} {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
-            </span>
-          )}
-        </div>
 
+          <div className="gallery-item-details" style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <div className="gallery-item-name" style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontSize: "12px", color: "#000" }}>{file.name}</span>
+              {file.type && file.type.startsWith("video/") && videoMetadata && videoMetadata[fileId] && (
+                <span style={{ fontSize: "12px", color: "#000" }}>
+                  {formatTime(videoMetadata[fileId].duration)} | {actualFrameCount} frames
+                </span>
+              )}
+            </div>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end" }}>
+              <span
+                className="gallery-item-media-info"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleMediaInfoClick(file);
+                }}
+                style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
+              >
+                Media Info
+              </span>
+              {file.type && file.type.startsWith("video/") && (
+                <span
+                  className="gallery-item-expand-frames"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleExpandFrames(file);
+                  }}
+                  style={{ fontSize: "12px", color: "#007BFF", cursor: "pointer" }}
+                >
+                  {isExpanded ? "Collapse frames" : "Expand Frames"} {isExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
-    </div>
-  );
-});
+    );
+  }
+);
 
 const UploadFiles = React.memo(() => {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
   const [showImportMediaModal, setShowImportMediaModal] = useState(false);
   const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
   const [showPlusModal, setShowPlusModal] = useState(false);
-
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [pendingImages, setPendingImages] = useState([]);
-
   const [folderSelections, setFolderSelections] = useState([]);
   const [selectedFolders, setSelectedFolders] = useState([]);
   const [databases, setDatabases] = useState([]);
@@ -220,13 +253,11 @@ const UploadFiles = React.memo(() => {
   const [expandedFrames, setExpandedFrames] = useState({});
   const [frameData, setFrameData] = useState({});
   const [showVideoFrameModal, setShowVideoFrameModal] = useState(false);
-
   const [isVideoLoading, setIsVideoLoading] = useState(false);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [selectedVideoUrl, setSelectedVideoUrl] = useState(null);
   const [videoId, setVideoId] = useState(null);
-  const [videoMetadata, setVideoMetadata] = useState({}); // Object to store metadata by fileId
-
+  const [videoMetadata, setVideoMetadata] = useState({});
 
   const { setSelectedImage, setUploadedFiles, finalSelectedImages, setFinalSelectedImages, setSelectedFileInfo } = useContext(ImageContext);
   const [localFinalSelectedImages, setLocalFinalSelectedImages] = useState([]);
@@ -236,16 +267,25 @@ const UploadFiles = React.memo(() => {
   const [isGridView, setIsGridView] = useState(false);
   const [isCreateButtonClicked, setIsCreateButtonClicked] = useState(false);
 
-
   // Cache file URLs to prevent recreation on every render
   const fileUrlCache = useRef(new Map());
 
   const getFileUrl = (file) => {
-    const fileId = `${file.name}-${file.lastModified}`;
+    if (!file || !(file instanceof File)) {
+      console.error("Invalid file object:", file);
+      return null;
+    }
+
+    const fileId = `${file.name}-${file.lastModified}-${file.id || ''}`;
     if (!fileUrlCache.current.has(fileId)) {
-      const url = URL.createObjectURL(file);
-      fileUrlCache.current.set(fileId, url);
-      return url;
+      try {
+        const url = URL.createObjectURL(file);
+        fileUrlCache.current.set(fileId, url);
+        return url;
+      } catch (error) {
+        console.error("Failed to create object URL for file:", file, error);
+        return null;
+      }
     }
     return fileUrlCache.current.get(fileId);
   };
@@ -274,7 +314,7 @@ const UploadFiles = React.memo(() => {
 
   const handleImageClick = useCallback((fileInfo) => {
     setSelectedFileInfo({
-      fileUrl: fileInfo.fileUrl || URL.createObjectURL(fileInfo),
+      fileUrl: fileInfo.fileUrl || (fileInfo instanceof File ? URL.createObjectURL(fileInfo) : null),
       fileName: fileInfo.fileName || fileInfo.name,
       fileSize: fileInfo.fileSize || fileInfo.size,
       fileType: fileInfo.fileType || fileInfo.type,
@@ -282,11 +322,9 @@ const UploadFiles = React.memo(() => {
   }, [setSelectedFileInfo]);
 
   const handleVideoClick = useCallback(async (file) => {
-
     setIsVideoLoading(true);
     try {
       const fileUrl = getFileUrl(file);
-
       const formData = new FormData();
       formData.append("file", file);
       const response = await fetch("http://localhost:8000/extract-frames/", {
@@ -294,13 +332,12 @@ const UploadFiles = React.memo(() => {
         body: formData,
       });
 
-
       if (!response.ok) {
         throw new Error("Failed to extract frames");
       }
 
       const data = await response.json();
-      const fileId = `${file.name}-${file.lastModified}`;
+      const fileId = `${file.name}-${file.lastModified}-${file.id || ''}`;
       setVideoMetadata((prev) => ({
         ...prev,
         [fileId]: data.video_metadata,
@@ -312,10 +349,8 @@ const UploadFiles = React.memo(() => {
       setShowVideoFrameModal(true);
     } catch (error) {
       console.error("Error extracting frames:", error);
-
     } finally {
       setIsVideoLoading(false);
-
     }
   }, []);
 
@@ -330,18 +365,29 @@ const UploadFiles = React.memo(() => {
   }, []);
 
   const handleDisplayDbNext = useCallback((data) => {
+    // Validate and assign unique ids to files before adding them to the database
+    const filesWithIds = [...data.files, ...pendingImages]
+      .filter((file) => file && file.name && file.type && file instanceof File)
+      .map((file) => {
+        const id = generateUniqueId("db-"); // Use global ID generator
+        return Object.assign(file, { id });
+      });
+
+    if (filesWithIds.length === 0) {
+      console.warn("No valid files to add to the database");
+      return;
+    }
+
     const newDatabase = {
       name: data.databaseName,
-
-      files: [...data.files, ...pendingImages],
+      files: filesWithIds,
     };
     setDatabases((prev) => [...prev, newDatabase]);
-    setLocalFinalSelectedImages([...data.files, ...pendingImages]);
+    setLocalFinalSelectedImages(filesWithIds);
     setSelectedDatabaseIndex(databases.length);
     setShowDisplayDbModal(false);
     setPendingImages([]);
   }, [databases, pendingImages]);
-
 
   const handleDeleteDatabase = useCallback((index) => {
     setDatabases((prev) => prev.filter((_, i) => i !== index));
@@ -355,8 +401,8 @@ const UploadFiles = React.memo(() => {
   }, [selectedDatabaseIndex]);
 
   const handleExpandFrames = useCallback(async (file) => {
-    if (!file.type.startsWith("video/")) return;
-    const fileId = `${file.name}-${file.lastModified}`;
+    if (!file || !file.type || !file.type.startsWith("video/")) return;
+    const fileId = `${file.name}-${file.lastModified}-${file.id || ''}`;
     const isCurrentlyExpanded = expandedFrames[fileId] || false;
 
     setExpandedFrames((prev) => ({
@@ -385,11 +431,10 @@ const UploadFiles = React.memo(() => {
             throw new Error("Invalid frames data received from server");
           }
 
-
           // Use the actual number of frames extracted
           const frames = data.frames.map((frame, index) => ({
             ...frame,
-            frame_number: index + 1, // Start counting from 1
+            frame_number: index + 1,
           }));
 
           setFrameData((prev) => ({
@@ -401,7 +446,6 @@ const UploadFiles = React.memo(() => {
             [fileId]: data.video_metadata,
           }));
           console.log(`Frames extracted for ${file.name}:`, frames);
-
         } catch (error) {
           console.error("Error fetching frames:", error.message);
           setFrameData((prev) => ({
@@ -424,7 +468,6 @@ const UploadFiles = React.memo(() => {
   const formatTime = useCallback((time) => {
     const minutes = Math.floor(time / 60);
     const seconds = Math.floor(time % 60);
-
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   }, []);
 
@@ -438,23 +481,27 @@ const UploadFiles = React.memo(() => {
       return;
     }
 
+    // Assign a unique id to the file before adding it
+    const fileWithId = Object.assign(imageInfo.file, {
+      id: generateUniqueId("add-"), // Use global ID generator
+    });
+
     // Add the image to the current database's files array
     if (selectedDatabaseIndex !== null && databases[selectedDatabaseIndex]) {
       setDatabases((prevDatabases) => {
         const newDatabases = [...prevDatabases];
         newDatabases[selectedDatabaseIndex] = {
           ...newDatabases[selectedDatabaseIndex],
-          files: [...newDatabases[selectedDatabaseIndex].files, imageInfo.file],
+          files: [...newDatabases[selectedDatabaseIndex].files, fileWithId],
         };
         return newDatabases;
       });
 
       // Update localFinalSelectedImages to reflect the new image in the gallery
-      setLocalFinalSelectedImages((prevImages) => [...prevImages, imageInfo.file]);
+      setLocalFinalSelectedImages((prevImages) => [...prevImages, fileWithId]);
     } else {
       console.error("No database selected to add the image to.");
     }
-
   };
 
   return (
@@ -491,7 +538,6 @@ const UploadFiles = React.memo(() => {
         </Box>
       )}
       <div className="main-container">
-
         {/* Top Navigation Bar - Always Visible */}
         <div className="top-navigation">
           <div className="search-container">
@@ -564,7 +610,6 @@ const UploadFiles = React.memo(() => {
         </div>
 
         {/* Center Buttons - Only Visible When No Database */}
-
         {databases.length === 0 && !showCreateDbModal && !showImportMediaModal && !showDisplayDbModal && !showPlusModal && (
           <div className="center-buttons">
             <button className="action-button open-database">Open a Database</button>
@@ -603,9 +648,7 @@ const UploadFiles = React.memo(() => {
               setShowCreateDbModal(false);
               setShowImportMediaModal(true);
             }}
-
             existingDatabaseNames={existingDatabaseNames}
-
           />
         )}
         {showImportMediaModal && (
@@ -632,24 +675,20 @@ const UploadFiles = React.memo(() => {
             <h3 className="gallery-title">Final Gallery</h3>
             <div className="gallery-items" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
               {databases[selectedDatabaseIndex].files.map((file, index) => {
-
                 const fileUrl = getFileUrl(file);
-
-                const fileId = `${file.name}-${file.lastModified}`;
+                const fileId = `${file.name}-${file.lastModified}-${file.id || ''}`;
                 const isExpanded = expandedFrames[fileId] || false;
                 return (
                   <GalleryItem
-                    key={fileId}
+                    key={file.id}
                     file={file}
+                    fileUrl={fileUrl}
                     index={index}
                     arrLength={databases[selectedDatabaseIndex].files.length}
-                    fileUrl={fileUrl}
                     fileId={fileId}
                     isExpanded={isExpanded}
                     frameData={frameData}
-
                     videoMetadata={videoMetadata}
-
                     handleImageClick={handleImageClick}
                     handleVideoClick={handleVideoClick}
                     handleMediaInfoClick={handleMediaInfoClick}
@@ -686,7 +725,6 @@ const UploadFiles = React.memo(() => {
             </div>
           </div>
         )}
-
         {isVideoLoading && (
           <div
             style={{
@@ -704,23 +742,18 @@ const UploadFiles = React.memo(() => {
             Loading video...
           </div>
         )}
-        {showVideoFrameModal && selectedVideo && selectedVideoUrl && (
-
+        {showVideoFrameModal && selectedVideo && (
           <VideoFrameModal
             file={selectedVideo}
             fileUrl={selectedVideoUrl}
             videoId={videoId}
-
             videoMetadata={videoMetadata}
-
             onClose={() => {
               setShowVideoFrameModal(false);
               setSelectedVideo(null);
               setSelectedVideoUrl(null);
               setVideoId(null);
-
               setVideoMetadata({});
-
             }}
             onFrameSelect={(frameInfo) => {
               handleImageClick(frameInfo);
@@ -737,6 +770,5 @@ const UploadFiles = React.memo(() => {
     </div>
   );
 });
-
 
 export default UploadFiles;
