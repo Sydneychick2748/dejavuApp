@@ -1,21 +1,23 @@
 
-
-
 "use client";
 import React, { useState } from "react";
 import { Flex, Box, Button } from "@chakra-ui/react";
+import Image from "next/image";
+
 import SearchFor from "./search-for/searchFor";
 import SearchParams from "./search-params/searchParams";
 import UploadFiles from "./upload-files/UploadFiles";
 import Results from "../dashboard/search-results/searchResults";
 import { ImageProvider } from "@/contexts/ImageContext";
+import PhotonIcon from "../../../public/images/logos/photon-icon.png";
+import ParamsNavbar from "../../components/navigation/params-navbar/index";
+import DVAILogoHorizontalDark from "../../../public/images/logos/DVAILogoHorizontalDark.png";
 
 import "../globals.css";
 import "./dashboard.css";
 
 export default function Dashboard() {
-
-
+  const [activeBox, setActiveBox] = useState(null);
   const [showResults, setShowResults] = useState(false);
 
   const startSearch = () => {
@@ -62,20 +64,17 @@ export default function Dashboard() {
             <Box
               className="uploadFilesBox"
               flex="0 0 40%"
-
-              bg="#F1F1F1"
+              bg={activeBox === "upload" ? "#E7EAEE" : "#F1F1F1"}
               borderRadius="lg"
               shadow="md"
               transition="background 0.3s ease"
-              _hover={{ bg: "#E7EAEE" }}
-
+              onMouseEnter={() => setActiveBox("upload")}
+              onMouseLeave={() => setActiveBox(null)}
             >
               <Box
                 className="uploadSearchWithin"
                 width="100%"
-
-                bg="#D6D6D6"
-
+                bg={activeBox === "upload" ? "#0B2856" : "#D6D6D6"}
                 p="14px 20px"
                 height="52px"
                 fontSize="16px"
@@ -84,9 +83,6 @@ export default function Dashboard() {
                 borderTopRightRadius="10px"
                 borderTopLeftRadius="10px"
                 transition="background 0.3s ease"
-
-                _hover={{ bg: "#0B2856" }}
-
               >
                 Search Within...
               </Box>
@@ -100,20 +96,17 @@ export default function Dashboard() {
                 flex={{ base: "0 0 100%", lg: "0 0 31%" }}
                 w="100%"
                 maxW="100%"
-
-                bg="#F1F1F1"
+                bg={activeBox === "searchFor" ? "#E7EAEE" : "#F1F1F1"}
                 borderRadius="lg"
                 shadow="md"
                 transition="background 0.3s ease"
-                _hover={{ bg: "#E7EAEE" }}
-
+                onMouseEnter={() => setActiveBox("searchFor")}
+                onMouseLeave={() => setActiveBox(null)}
               >
                 <Flex
                   align="center"
                   justify="space-between"
-
-                  bg="#D6D6D6"
-
+                  bg={activeBox === "searchFor" ? "#0B2856" : "#D6D6D6"}
                   p="10px 20px"
                   fontSize="16px"
                   fontWeight="600"
@@ -121,9 +114,6 @@ export default function Dashboard() {
                   borderTopRightRadius="10px"
                   borderTopLeftRadius="10px"
                   transition="background 0.3s ease"
-
-                  _hover={{ bg: "#0B2856" }}
-
                 >
                   <Box>Search For...</Box>
                   <Flex gap={2}>
@@ -131,9 +121,7 @@ export default function Dashboard() {
                       as="button"
                       bg="white"
                       fontWeight={300}
-
-                      color="#808080"
-
+                      color={activeBox === "searchFor" ? "#0B2856" : "#808080"}
                       border="1px solid white"
                       borderRadius="8px"
                       p="4px 8px"
@@ -149,17 +137,13 @@ export default function Dashboard() {
                       as="button"
                       bg="white"
                       fontWeight={300}
-
-                      color="#808080"
-
+                      color={activeBox === "searchFor" ? "#0B2856" : "#808080"}
                       border="1px solid white"
                       borderRadius="8px"
                       p="4px 8px"
                       _hover={{
                         bg: "white",
-
-                        color: "#4A88FF",
-
+                        color: activeBox === "searchFor" ? "#4A88FF" : "#0B2856",
                       }}
                       onClick={() => console.log("Object Library clicked")}
                     >
@@ -173,17 +157,16 @@ export default function Dashboard() {
               <Box
                 className="searchParamsBox"
                 flex="1"
-
-                bg="#F1F1F1"
+                bg={activeBox === "searchParams" ? "#E7EAEE" : "#F1F1F1"}
                 borderRadius="lg"
                 shadow="md"
                 transition="background 0.3s ease"
-                _hover={{ bg: "#E7EAEE" }}
+                onMouseEnter={() => setActiveBox("searchParams")}
+                onMouseLeave={() => setActiveBox(null)}
               >
                 <Box
                   width="100%"
-                  bg="#D6D6D6"
-
+                  bg={activeBox === "searchParams" ? "#0B2856" : "#D6D6D6"}
                   p="14px 20px"
                   height="52px"
                   fontSize="16px"
@@ -192,21 +175,30 @@ export default function Dashboard() {
                   borderTopRightRadius="10px"
                   borderTopLeftRadius="10px"
                   transition="background 0.3s ease"
-
-                  _hover={{ bg: "#0B2856" }}
-
                 >
                   Search Parameters
+                  <ParamsNavbar />
                 </Box>
                 <Box p={4}>
                   <SearchParams />
                 </Box>
               </Box>
-              {/* Search Button */}
-              <div className="search">
-                <Button variant="solid" size="xl" onClick={startSearch}>
-                  Search
-                </Button>
+              <div className="pageBottom">
+                {/* Search Button */}
+                <div className="search">
+                  <Button variant="solid" size="xl" onClick={startSearch}>
+                    <Image src={PhotonIcon} alt="Photon icon" />
+                    Search
+                  </Button>
+                </div>
+                <div className="poweredBy">
+                  <div>
+                    Powered by
+                  </div>
+                  <div>
+                    <Image className="DVAILogo" src={DVAILogoHorizontalDark} alt="DVAI logo dark" />
+                  </div>
+                </div>
               </div>
             </Flex>
           </Box>
@@ -214,7 +206,4 @@ export default function Dashboard() {
       )}
     </ImageProvider>
   );
-
 }
-
-
