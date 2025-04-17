@@ -1,6 +1,12 @@
+body {
+  color: black
+}
 
-body{
-  color:black
+.pageBottom {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  gap: 7rem;
 }
 
 .search {
@@ -8,11 +14,31 @@ body{
   flex-direction: row;
   justify-content: center;
 }
+
 .search .chakra-button {
   background-color: #4A87FB;
   color: white;
   border-radius: 1.5rem;
   margin-top: 1rem;
-  padding-left: 4rem;
-  padding-right: 4rem;
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  gap: 4rem;
+}
+
+.search img {
+  width: 19%;
+  margin-left: -1rem;
+}
+
+.poweredBy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-end;
+}
+
+.DVAILogo {
+  width: 7rem;
 }
