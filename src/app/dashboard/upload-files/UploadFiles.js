@@ -1,10 +1,8 @@
 
 
-// export default UploadFiles;
 import React, { useState, useContext, useEffect, useCallback, useRef, useMemo } from "react";
 
-import CombinedCreateDatabaseModal from "../modals/create-new-database/CombinedCreateDatabaseModal"; // New combined modal
-import DisplayDataBaseModal from "../modals/create-new-database/displayDataBaseModal";
+import CombinedCreateDatabaseModal from "../modals/create-new-database/CombinedCreateDatabaseModal";
 import VideoFrameModal from "./VideoFrameModal";
 import ImageUploadModal from "../search-for/ImageUploadModal";
 import { generateUniqueId } from "@/utils/idGenerator";
@@ -236,12 +234,9 @@ const GalleryItem = React.memo(
 
 const UploadFiles = React.memo(() => {
   const [showCreateDbModal, setShowCreateDbModal] = useState(false);
-  const [showDisplayDbModal, setShowDisplayDbModal] = useState(false);
   const [showPlusModal, setShowPlusModal] = useState(false);
   const [showImageUploadModal, setShowImageUploadModal] = useState(false);
   const [pendingImages, setPendingImages] = useState([]);
-  const [folderSelections, setFolderSelections] = useState([]);
-  const [selectedFolders, setSelectedFolders] = useState([]);
   const [databases, setDatabases] = useState([]);
   const [selectedDatabaseIndex, setSelectedDatabaseIndex] = useState(null);
   const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
@@ -380,7 +375,6 @@ const UploadFiles = React.memo(() => {
     setDatabases((prev) => [...prev, newDatabase]);
     setLocalFinalSelectedImages(filesWithIds);
     setSelectedDatabaseIndex(databases.length);
-    setShowDisplayDbModal(false);
     setPendingImages([]);
   }, [databases, pendingImages]);
 
@@ -602,7 +596,7 @@ const UploadFiles = React.memo(() => {
           </div>
         </div>
 
-        {databases.length === 0 && !showCreateDbModal && !showDisplayDbModal && !showPlusModal && (
+        {databases.length === 0 && !showCreateDbModal && !showPlusModal && (
           <div className="center-buttons">
             <button className="action-button open-database">Open a Database</button>
             <button className="action-button connect-es-database">Connect to ES Database</button>
@@ -634,23 +628,11 @@ const UploadFiles = React.memo(() => {
               setShowCreateDbModal(false);
               setIsCreateButtonClicked(false);
             }}
-            onNext={(structuredData) => {
-              console.log("Received structuredData in UploadFiles:", structuredData);
-              setSelectedFolders(structuredData);
-              setShowCreateDbModal(false);
-              setShowDisplayDbModal(true);
-            }}
+            onFinish={handleDisplayDbNext}
             existingDatabaseNames={existingDatabaseNames}
           />
         )}
-        {showDisplayDbModal && (
-          <DisplayDataBaseModal
-            onClose={() => setShowDisplayDbModal(false)}
-            onNext={handleDisplayDbNext}
-            selectedFolders={selectedFolders}
-          />
-        )}
-        {selectedDatabaseIndex !== null && !showDisplayDbModal && (
+        {selectedDatabaseIndex !== null && (
           <div className="gallery-container">
             <h3 className="gallery-title">Final Gallery</h3>
             <div className="gallery-items" style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>

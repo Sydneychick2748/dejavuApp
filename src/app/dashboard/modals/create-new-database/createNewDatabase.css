@@ -1,0 +1,400 @@
+
+.media-import-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  margin-top: 10px;
+  gap: 10px;
+}
+
+.media-import-left {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fff;
+  min-height: 200px;
+  position: relative;
+}
+
+.media-import-right {
+  flex: 1;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fff;
+  min-height: 200px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.import-media-button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
+
+.import-media-button {
+  padding: 8px 16px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.import-media-button:hover {
+  background-color: #0056d2;
+}
+
+.placeholder-video-controls {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: calc(100% - 20px);
+}
+
+.placeholder-video-button {
+  background: none;
+  border: none;
+  cursor: not-allowed;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  color: #b0bec5;
+  transition: none;
+}
+
+.placeholder-range-input {
+  flex: 1;
+  cursor: not-allowed;
+  accent-color: #b0bec5;
+  opacity: 0.5;
+}
+
+.placeholder-time {
+  color: #b0bec5;
+  font-size: 12px;
+}
+
+/* Input Fields */
+.input-container {
+  margin-bottom: 10px;
+}
+
+.input-label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+  font-size: 14px;
+  color: #333;
+}
+
+.input-field {
+  width: calc(100% - 70px);
+  height: 28px;
+  padding: 6px 12px;
+  background-color: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.input-field:focus {
+  border-color: #007bff;
+}
+
+.input-field::placeholder {
+  color: #999;
+  opacity: 1;
+}
+
+.input-error {
+  color: #ff4444;
+  font-size: 12px;
+  margin-top: 5px;
+}
+
+.items-selected {
+  font-size: 12px;
+  color: #666;
+  margin-top: 5px;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.browse-button {
+  padding: 6px 12px;
+  background-color: #007bff;
+  color: white;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.browse-button:hover {
+  background-color: #0056d2;
+}
+
+/* Slider (Database Pattern Density Level) */
+.slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.slider-label {
+  font-size: 14px;
+  color: #333;
+}
+
+.slider {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  height: 8px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #007bff;
+  border-radius: 50%;
+  cursor: pointer;
+  box-shadow: 0 0 2px rgba(0, 0, 0, 0.3);
+}
+
+.slider-value {
+  font-size: 14px;
+  color: #333;
+}
+
+/* Radio Buttons and Checkbox */
+.settings-section {
+  padding: 10px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.radio-group {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+.radio-input {
+  margin: 0;
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.checkbox-input {
+  margin: 0;
+  cursor: pointer;
+}
+
+/* Bottom Buttons (Cancel/Create Database) */
+.button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.cancel-button,
+.create-button {
+  padding: 8px 20px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.cancel-button {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-button:hover {
+  background-color: #d0d0d0;
+}
+
+.create-button {
+  background-color: #b0bec5;
+  color: white;
+}
+
+.create-button.enabled {
+  background-color: #007bff;
+}
+
+.create-button.enabled:hover {
+  background-color: #0056d2;
+}
+
+/* Moved Styles from JavaScript to CSS */
+
+/* Toggle Button (Chevron Up/Down) */
+.toggle-button {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  background-color: #E0E7FF;
+  color: #0056D2;
+  transition: background-color 0.3s ease;
+}
+
+/* Left Panel (File Selection List) */
+.left-panel {
+  flex: 1;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+/* Right Panel (Preview Section) */
+.right-panel {
+  flex: 1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  background-color: #F9FBFF;
+  max-height: 400px;
+}
+
+/* File Item (In File Selection List) */
+.file-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+/* Video Controls (Rewind, Play, Fast-Forward) */
+.video-controls {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+}
+
+.video-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 5px;
+  display: flex;
+  align-items: center;
+  color: #007BFF;
+  transition: color 0.3s ease;
+}
+
+/* Range Input (Video Seek Bar) */
+.range-input {
+  flex: 1;
+  cursor: pointer;
+  accent-color: #007BFF;
+}
+
+/* Preview Details (File Metadata) */
+.preview-details {
+  margin-top: 10px;
+  text-align: left;
+  color: #000000;
+  width: 100%;
+}
+
+/* Media Info Modal Close Button */
+.modal-close-button {
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  background-color: #007BFF;
+  color: #FFFFFF;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
+
+/* File Icons (Base, Hover, Clicked States) */
+.file-icon-base {
+  color: #E0E7FF;
+  transition: color 0.3s ease;
+}
+
+.file-icon-hover {
+  color: #0056D2;
+}
+
+.file-icon-clicked {
+  color: #003087;
+}
+
+/* Inline Folder Icon (Next to Save Location Input) */
+.inline-folder-icon {
+  margin-left: 10px;
+  color: #007BFF;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+/* Inline Preview Text (Placeholder Text in Preview Section) */
+.inline-preview-text {
+  font-size: 14px;
+  color: #000000;
+}

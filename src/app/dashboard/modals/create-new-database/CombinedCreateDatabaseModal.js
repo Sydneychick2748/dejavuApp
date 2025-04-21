@@ -1,28 +1,234 @@
 
-
-
-
-// This code is a React component for a modal that allows users to create a new database by uploading folders containing images and videos.
 "use client";
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef, useContext, useMemo } from "react";
+import { ImageContext } from "@/contexts/ImageContext";
+import { generateUniqueId } from "@/utils/idGenerator";
 import {
   FaCloudUploadAlt,
   FaFolder,
   FaFolderOpen,
   FaTimes,
   FaArrowRight,
+  FaFileImage,
+  FaFileVideo,
+  FaForward,
+  FaBackward,
+  FaChevronDown,
+  FaChevronUp,
 } from "react-icons/fa";
+import "./createNewDatabase.css"; // Import the CSS file
 
-const CombinedCreateDatabaseModal = ({ onClose, onNext, existingDatabaseNames }) => {
+// Define minimal styles for dynamic or inline requirements
+const styles = {
+  modalStyle: {
+    position: "fixed",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    backgroundColor: "white",
+    borderRadius: "8px",
+    zIndex: 1000,
+    display: "block",
+    width: "70vw",
+    height: "80vh",
+    boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
+    overflow: "hidden",
+  },
+  headerStyle: {
+    backgroundColor: "#EEF2FF",
+    padding: "10px 20px",
+    borderTopLeftRadius: "8px",
+    borderTopRightRadius: "8px",
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  contentStyle: {
+    padding: "20px",
+    color: "black",
+    display: "flex",
+    flexDirection: "column",
+    height: "calc(100% - 40px)",
+  },
+  modalOverlayStyle: {
+    position: "fixed",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 1100,
+  },
+  modalContentStyle: {
+    backgroundColor: "white",
+    padding: "20px",
+    borderRadius: "8px",
+    textAlign: "center",
+    boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
+    color: "#000000",
+  },
+};
+
+const CombinedCreateDatabaseModal = ({ onClose, onFinish, existingDatabaseNames }) => {
+  const { setFinalSelectedImages } = useContext(ImageContext);
   const [databaseName, setDatabaseName] = useState("");
   const [databaseNameError, setDatabaseNameError] = useState("");
-  const [saveLocation, setSaveLocation] = useState("Photon Location");
+  const [saveLocation, setSaveLocation] = useState("");
   const [selectedFolders, setSelectedFolders] = useState([]);
   const folderInputRef = useRef(null);
+
+  const allFiles = useMemo(() => {
+    const files = [];
+    const collectFilesRecursively = (folders) => {
+      folders.forEach((folder) => {
+        if (folder.files && folder.files.length > 0) {
+          files.push(...folder.files);
+        }
+        if (folder.subFolders && folder.subFolders.length > 0) {
+          collectFilesRecursively(folder.subFolders);
+        }
+      });
+    };
+    collectFilesRecursively(selectedFolders);
+    return files;
+  }, [selectedFolders]);
+
+  const [fileSelections, setFileSelections] = useState({});
+  const [fileMetadata, setFileMetadata] = useState({});
+  const [showMediaInfoModal, setShowMediaInfoModal] = useState(false);
+  const [mediaInfoFile, setMediaInfoFile] = useState(null);
+  const [selectedPreview, setSelectedPreview] = useState(null);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [videoDuration, setVideoDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
+  const [totalFrames, setTotalFrames] = useState(0);
+  const [resolution, setResolution] = useState("N/A");
+  const videoRef = useRef(null);
+  const [databaseCount, setDatabaseCount] = useState(() =>
+    parseInt(localStorage.getItem("databaseCount") || "1", 10)
+  );
+  const [clickedIcon, setClickedIcon] = useState(null);
+  const [fileUrls, setFileUrls] = useState({});
+  const [databaseSelected, setDatabaseSelected] = useState(true);
+  const [isFilesExpanded, setIsFilesExpanded] = useState(true);
+  const [resolutionLevel, setResolutionLevel] = useState(6);
+  const [colorSetting, setColorSetting] = useState("fullColor");
+  const [useGPU, setUseGPU] = useState(false);
+
+  const fileUrlCache = useRef(new Map());
+
+  const getFileUrl = (file, index) => {
+    if (!file || !(file instanceof File)) {
+      console.error("Invalid file object:", file);
+      return null;
+    }
+
+    const fileId = `file-${index}`;
+    if (!fileUrlCache.current.has(fileId)) {
+      try {
+        const url = URL.createObjectURL(file);
+        fileUrlCache.current.set(fileId, url);
+        return url;
+      } catch (error) {
+        console.error("Failed to create object URL for file:", file, error);
+        return null;
+      }
+    }
+    return fileUrlCache.current.get(fileId);
+  };
+
+  useEffect(() => {
+    const newFileUrls = {};
+    allFiles.forEach((file, index) => {
+      const fileId = `file-${index}`;
+      if (!fileUrls[fileId]) {
+        const url = getFileUrl(file, index);
+        if (url) {
+          newFileUrls[fileId] = url;
+        }
+      }
+    });
+    setFileUrls((prev) => ({ ...prev, ...newFileUrls }));
+
+    return () => {
+      Object.keys(newFileUrls).forEach((fileId) => {
+        const url = newFileUrls[fileId];
+        URL.revokeObjectURL(url);
+        fileUrlCache.current.delete(fileId);
+      });
+    };
+  }, [allFiles]);
+
+  useEffect(() => {
+    const fetchMetadata = async () => {
+      const metadataPromises = allFiles.map(async (file, index) => {
+        const formData = new FormData();
+        formData.append("file", file);
+        try {
+          const response = await fetch("http://localhost:8000/extract-metadata", {
+            method: "POST",
+            body: formData,
+          });
+          if (!response.ok) throw new Error("Failed to fetch metadata");
+          const data = await response.json();
+          return { index, metadata: data };
+        } catch (error) {
+          console.error(`Error fetching metadata for file ${file.name}:`, error);
+          return {
+            index,
+            metadata: {
+              creationTime: null,
+              duration: 0,
+              totalFrames: 0,
+              resolution: "N/A",
+              fileSize: 0,
+              videoCodec: "N/A",
+              audioCodec: "N/A",
+              bitRate: "N/A",
+              fileFormat: "N/A",
+            },
+          };
+        }
+      });
+
+      const metadataResults = await Promise.all(metadataPromises);
+      const metadataMap = metadataResults.reduce((acc, { index, metadata }) => {
+        acc[index] = metadata;
+        return acc;
+      }, {});
+      setFileMetadata(metadataMap);
+    };
+
+    fetchMetadata();
+  }, [allFiles]);
+
+  useEffect(() => {
+    localStorage.setItem("databaseCount", databaseCount);
+  }, [databaseCount]);
 
   useEffect(() => {
     console.log("Existing database names:", existingDatabaseNames);
   }, [existingDatabaseNames]);
+
+  useEffect(() => {
+    setFileSelections((prev) => {
+      const newFileSelections = { ...prev };
+      allFiles.forEach((_, index) => {
+        if (newFileSelections[index] === undefined) {
+          newFileSelections[index] = true;
+        }
+      });
+      Object.keys(newFileSelections).forEach((key) => {
+        if (parseInt(key) >= allFiles.length) {
+          delete newFileSelections[key];
+        }
+      });
+      return newFileSelections;
+    });
+  }, [allFiles]);
 
   const handleFolderChange = (event) => {
     const files = Array.from(event.target.files);
@@ -78,11 +284,42 @@ const CombinedCreateDatabaseModal = ({ onClose, onNext, existingDatabaseNames })
     folderInputRef.current?.click();
   };
 
-  const handleRemoveFolder = (index) => {
-    setSelectedFolders((prev) => prev.filter((_, i) => i !== index));
+  const handleFolderIconClick = () => {
+    alert("Folder selection modal will open here in the future.");
   };
 
-  const handleNextClick = () => {
+  const isDuplicateName =
+    databaseName.trim() && existingDatabaseNames.includes(databaseName.trim().toLowerCase());
+  const hasValidationError = !databaseName.trim() || isDuplicateName;
+
+  const toggleDatabaseSelection = () => {
+    const newSelected = !databaseSelected;
+    setDatabaseSelected(newSelected);
+    const newFileSelections = {};
+    allFiles.forEach((_, index) => {
+      newFileSelections[index] = newSelected;
+    });
+    setFileSelections(newFileSelections);
+  };
+
+  const toggleFileSelection = (fileIndex) => {
+    setFileSelections((prev) => ({
+      ...prev,
+      [fileIndex]: !prev[fileIndex],
+    }));
+    const allFilesChecked = Object.values({
+      ...fileSelections,
+      [fileIndex]: !fileSelections[fileIndex],
+    }).every(Boolean);
+    setDatabaseSelected(allFilesChecked);
+  };
+
+  const handleMediaInfoClick = (file) => {
+    setMediaInfoFile(file);
+    setShowMediaInfoModal(true);
+  };
+
+  const handleFinish = () => {
     if (!databaseName.trim()) {
       setDatabaseNameError("You need to name your database.");
       return;
@@ -98,65 +335,118 @@ const CombinedCreateDatabaseModal = ({ onClose, onNext, existingDatabaseNames })
       return;
     }
 
-    setDatabaseNameError("");
+    const selectedFiles = allFiles
+      .filter((_, index) => fileSelections[index])
+      .map((file) => {
+        const id = generateUniqueId("db-");
+        return Object.assign(file, { id });
+      });
 
-    const databaseData = {
-      databaseName: databaseName.trim(),
-      mainFolder: {
-        name: databaseName.trim(),
-        subFolders: selectedFolders.map((folder) => ({
-          name: folder.name,
-          files: folder.files,
-          subFolders: folder.subFolders,
-        })),
-      },
-    };
+    if (selectedFiles.length === 0) {
+      console.warn("No files selected to create the database");
+      return;
+    }
 
-    console.log("Passing data to next modal:", databaseData);
-    onNext(databaseData);
+    const databaseNameFinal = databaseName.trim();
+    setDatabaseCount((prev) => prev + 1);
+    onFinish({ files: selectedFiles, databaseName: databaseNameFinal, resolutionLevel, colorSetting });
+    onClose();
   };
 
-  const handleFolderIconClick = () => {
-    alert("Folder selection modal will open here in the future.");
+  const getFileIcon = (file, iconId) => {
+    const handleMouseDown = () => setClickedIcon(iconId);
+    const handleMouseUp = () => setClickedIcon(null);
+
+    return file.type && file.type.startsWith("image/") ? (
+      <FaFileImage
+        className={`file-icon-base ${clickedIcon === iconId ? "file-icon-clicked" : "file-icon-hover"}`}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+    ) : file.type && file.type.startsWith("video/") ? (
+      <FaFileVideo
+        className={`file-icon-base ${clickedIcon === iconId ? "file-icon-clicked" : "file-icon-hover"}`}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+    ) : (
+      <FaFileImage
+        className={`file-icon-base ${clickedIcon === iconId ? "file-icon-clicked" : "file-icon-hover"}`}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+      />
+    );
   };
 
-  const calculateFolderStats = (folders) => {
-    let folderCount = folders.length;
-    let subFolderCount = 0;
-    let fileCount = 0;
-
-    folders.forEach((folder) => {
-      fileCount += folder.files?.length || 0;
-      if (folder.subFolders && folder.subFolders.length > 0) {
-        const subStats = calculateFolderStats(folder.subFolders);
-        subFolderCount += subStats.folderCount;
-        fileCount += subStats.fileCount;
-      }
-    });
-
-    return { folderCount, subFolderCount, fileCount };
+  const handleVideoLoadedMetadata = () => {
+    if (videoRef.current) {
+      setVideoDuration(videoRef.current.duration);
+      setResolution(`${videoRef.current.videoWidth}x${videoRef.current.videoHeight}`);
+      const frameRate = 30;
+      setTotalFrames(Math.floor(videoRef.current.duration * frameRate));
+    }
   };
 
-  const { folderCount, subFolderCount, fileCount } = calculateFolderStats(selectedFolders);
+  const handleTimeUpdate = () => {
+    if (videoRef.current) {
+      setCurrentTime(videoRef.current.currentTime);
+    }
+  };
 
-  const isDuplicateName =
-    databaseName.trim() && existingDatabaseNames.includes(databaseName.trim().toLowerCase());
-  const hasValidationError = !databaseName.trim() || isDuplicateName;
+  const handleSeek = (event) => {
+    const newTime = parseFloat(event.target.value);
+    setCurrentTime(newTime);
+    if (videoRef.current) {
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleFastForward = () => {
+    if (videoRef.current) {
+      const newTime = Math.min(videoRef.current.currentTime + 5, videoDuration);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  const handleRewind = () => {
+    if (videoRef.current) {
+      const newTime = Math.max(videoRef.current.currentTime - 5, 0);
+      setCurrentTime(newTime);
+      videoRef.current.currentTime = newTime;
+    }
+  };
+
+  const formatTime = (time) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
+  };
+
+  const formatDateTime = (timestamp) => {
+    if (!timestamp) return "N/A";
+    const date = new Date(timestamp);
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("default", { month: "short" }).toUpperCase();
+    const year = String(date.getFullYear()).slice(-2);
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
+    const timezone = "EST";
+    return `${day}${month}${year} ${hours}:${minutes}:${seconds}${timezone}`;
+  };
+
+  const totalItems = allFiles.length;
 
   return (
-    <div className="modal" style={modalStyle}>
-      <div style={headerStyle}>
+    <div className="modal" style={styles.modalStyle}>
+      <div style={styles.headerStyle}>
         <h3 style={{ color: "black", margin: 0, fontSize: 15 }}>Create New Database</h3>
-        <button onClick={onClose} style={closeButtonStyle}>
-          ×
-        </button>
+        <button onClick={onClose} style={{ width: "24px", height: "24px", backgroundColor: "white", borderRadius: "50%", border: "none", color: "black", fontSize: "16px", fontWeight: "400", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", padding: "0", transition: "background-color 0.3s ease" }}>×</button>
       </div>
-      <div style={contentStyle}>
-        <div style={{ margin: "10px 0" }}>
-          <label
-            htmlFor="databaseName"
-            style={{ display: "block", marginBottom: "5px", fontWeight: "500" }}
-          >
+      <div style={styles.contentStyle}>
+        <div className="input-container">
+          <label htmlFor="databaseName" className="input-label">
             Database Name:
           </label>
           <div style={{ position: "relative", width: "100%" }}>
@@ -171,316 +461,388 @@ const CombinedCreateDatabaseModal = ({ onClose, onNext, existingDatabaseNames })
                 }
               }}
               placeholder="Text field"
-              style={{
-                width: "100%",
-                padding: "10px 20px",
-                backgroundColor: "#FFFFFF",
-                color: "black",
-                borderRadius: "0px",
-                border: "1px solid #D6D6D6",
-                fontSize: "16px",
-                fontWeight: "500",
-                outline: "none",
-                transition: "all 0.3s ease",
-              }}
-              onFocus={(e) => (e.target.style.borderColor = "#C0C0C0")}
-              onBlur={(e) => (e.target.style.borderColor = "#D6D6D6")}
+              className="input-field"
             />
-            <style jsx>{`
-              #databaseName::placeholder {
-                color: #999;
-                opacity: 1;
-              }
-            `}</style>
           </div>
           {databaseNameError && (
-            <div style={{ color: "#FF4444", fontSize: "12px", marginTop: "5px" }}>
-              {databaseNameError}
-            </div>
+            <div className="input-error">{databaseNameError}</div>
           )}
           {isDuplicateName && !databaseNameError && (
-            <div style={{ color: "#FF4444", fontSize: "12px", marginTop: "5px" }}>
+            <div className="input-error">
               Database name already exists. Please choose a unique name.
             </div>
           )}
         </div>
 
-        <div style={{ margin: "10px 0", display: "flex", alignItems: "center" }}>
-          <div style={{ flex: 1 }}>
-            <label
-              htmlFor="saveLocation"
-              style={{ display: "block", marginBottom: "5px", fontWeight: "500" }}
-            >
-              Save to:
-            </label>
-            <div style={{ position: "relative", width: "100%" }}>
-              <input
-                type="text"
-                id="saveLocation"
-                value={saveLocation}
-                onChange={(e) => setSaveLocation(e.target.value)}
-                placeholder="Photon Location"
-                style={{
-                  width: "100%",
-                  padding: "10px 20px",
-                  backgroundColor: "#FFFFFF",
-                  color: "black",
-                  borderRadius: "0px",
-                  border: "1px solid #D6D6D6",
-                  fontSize: "16px",
-                  fontWeight: "500",
-                  outline: "none",
-                  transition: "all 0.3s ease",
-                }}
-                onFocus={(e) => (e.target.style.borderColor = "#C0C0C0")}
-                onBlur={(e) => (e.target.style.borderColor = "#D6D6D6")}
-              />
-              <style jsx>{`
-                #saveLocation::placeholder {
-                  color: #999;
-                  opacity: 1;
-                }
-              `}</style>
-            </div>
-            <div style={{ fontSize: "12px", color: "#555", marginTop: "5px" }}>
-              0 items selected.
-            </div>
+        <div className="input-container">
+          <label htmlFor="saveLocation" className="input-label">
+            Save to:
+          </label>
+          <div className="input-group">
+            <input
+              type="text"
+              id="saveLocation"
+              value={saveLocation}
+              onChange={(e) => setSaveLocation(e.target.value)}
+              placeholder="Location"
+              className="input-field"
+            />
+            <button className="browse-button" onClick={handleFolderIconClick}>
+              Browse
+            </button>
           </div>
-          <FaFolder
-            size={20}
-            style={{
-              marginLeft: "10px",
-              color: "#007BFF",
-              cursor: "pointer",
-              transition: "color 0.3s ease",
-            }}
-            onClick={handleFolderIconClick}
-            onMouseEnter={(e) => (e.target.style.color = "#0056D2")}
-            onMouseLeave={(e) => (e.target.style.color = "#007BFF")}
-          />
+          <div className="items-selected">
+            {totalItems} item{totalItems !== 1 ? "s" : ""} selected.
+          </div>
         </div>
 
-        <div style={{ margin: "10px 0", textAlign: "center" }}>
-          <button onClick={handleUploadClick} style={importMediaButtonStyle}>
-            Import more media
-          </button>
-          <input
-            type="file"
-            ref={folderInputRef}
-            onChange={handleFolderChange}
-            webkitdirectory="true"
-            directory="true"
-            multiple
-            style={{ display: "none" }}
-          />
-        </div>
-
-        {selectedFolders.length > 0 && (
-          <div style={folderListStyle}>
-            <div style={{ display: "flex", alignItems: "center", marginBottom: "10px", height: "24px" }}>
-              <FaFolder size={24} style={{ color: "#FFD700", marginRight: "8px", flexShrink: 0 }} />
-              <span style={{ lineHeight: "24px" }}>
-                Main Folder: <strong>{databaseName || "Unnamed Database"}</strong>
-              </span>
-            </div>
-            <p>
-              Subfolders in your database ({folderCount} folders, {subFolderCount} subfolders, {fileCount} files) (click X to remove):
-            </p>
-            <div style={folderContainerStyle}>
-              {selectedFolders.map((folder, index) => {
-                const subStats = calculateFolderStats(folder.subFolders || []);
-                const totalFiles = (folder.files?.length || 0) + subStats.fileCount;
-                return (
-                  <div key={`folder-${index}`} style={{ marginBottom: "8px" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <FaFolder size={24} style={{ marginRight: "8px", color: "#007BFF" }} />
-                      <div style={{ flex: 1 }}>
-                        <div style={{ fontWeight: "bold", color: "black" }}>{folder.name}</div>
-                        <div style={{ fontSize: "0.9rem", color: "black" }}>
-                          {totalFiles} file{totalFiles !== 1 ? "s" : ""}
-                          {folder.subFolders?.length > 0 && (
-                            <span>
-                              , {folder.subFolders.length} subfolder{folder.subFolders.length !== 1 ? "s" : ""}
-                            </span>
-                          )}
-                        </div>
-                        {folder.subFolders?.length > 0 && (
-                          <ul style={{ listStyleType: "none", padding: 0, marginLeft: "20px" }}>
-                            {folder.subFolders.map((nestedFolder, nestedIndex) => (
-                              <li
-                                key={nestedIndex}
-                                style={{
-                                  display: "flex",
-                                  alignItems: "center",
-                                  marginBottom: "8px",
-                                  padding: "8px",
-                                  borderRadius: "4px",
-                                }}
-                              >
-                                <FaFolderOpen size={20} style={{ marginRight: "8px", color: "#0056D2" }} />
-                                <div>
-                                  <div>{nestedFolder.name}</div>
-                                  <div style={{ fontSize: "0.8rem", color: "#555" }}>
-                                    {nestedFolder.files?.length || 0} file{nestedFolder.files?.length !== 1 ? "s" : ""}
-                                  </div>
-                                </div>
-                              </li>
-                            ))}
-                          </ul>
-                        )}
+        {/* Media Import Section */}
+        <div className="media-import-container">
+          {/* Left Side: Import Button or File Selection */}
+          <div className="media-import-left">
+            {selectedFolders.length > 0 ? (
+              <>
+                <div
+                  style={{
+                    padding: "10px",
+                    borderBottom: "1px solid #ddd",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                  }}
+                >
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <input
+                      type="checkbox"
+                      checked={databaseSelected}
+                      onChange={toggleDatabaseSelection}
+                      style={{ marginRight: "8px" }}
+                    />
+                    <FaFolder size={40} style={{ color: "#FFD700", marginRight: "12px" }} />
+                    <div>
+                      <strong style={{ fontSize: "18px", color: "#000000" }}>
+                        {databaseName || "Unnamed Database"}
+                      </strong>
+                      <div style={{ fontSize: "0.9rem", color: "#555" }}>
+                        {totalItems} item{totalItems !== 1 ? "s" : ""}
                       </div>
-                      <FaTimes
-                        size={20}
-                        style={{ color: "#FF4444", cursor: "pointer", marginLeft: "8px" }}
-                        onClick={() => handleRemoveFolder(index)}
-                      />
                     </div>
                   </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
+                  <button
+                    onClick={() => setIsFilesExpanded(!isFilesExpanded)}
+                    className="toggle-button"
+                  >
+                    {isFilesExpanded ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+                </div>
 
-        <div style={buttonContainerStyle}>
-          <button onClick={onClose} style={cancelButtonStyle}>
+                {isFilesExpanded && allFiles.length > 0 ? (
+                  allFiles.map((file, index) => {
+                    const fileId = `file-${index}`;
+                    const fileUrl = fileUrls[fileId] || "";
+                    const metadata = fileMetadata[index] || {};
+                    const duration = metadata.duration ? formatTime(metadata.duration) : "N/A";
+                    const frames = metadata.totalFrames || "N/A";
+                    return (
+                      <div
+                        key={fileId}
+                        className="file-item"
+                        style={{ opacity: fileSelections[index] ? 1 : 0.4 }}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={fileSelections[index] ?? true}
+                          onChange={() => toggleFileSelection(index)}
+                          style={{ marginRight: "8px" }}
+                        />
+                        {fileUrl && file.type && file.type.startsWith("image/") ? (
+                          <img
+                            src={fileUrl}
+                            alt={file.name}
+                            style={{
+                              maxWidth: "100px",
+                              maxHeight: "100px",
+                              marginRight: "8px",
+                              cursor: "pointer",
+                              borderRadius: "4px",
+                            }}
+                            onClick={() => {
+                              setSelectedPreview(fileUrl);
+                              setSelectedFile(file);
+                            }}
+                          />
+                        ) : fileUrl && file.type && file.type.startsWith("video/") ? (
+                          <video
+                            src={fileUrl}
+                            style={{
+                              maxWidth: "100px",
+                              maxHeight: "100px",
+                              marginRight: "8px",
+                              cursor: "pointer",
+                              borderRadius: "4px",
+                            }}
+                            muted
+                            onLoadedMetadata={handleVideoLoadedMetadata}
+                          >
+                            Your browser does not support the video tag.
+                          </video>
+                        ) : (
+                          <span style={{ marginRight: "8px" }}>{getFileIcon(file, `file-${fileId}`)}</span>
+                        )}
+                        <div style={{ display: "flex", flexDirection: "column" }}>
+                          <span
+                            style={{
+                              fontSize: "0.8rem",
+                              cursor: "pointer",
+                              color: selectedPreview === fileUrl ? "#0056D2" : "#000000",
+                              fontWeight: selectedPreview === fileUrl ? "bold" : "normal",
+                            }}
+                            onClick={() => {
+                              setSelectedPreview(fileUrl);
+                              setSelectedFile(file);
+                            }}
+                          >
+                            {file.name}
+                          </span>
+                          <span style={{ fontSize: "0.7rem", color: "#555" }}>
+                            {file.type && file.type.startsWith("video/") ? `${duration} | ${frames} frames` : "N/A"}
+                          </span>
+                          <span
+                            style={{ fontSize: "0.7rem", color: "#007BFF", cursor: "pointer" }}
+                            onClick={() => handleMediaInfoClick(file)}
+                          >
+                            Media info
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : isFilesExpanded ? (
+                  <p style={{ color: "#000000", padding: "10px" }}>No files selected.</p>
+                ) : null}
+              </>
+            ) : (
+              <div className="import-media-button-container">
+                <button onClick={handleUploadClick} className="import-media-button">
+                  Import media
+                </button>
+                <input
+                  type="file"
+                  ref={folderInputRef}
+                  onChange={handleFolderChange}
+                  webkitdirectory="true"
+                  directory="true"
+                  multiple
+                  style={{ display: "none" }}
+                />
+              </div>
+            )}
+          </div>
+
+          {/* Right Side: Preview with Video Controls */}
+          <div className="media-import-right">
+            {/* Always render the box with placeholder controls until a preview is selected */}
+            {selectedPreview ? (
+              <div className="right-panel">
+                <div style={{ width: "100%", textAlign: "left", marginBottom: "10px" }}>
+                  <strong style={{ fontSize: "16px", color: "#000000" }}>
+                    {selectedFile?.name || "Unknown"}
+                  </strong>
+                  <span style={{ fontSize: "14px", color: "#555", marginLeft: "10px" }}>
+                    Frame 001 / {totalFrames}
+                  </span>
+                </div>
+                <div style={{ width: "100%", height: "50%", position: "relative" }}>
+                  {selectedFile?.type && selectedFile.type.startsWith("video/") ? (
+                    <>
+                      <video
+                        key={selectedPreview}
+                        ref={videoRef}
+                        src={selectedPreview}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "contain",
+                          borderRadius: "5px",
+                        }}
+                        muted
+                        onLoadedMetadata={handleVideoLoadedMetadata}
+                        onTimeUpdate={handleTimeUpdate}
+                      >
+                        Your browser does not support the video tag.
+                      </video>
+                      <div className="video-controls">
+                        <button
+                          onClick={handleRewind}
+                          className="video-button"
+                          title="Rewind 5 seconds"
+                        >
+                          <FaBackward size={20} />
+                        </button>
+                        <span style={{ color: "#000000" }}>{formatTime(currentTime)}</span>
+                        <input
+                          type="range"
+                          min="0"
+                          max={videoDuration || 0}
+                          step="0.1"
+                          value={currentTime}
+                          onChange={handleSeek}
+                          className="range-input"
+                        />
+                        <span style={{ color: "#000000" }}>{formatTime(videoDuration)}</span>
+                        <button
+                          onClick={handleFastForward}
+                          className="video-button"
+                          title="Fast-forward 5 seconds"
+                        >
+                          <FaForward size={20} />
+                        </button>
+                      </div>
+                    </>
+                  ) : (
+                    <img
+                      src={selectedPreview}
+                      alt="Selected Preview"
+                      style={{
+                        width: "100%",
+                        height: "100%",
+                        objectFit: "contain",
+                        borderRadius: "5px",
+                      }}
+                    />
+                  )}
+                </div>
+                <div className="preview-details">
+                  <p style={{ margin: "5px 0", color: "#000000" }}>
+                    C:\Users\Admin\{databaseName || "Unnamed Database"}\{selectedFile?.name || "Unknown"}
+                  </p>
+                  <p style={{ margin: "5px 0", color: "#000000" }}>
+                    {formatTime(videoDuration)} | {totalFrames} frames
+                  </p>
+                  <p style={{ margin: "5px 0", color: "#000000" }}>
+                    {((selectedFile?.size || 0) / (1024 * 1024)).toFixed(1)} MB
+                  </p>
+                  <p style={{ margin: "5px 0", color: "#000000" }}>
+                    {resolution === "N/A" ? "1080p" : resolution.includes("x") ? `${resolution.split("x")[1]}p` : resolution}
+                  </p>
+                  <p style={{ margin: "5px 0", color: "#000000" }}>
+                    {formatDateTime(fileMetadata[allFiles.findIndex((f) => f === selectedFile)]?.creationTime)}
+                  </p>
+                  <p
+                    style={{ margin: "5px 0", color: "#007BFF", cursor: "pointer" }}
+                    onClick={() => console.log("Open File clicked")}
+                  >
+                    Open File
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="placeholder-video-controls">
+                <button className="placeholder-video-button" disabled>
+                  <FaBackward size={20} />
+                </button>
+                <span className="placeholder-time">0:00</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  step="0.1"
+                  value="0"
+                  className="placeholder-range-input"
+                  disabled
+                />
+                <span className="placeholder-time">0:00</span>
+                <button className="placeholder-video-button" disabled>
+                  <FaForward size={20} />
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Settings Section */}
+        <div className="settings-section">
+          <div className="slider-container">
+            <label className="slider-label">Database Pattern Density Level:</label>
+            <input
+              type="range"
+              min="2"
+              max="12"
+              step="1"
+              value={resolutionLevel}
+              onChange={(e) => setResolutionLevel(parseInt(e.target.value))}
+              className="slider"
+            />
+            <span className="slider-value">{resolutionLevel}</span>
+          </div>
+          <div className="radio-group">
+            <label className="slider-label">Database Color Settings:</label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                value="fullColor"
+                checked={colorSetting === "fullColor"}
+                onChange={(e) => setColorSetting(e.target.value)}
+                className="radio-input"
+              />
+              Full color
+            </label>
+            <label className="radio-label">
+              <input
+                type="radio"
+                value="blackAndWhite"
+                checked={colorSetting === "blackAndWhite"}
+                onChange={(e) => setColorSetting(e.target.value)}
+                className="radio-input"
+              />
+              Black & white
+            </label>
+            <label className="checkbox-label">
+              <input
+                type="checkbox"
+                checked={useGPU}
+                onChange={(e) => setUseGPU(e.target.checked)}
+                className="checkbox-input"
+              />
+              Use GPU acceleration
+            </label>
+          </div>
+        </div>
+
+        <div className="button-container">
+          <button onClick={onClose} className="cancel-button">
             Cancel
           </button>
           <button
-            onClick={handleNextClick}
-            style={{
-              ...selectButtonStyle,
-              backgroundColor: hasValidationError ? "#B0BEC5" : "#007BFF",
-              cursor: hasValidationError ? "not-allowed" : "pointer",
-            }}
+            onClick={handleFinish}
+            className={`create-button ${hasValidationError ? "" : "enabled"}`}
             disabled={hasValidationError}
           >
             Create Database
-            <FaArrowRight style={{ marginLeft: "8px" }} />
           </button>
         </div>
       </div>
+
+      {showMediaInfoModal && (
+        <div style={styles.modalOverlayStyle}>
+          <div style={styles.modalContentStyle}>
+            <h3 style={{ color: "#000000" }}>Media Info</h3>
+            <p style={{ color: "#000000" }}>{mediaInfoFile ? `File Name: ${mediaInfoFile.name}` : "No file selected."}</p>
+            <p style={{ color: "#000000" }}>{`File Size: ${((mediaInfoFile?.size || 0) / (1024 * 1024)).toFixed(2)} MB`}</p>
+            <p style={{ color: "#000000" }}>{`Resolution: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.resolution || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Duration: ${formatTime(fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.duration || 0)}`}</p>
+            <p style={{ color: "#000000" }}>{`Frames: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.totalFrames || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Video Codec: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.videoCodec || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Audio Codec: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.audioCodec || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Bit Rate: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.bitRate || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Format: ${fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.fileFormat || "N/A"}`}</p>
+            <p style={{ color: "#000000" }}>{`Date: ${formatDateTime(fileMetadata[allFiles.findIndex((f) => f === mediaInfoFile)]?.creationTime)}`}</p>
+            <button onClick={() => setShowMediaInfoModal(false)} className="modal-close-button">Close</button>
+          </div>
+        </div>
+      )}
     </div>
   );
-};
-
-// Styles
-const modalStyle = {
-  position: "fixed",
-  top: "50%",
-  left: "50%",
-  transform: "translate(-50%, -50%)",
-  backgroundColor: "white",
-  borderRadius: "8px",
-  zIndex: 1000,
-  display: "block",
-  width: "70vw",
-  height: "80vh",
-  boxShadow: "0 4px 15px rgba(0, 0, 123, 0.2)",
-  overflow: "hidden",
-};
-
-const headerStyle = {
-  backgroundColor: "#EEF2FF",
-  padding: "10px 20px",
-  borderTopLeftRadius: "8px",
-  borderTopRightRadius: "8px",
-  display: "flex",
-  justifyContent: "space-between",
-  alignItems: "center",
-};
-
-const contentStyle = {
-  padding: "20px",
-  color: "black",
-  display: "flex",
-  flexDirection: "column",
-  height: "calc(100% - 40px)",
-};
-
-const importMediaButtonStyle = {
-  padding: "10px 20px",
-  backgroundColor: "#007BFF",
-  color: "white",
-  borderRadius: "20px",
-  border: "none",
-  cursor: "pointer",
-  fontSize: "14px",
-  transition: "background-color 0.3s ease",
-};
-
-const folderListStyle = {
-  margin: "10px 0",
-  flex: "1 1 auto",
-  minHeight: 0,
-  display: "flex",
-  flexDirection: "column",
-};
-
-const folderContainerStyle = {
-  flex: "1 1 auto",
-  overflowY: "auto",
-  border: "1px solid #ddd",
-  borderRadius: "4px",
-  padding: "10px",
-};
-
-const buttonContainerStyle = {
-  marginTop: "20px",
-  display: "flex",
-  justifyContent: "flex-end",
-  gap: "10px", // Add spacing between buttons
-};
-
-const selectButtonStyle = {
-  padding: "8px 16px",
-  backgroundColor: "#007BFF",
-  color: "white",
-  borderRadius: "20px",
-  border: "none",
-  width: "250px",
-  height: "30px",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  lineHeight: "1",
-  paddingTop: "6px",
-  transition: "background-color 0.3s ease",
-};
-
-const cancelButtonStyle = {
-  padding: "8px 16px",
-  backgroundColor: "#D3D3D3", // Light gray background for Cancel button
-  color: "black",
-  borderRadius: "20px",
-  border: "none",
-  width: "250px",
-  height: "30px",
-  cursor: "pointer",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  lineHeight: "1",
-  paddingTop: "6px",
-  transition: "background-color 0.3s ease",
-};
-
-const closeButtonStyle = {
-  width: "24px",
-  height: "24px",
-  backgroundColor: "white",
-  borderRadius: "50%",
-  border: "none",
-  color: "black",
-  fontSize: "16px",
-  fontWeight: "400",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  cursor: "pointer",
-  padding: "0",
-  transition: "background-color 0.3s ease",
 };
 
 export default CombinedCreateDatabaseModal;
