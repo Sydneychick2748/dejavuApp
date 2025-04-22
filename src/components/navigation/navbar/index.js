@@ -40,13 +40,15 @@ const Navbar = () => {
                 <div className="dropdown-content">
                   <a className="dropdown-item" href="/about-photon">About Photon</a>
                   <a className="dropdown-item" href="/about-dejavuai">About DejaVuAI</a>
-                  <a className="dropdown-item" href="/photon-user-manual">Photon User Manual</a>
-                  <a className="dropdown-item" href="/contact-support">Contact support</a>
                   <hr></hr>
                   <a className="dropdown-item" href="/accounts/create-account">Account</a>
+                  <a className="dropdown-item" href="/accounts/create-account">Preferences</a>
                   <a className="dropdown-item" href="#">Plugins</a>
-                  <a className="dropdown-item" href="#">Preferences</a>
                   <a className="dropdown-item" href="#">Connect to ES network</a>
+                  <hr></hr>
+                  <a className="dropdown-item" href="#">Help</a>
+                  <a className="dropdown-item" href="/photon-user-manual">Photon User Manual</a>
+                  <a className="dropdown-item" href="/contact-support">Contact support</a>
                   <hr></hr>
                   <a className="dropdown-item" href="#">Sign out</a>
                 </div>
