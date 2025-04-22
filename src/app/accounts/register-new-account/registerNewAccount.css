@@ -1,0 +1,104 @@
+
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 50px 20px;
+    min-height: 100vh;
+    background-image: url("/images/background/login_registerNewAccountBackground.png"); /* 👈 Your image path */
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  .register-box {
+    background: white;
+    border-radius: 20px;
+    padding: 35px;
+    width: 450px;
+    max-width: 100%;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    font-family: "Poppins", sans-serif;
+  }
+  
+  .register-box h2 {
+    color: #12224c;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+  
+  .name-row {
+    display: flex;
+    gap: 12px;
+  }
+  
+  .name-row input {
+    flex: 1;
+  }
+  
+  .register-box input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    font-size: 1rem;
+  }
+  
+  .password-hint {
+    font-size: 0.75rem;
+    color: #777;
+    margin-top: -12px;
+  }
+  
+  .disclaimer,
+  .legal {
+    font-size: 0.75rem;
+    color: #777;
+  }
+  
+  .disclaimer a,
+  .legal a {
+    color: #3d8bff;
+    text-decoration: none;
+  }
+  
+  .disclaimer a:hover,
+  .legal a:hover {
+    text-decoration: underline;
+  }
+  
+  .agree-btn {
+    background-color: #a9d096;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    margin-top: 8px;
+  }
+  
+  .agree-btn:hover {
+    background-color: #94be83;
+  }
+  
+  .support-link {
+    text-align: center;
+    font-size: 0.85rem;
+    margin-top: 20px;
+    color: black;
+  }
+  
+  .support-link a {
+    color: #3d8bff;
+    text-decoration: none;
+  }
+  
+  .support-link a:hover {
+    text-decoration: underline;
+  }
+  
