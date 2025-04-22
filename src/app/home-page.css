@@ -1,0 +1,152 @@
+
+
+.home-background {
+    background-image: url('/images/background/dejavubackground.png');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px;
+    font-family: 'Inter', sans-serif;
+  }
+  
+  .content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    width: 100%;
+    gap: 60px;
+    margin-bottom: 200px;
+  }
+  
+  .left-section {
+    max-width: 550px;
+    color: #1e1e2f;
+    margin-left: 30px;
+  }
+  
+  .left-section h1 {
+    font-size: 2.6rem;
+    line-height: 1.2;
+    margin-bottom: 60px;
+  }
+  
+  .left-section .highlight {
+    font-weight: 300;
+    color: black;
+  }
+  
+  .left-section p {
+    font-size: 1.15rem;
+    color: #444;
+    margin-bottom: 12px;
+  }
+  
+  .learn-link {
+    color: #4661e6;
+    font-size: 0.95rem;
+    text-decoration: none;
+  }
+
+  .learn-link:hover {
+    text-decoration: underline;
+    color: #2a6edb; /* Optional: darker blue on hover */
+    /* padding-bottom: 10px; */
+  }
+  
+  .powered-box {
+    width: 700px;
+    height: 140px;
+    background: rgba(73, 132, 248, 0.1); /* 10% opacity blue */
+    border-top-right-radius: 15px;
+    border-bottom-right-radius: 15px;
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    padding: 20px;
+    padding-left: 290px;
+    margin-top: 70px; /* Use padding/margin contextually if needed */
+    margin-left: -280px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .poweredBy {
+    font-size: 1.5rem; /* Increase this value as needed */
+    font-weight: 500;
+    color: #12224c;
+  }
+  
+  .powered-box .logo {
+    height: 39px;
+  }
+  
+  .powered-buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .about-btn,
+  .visit-btn {
+    border: none;
+    border-radius: 6px;
+    padding: 8px 14px;
+    font-size: 0.9rem;
+    cursor: pointer;
+  }
+  
+  .about-btn {
+    background-color: #e5ebff;
+    color: #3d8bff;
+    border: 1px solid #3d8bff;
+    width: 180px;
+    border-radius: 10px;
+    font-size: 1rem;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;    
+    margin-bottom: 20px;
+  }
+
+  .about-btn:hover {
+    background-color: #3d8bff; /* Solid blue background */
+    color: white;              /* White text on hover */
+    border-color: #3d8bff;     /* Match border to background */
+  }
+  
+  .visit-btn {
+    color: #3d8bff;
+    width: 190px;
+    font-size: 1.15rem;
+    background-color: transparent;
+    height: 30px;
+    display: flex;
+    align-items: center;       /* Vertically center the text */
+    justify-content: flex-start; /* Align text to the left inside the button */
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 10px; /* Pull the button to the left */
+    transition: all 0.2s ease;
+    text-align: left;
+  }
+  
+  .visit-btn:hover {
+    text-decoration: underline;
+    color: #2a6edb; /* Optional: darker blue on hover */
+  }
+  
+  .forgot-link {
+    font-size: 0.85rem;
+    color: #5c7cfa;
+    text-align: right;
+    text-decoration: none;
+  }
+  
