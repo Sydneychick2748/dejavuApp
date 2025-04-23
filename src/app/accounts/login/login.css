@@ -43,6 +43,14 @@
   height: 40px;
 }
 
+.login-box input,
+.login-box input:-webkit-autofill {
+  background-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #333 !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
+
 .login-box input::placeholder {
   color: #c0c0c0;
 }
