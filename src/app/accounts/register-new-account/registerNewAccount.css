@@ -28,8 +28,8 @@
 
 .register-box h2 {
   color: #12224c;
-  font-weight: 400;
-  font-size: 1.1rem; /* added to scale heading down */
+  font-weight: 300;
+  font-size: 1.75rem; /* added to scale heading down */
   margin-bottom: 6px; /* was 8px */
 }
 

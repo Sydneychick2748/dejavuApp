@@ -121,6 +121,7 @@
 "use client";
 
 import { useState } from "react";
+// import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import VerifyEmail from "./VerifyEmail"; // Import your VerifyEmail component
 // import AccountSetUp from "./AccountSetUp"; // Assuming this exists
@@ -129,6 +130,9 @@ import VerifyEmail from "./VerifyEmail"; // Import your VerifyEmail component
 import "./registerNewAccount.css"; // Optional for styling
 
 export default function CreateAccount() {
+  // const pathname = usePathname();
+  // const isRegisterNewAccountpage = pathname === "/accounts/register-new-account";
+  // console.log("isRegisterNewAccountpage", isRegisterNewAccountpage);
   const router = useRouter();
 
   // State to manage the current step
