@@ -1,12 +1,13 @@
 
 
+
 "use client";
 import React, { useContext, useState, useRef, useEffect, useMemo } from "react";
 import CanvasDraw from "react-canvas-draw";
 import { ImageContext } from "@/contexts/ImageContext";
 import { FaPlus, FaTimes } from "react-icons/fa";
 import { Box } from "@chakra-ui/react";
-import ImageUploadModal from "./ImageUploadModal"; // Import the new modal
+import ImageUploadModal from "./ImageUploadModal";
 import "./searchFor.css";
 
 // Composite the image onto a white background at 500×500.
@@ -440,7 +441,7 @@ export default function SearchFor() {
       console.log(
         `:rocket: Sending image to FastAPI for isolation for box ${boxId}...`
       );
-      const res = await fetch("http://127.0.0.1:8000/process-image", {
+      const res = await fetch("http://127.0.0.1:8000/dashboard/process-image", { // Updated route
         method: "POST",
         body: formData,
       });
@@ -449,7 +450,7 @@ export default function SearchFor() {
       console.log(":white_check_mark: Response from FastAPI:", data);
       setResponse(data.message);
       if (data.filename) {
-        const processedUrl = `http://127.0.0.1:8000/get-image/${encodeURIComponent(
+        const processedUrl = `http://127.0.0.1:8000/dashboard/get-image/${encodeURIComponent( // Updated route
           data.filename
         )}`;
         setBoxes((prevBoxes) => {
@@ -518,7 +519,7 @@ export default function SearchFor() {
       console.log(
         `:rocket: Sending image and processed mask to FastAPI for box ${currentBoxId}...`
       );
-      const res = await fetch("http://127.0.0.1:8000/remove-area", {
+      const res = await fetch("http://127.0.0.1:8000/dashboard/remove-area", { // Updated route
         method: "POST",
         body: formData,
       });
@@ -527,7 +528,7 @@ export default function SearchFor() {
       console.log(":white_check_mark: Response from FastAPI:", data);
       setResponse(data.message);
       if (data.filename) {
-        const processedUrl = `http://127.0.0.1:8000/get-image/${encodeURIComponent(
+        const processedUrl = `http://127.0.0.1:8000/dashboard/get-image/${encodeURIComponent( // Updated route
           data.filename
         )}`;
         setBoxes((prevBoxes) => {

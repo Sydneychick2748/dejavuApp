@@ -318,7 +318,7 @@ const UploadFiles = React.memo(() => {
       const fileUrl = getFileUrl(file);
       const formData = new FormData();
       formData.append("file", file);
-      const response = await fetch("http://localhost:8000/extract-frames/", {
+      const response = await fetch("http://localhost:8000/dashboard/extract-frames/", {
         method: "POST",
         body: formData,
       });
@@ -408,7 +408,7 @@ const UploadFiles = React.memo(() => {
         try {
           const formData = new FormData();
           formData.append("file", file);
-          const response = await fetch("http://localhost:8000/extract-frames/", {
+          const response = await fetch("http://localhost:8000/dashboard/extract-frames/", {
             method: "POST",
             body: formData,
           });
