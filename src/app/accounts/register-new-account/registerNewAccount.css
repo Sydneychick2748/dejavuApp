@@ -1,100 +1,187 @@
-
-
 .register-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 50px 20px;
+  min-height: 100vh;
+  background-image: url("/images/background/login_registerNewAccountBackground.png"); /* 👈 Your image path */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.register-box {
+  background: white;
+  border-radius: 20px;
+  max-width: 100%;
+  /* height: 75vh; */
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+  font-family: "Poppins", sans-serif;
+  margin-bottom: 100px;
+  padding: 25px; /* was 35px */
+  width: 450px; /* was 400px */
+  gap: 14px;
+}
+
+.register-box h2 {
+  color: #12224c;
+  font-weight: 400;
+  font-size: 1.1rem; /* added to scale heading down */
+  margin-bottom: 6px; /* was 8px */
+}
+
+.name-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap; /* allows wrapping on smaller screens */
+}
+
+.name-row input {
+  flex: 1 1 0;
+  min-width: 0; /* ✅ prevents input from overflowing */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.register-box input {
+  padding: 6px 8px; /* was 12px */
+  border: 1px solid #ccc;
+  border-radius: 6px; /* was 10px */
+  font-size: 0.75rem; /* was 1rem */
+}
+
+.register-box input,
+.register-box input:-webkit-autofill {
+  background-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #333 !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
+
+.password-hint {
+  font-size: 0.75rem;
+  color: #777;
+  margin-top: -12px;
+}
+
+.disclaimer,
+.legal {
+  font-size: 0.75rem;
+  color: #777;
+}
+
+.disclaimer a,
+.legal a {
+  color: #3d8bff;
+  text-decoration: none;
+}
+
+.disclaimer a:hover,
+.legal a:hover {
+  text-decoration: underline;
+}
+
+.agree-btn {
+  background-color: #a9d096;
+  color: white;
+  font-weight: 600;
+  font-size: 0.75rem; /* was 1rem */
+  padding: 8px 10px; /* was 12px */
+  border: none;
+  border-radius: 6px; /* was 10px */
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+.agree-btn:hover {
+  background-color: #a9d096;
+  color: #e3f7da;
+}
+
+.support-link {
+  text-align: center;
+  font-size: 0.8rem; /* was 0.85rem */
+  margin-top: 16px; /* was 20px */
+  color: black;
+}
+
+.support-link a {
+  color: #3d8bff;
+  text-decoration: none;
+}
+
+.support-link a:hover {
+  text-decoration: underline;
+}
+
+/* Here is the css for Verify email */
+
+
+
+.verify-container {
+    height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    padding: 50px 20px;
-    min-height: 100vh;
-    background-image: url("/images/background/login_registerNewAccountBackground.png"); /* 👈 Your image path */
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    justify-content: center;
+    background: linear-gradient(to bottom right, #f9fbff, #ffffff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
   }
   
-  .register-box {
-    background: white;
-    border-radius: 20px;
-    padding: 35px;
-    width: 450px;
-    max-width: 100%;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    font-family: "Poppins", sans-serif;
+  .verify-box {
+    background-color: white;
+    border-radius: 12px;
+    padding: 40px;
+    width: 360px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    text-align: center;
   }
   
-  .register-box h2 {
-    color: #12224c;
-    font-weight: 400;
-    margin-bottom: 8px;
+  .verify-box h1 {
+    margin-bottom: 20px;
+    color: #1d2d50;
+    font-size: 24px;
   }
   
-  .name-row {
-    display: flex;
-    gap: 12px;
+  .verify-box p {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 20px;
   }
   
-  .name-row input {
-    flex: 1;
-  }
-  
-  .register-box input {
-    padding: 12px;
+  .verify-box input {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 20px;
     border: 1px solid #ccc;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 6px;
+    font-size: 14px;
   }
   
-  .password-hint {
-    font-size: 0.75rem;
-    color: #777;
-    margin-top: -12px;
-  }
-  
-  .disclaimer,
-  .legal {
-    font-size: 0.75rem;
-    color: #777;
-  }
-  
-  .disclaimer a,
-  .legal a {
-    color: #3d8bff;
-    text-decoration: none;
-  }
-  
-  .disclaimer a:hover,
-  .legal a:hover {
-    text-decoration: underline;
-  }
-  
-  .agree-btn {
-    background-color: #a9d096;
+  .verify-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4f7cff;
     color: white;
-    font-weight: 600;
-    font-size: 1rem;
-    padding: 12px;
     border: none;
-    border-radius: 10px;
+    border-radius: 6px;
     cursor: pointer;
-    margin-top: 8px;
+    font-size: 14px;
   }
   
-  .agree-btn:hover {
-    background-color: #94be83;
+  .verify-box button:hover {
+    background-color: #3d64db;
   }
   
   .support-link {
-    text-align: center;
-    font-size: 0.85rem;
-    margin-top: 20px;
-    color: black;
+    margin-top: 16px;
+    font-size: 13px;
   }
   
   .support-link a {
-    color: #3d8bff;
+    color: #4f7cff;
     text-decoration: none;
   }
   
