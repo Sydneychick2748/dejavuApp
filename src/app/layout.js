@@ -21,7 +21,7 @@ export default function RootLayout({ children }) {
       <body  suppressHydrationWarning>
         {/* <div className="container"> */}
           <Provider>
-          {pathname === '/accounts/create-account' || pathname === '/accounts/login' || pathname === '/accounts/profile' || pathname === '/contact' || pathname === '/dashboard/upload-files' || pathname === '/help' || pathname === '/dashboard' || pathname === '/accounts/register-new-account' || pathname === '/accounts/about-dejavu' || pathname === '/accounts/contact-support' || pathname === '/account-info-setting'  || pathname === '/photon-user-manuel'? <Header2 /> : <Header1 />}
+          {pathname === '/user-history' || pathname === '/accounts/login' || pathname === '/bookmarks' || pathname === '/contact' || pathname === '/dashboard/upload-files' || pathname === '/help' || pathname === '/dashboard' || pathname === '/accounts/register-new-account' || pathname === '/photon-dropdown/about-dejavu' || pathname === '/photon-dropdown/contact-support' || pathname === '/photon-dropdown/account-info-setting'  || pathname === '/photon-dropdown/photon-user-manuel'? <Header2 /> : <Header1 />}
           {children}
           {/* {pathname === '/help' || pathname === '/contact' ? <Footer2 /> : <Footer1 />} */}
           </Provider>
