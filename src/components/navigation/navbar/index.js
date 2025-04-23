@@ -39,7 +39,7 @@ const Navbar = () => {
               {isOpen && (
                 <div className="dropdown-content">
                   <a className="dropdown-item" href="/about-photon">About Photon</a>
-                  <a className="dropdown-item" href="/about-dejavuai">About DejaVuAI</a>
+                  <a className="dropdown-item" href="/about-dejavuai">About DejaVuAI&#174;</a>
                   <hr></hr>
                   <a className="dropdown-item" href="/accounts/create-account">Account</a>
                   <a className="dropdown-item" href="/accounts/create-account">Preferences</a>
