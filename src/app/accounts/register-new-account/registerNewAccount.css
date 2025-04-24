@@ -117,75 +117,88 @@
   text-decoration: underline;
 }
 
-/* Here is the css for Verify email */
-
-
+/* ******************************** Here is the css for Verify email *******************************************/
 
 .verify-container {
-    height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(to bottom right, #f9fbff, #ffffff);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  }
-  
-  .verify-box {
-    background-color: white;
-    border-radius: 12px;
-    padding: 40px;
-    width: 360px;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-    text-align: center;
-  }
-  
-  .verify-box h1 {
-    margin-bottom: 20px;
-    color: #1d2d50;
-    font-size: 24px;
-  }
-  
-  .verify-box p {
-    font-size: 14px;
-    color: #555;
-    margin-bottom: 20px;
-  }
-  
-  .verify-box input {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 14px;
-  }
-  
-  .verify-box button {
-    width: 100%;
-    padding: 10px;
-    background-color: #4f7cff;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .verify-box button:hover {
-    background-color: #3d64db;
-  }
-  
-  .support-link {
-    margin-top: 16px;
-    font-size: 13px;
-  }
-  
-  .support-link a {
-    color: #4f7cff;
-    text-decoration: none;
-  }
-  
-  .support-link a:hover {
-    text-decoration: underline;
-  }
-  
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(to bottom right, #f9fbff, #ffffff);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background-image: url("/images/background/login_registerNewAccountBackground.png"); /* 👈 Your image path */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+.verify-box {
+  background-color: white;
+  border-radius: 12px;
+  padding: 40px;
+  width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  text-align: left;
+  margin-bottom: 100px;
+}
+
+.verify-box input,
+.verify-box input:-webkit-autofill {
+  background-color: white !important;
+  transition: background-color 5000s ease-in-out 0s;
+  -webkit-text-fill-color: #333 !important;
+  box-shadow: 0 0 0px 1000px white inset !important;
+}
+
+.verify-box h1 {
+  margin-bottom: 20px;
+  color: #1d2d50;
+  font-size: 24px;
+  font-weight: 300;
+  /* align-items: left; */
+}
+
+.verify-box p {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+  line-height: 1.3; 
+}
+
+.verify-box input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.verify-box button {
+  width: 100%;
+  padding: 10px;
+  background-color: #4f7cff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.verify-box button:hover {
+  background-color: #3d64db;
+}
+
+.support-link {
+  margin-top: 16px;
+  font-size: 13px;
+}
+
+.support-link a {
+  color: #4f7cff;
+  text-decoration: none;
+}
+
+.support-link a:hover {
+  text-decoration: underline;
+}
