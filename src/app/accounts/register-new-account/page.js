@@ -123,7 +123,7 @@
 import { useState } from "react";
 // import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import VerifyEmail from "./VerifyEmail"; // Import your VerifyEmail component
+import VerifyEmail from "../register-new-account/verifyEmail"; // Import your VerifyEmail component
 // import AccountSetUp from "./AccountSetUp"; // Assuming this exists
 // import Plans from "./Plans"; // Assuming this exists
 // import LastThing from "./LastThing"; // Assuming this exists
