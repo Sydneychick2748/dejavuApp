@@ -1,0 +1,129 @@
+.preferences-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1200;
+}
+
+.preferences-modal-container {
+  background-color: white;
+  border-radius: 8px;
+  width: 600px;
+  height: 400px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 15px rgba(0, 0, 123, 0.2);
+}
+
+.preferences-modal-header {
+  background-color: #EEF2FF;
+  padding: 10px 20px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.preferences-modal-title {
+  color: black;
+  margin: 0;
+  font-size: 15px;
+}
+
+.preferences-modal-close-button {
+  width: 24px;
+  height: 24px;
+  background-color: white;
+  border-radius: 50%;
+  border: none;
+  color: black;
+  font-size: 16px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background-color 0.3s ease;
+}
+
+.preferences-modal-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  border-top: 1px solid #ddd;
+  border-bottom: 1px solid #ddd;
+}
+
+.preferences-section {
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 10px;
+}
+
+.preferences-section:last-child {
+  border-bottom: none;
+}
+
+.preferences-section-title {
+  font-size: 16px;
+  margin: 20px 0 10px 0;
+  color: #000000;
+}
+
+.preferences-section-title:first-child {
+  margin-top: 0;
+}
+
+.preferences-section-text {
+  font-size: 14px;
+  color: #555;
+}
+
+.preferences-section-label {
+  font-size: 14px;
+  margin: 0 0 10px 0;
+  color: #000000;
+}
+
+.preferences-section-option {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.preferences-section-option:last-child {
+  margin-bottom: 0;
+}
+
+.preferences-section-option input {
+  margin-right: 8px;
+}
+
+.preferences-section-option span {
+  font-size: 14px;
+  color: #000000;
+}
+
+.preferences-modal-footer {
+  padding: 10px 20px;
+  display: flex;
+  justify-content: flex-end;
+  border-top: 1px solid #ddd;
+}
+
+.preferences-modal-footer-button {
+  padding: 8px 16px;
+  border: none;
+  cursor: pointer;
+  background-color: #E0E7FF;
+  color: #0056D2;
+  border-radius: 20px;
+  transition: background-color 0.3s ease;
+}
