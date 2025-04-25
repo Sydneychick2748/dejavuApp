@@ -1,66 +1,26 @@
 import React, { useState } from 'react';
-
+import Link from 'next/link';
+import "./registerNewAccount.css"; // Optional for styling
 
 
 const AccountSetUp = () => {
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData({
-            ...formData,
-            [name]: value,
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        console.log('Form submitted:', formData);
-        // Add your form submission logic here
-    };
-
     return (
-        <div>
-            <h1>Account Setup</h1>
-            <form onSubmit={handleSubmit}>
-                <div>
-                    <label htmlFor="username">Username:</label>
-                    <input
-                        type="text"
-                        id="username"
-                        name="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="email">Email:</label>
-                    <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                    />
-                </div>
-                <div>
-                    <label htmlFor="password">Password:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                    />
-                </div>
-                <button type="submit">Submit</button>
-            </form>
+      <div className="account-setup-container">
+        <h1 className="setup-title">Finish Setting Up Your Account</h1>
+  
+        {/* If form fields are coming later, keep this empty space for layout balance */}
+        <div className="spacer"></div>
+  
+        <Link href="/accounts/register-new-account/plans">
+          <button className="continue-button">Continue to Plans & Pricing</button>
+        </Link>
+  
+        <div className="support-link">
+          <span>Questions? </span>
+          <Link href="/photon-dropdown/contact-support">Contact support</Link>
         </div>
+      </div>
     );
-};
-
-export default AccountSetUp;
+  };
+  
+  export default AccountSetUp;
