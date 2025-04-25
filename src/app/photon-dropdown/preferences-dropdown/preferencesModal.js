@@ -1,14 +1,19 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import { FaTimes } from "react-icons/fa";
+import { usePreferences } from "../../../contexts/PreferencesContext";
 import "./preferencesModal.css";
 
 const PreferencesModal = ({ onClose }) => {
-  const [databaseLocation, setDatabaseLocation] = useState("default"); // "default" or "manual"
+  const { databaseLocation, setDatabaseLocation, isLoading } = usePreferences();
 
   const handleLocationChange = (value) => {
     setDatabaseLocation(value);
   };
+
+  if (isLoading) {
+    return <div>Loading preferences...</div>;
+  }
 
   return (
     <div className="preferences-modal-overlay">
@@ -30,7 +35,9 @@ const PreferencesModal = ({ onClose }) => {
 
           <div className="preferences-section">
             <h4 className="preferences-section-title">Databases</h4>
-            <p className="preferences-section-label">New database save location:</p>
+            <p className="preferences-section-label">
+              New database save location:
+            </p>
             <label className="preferences-section-option">
               <input
                 type="radio"
@@ -38,9 +45,23 @@ const PreferencesModal = ({ onClose }) => {
                 value="default"
                 checked={databaseLocation === "default"}
                 onChange={() => handleLocationChange("default")}
+                className="preferences-radio"
+                style={{
+                  appearance: "none",
+                  WebkitAppearance: "none",
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
+                  border: "2px solid blue",
+                  backgroundColor:
+                    databaseLocation === "default" ? "blue" : "transparent",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
               />
               <span>Default Photon Directory (recommended)</span>
             </label>
+
             <label className="preferences-section-option">
               <input
                 type="radio"
@@ -48,6 +69,19 @@ const PreferencesModal = ({ onClose }) => {
                 value="manual"
                 checked={databaseLocation === "manual"}
                 onChange={() => handleLocationChange("manual")}
+                className="preferences-radio"
+                style={{
+                  appearance: "none",
+                  WebkitAppearance: "none",
+                  width: "16px",
+                  height: "16px",
+                  borderRadius: "50%",
+                  border: "2px solid blue",
+                  backgroundColor:
+                    databaseLocation === "manual" ? "blue" : "transparent",
+                  cursor: "pointer",
+                  outline: "none",
+                }}
               />
               <span>Manual location</span>
             </label>
