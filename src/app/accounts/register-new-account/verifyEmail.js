@@ -63,7 +63,11 @@ const VerifyEmail = ({ email, onVerify }) => {
   };
 
   const handleVerifyCode = () => {
-    onVerify(verificationCode); // Pass code back to parent
+    if (verificationCode === "123456") {
+      onVerify(verificationCode); // Pass mock code to parent
+    } else {
+      alert("Invalid mock code (try 123456)");
+    }
   };
 
   return (
@@ -90,9 +94,7 @@ const VerifyEmail = ({ email, onVerify }) => {
           </>
         )}
 
-        <Link href="../accounts/register-new-account/accountSetUp.js">
-          <button>Go to Verification</button>
-        </Link>
+       
 
         <div className="support-link">
           Questions? <a href="#">Contact support</a>

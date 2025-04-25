@@ -2,7 +2,7 @@ import { Box, Heading } from "@chakra-ui/react";
 
 import React from "react";
 
-import Navbar from "../navigation/navbar";
+import Navbar from "../navigation/navbar/navbarDropdown";
 
 export default function Header2() {
     return (
