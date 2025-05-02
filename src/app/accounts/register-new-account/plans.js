@@ -1,43 +1,4 @@
-// "use client";
 
-// import React from "react";
-// import Link from "next/link";
-// import "./registerNewAccount.css";
-
-// const Plans = ({ onContinue, onBack }) => {
-//   const handleContinue = () => {
-//     // Pass a placeholder plan value since plans are TBD
-//     onContinue("placeholder-plan");  // Replace with actual plan if available
-//   };
-
-//   const handleBack = () => {
-//     // Trigger the onBack prop to go to the previous step
-//     onBack();
-//   };
-
-//   return (
-//     <div className="plans-container">
-//       <h1 className="setup-title">Plans & Pricing</h1>
-//       <div className="plans-placeholder">
-//         <p>TBD...</p>
-//       </div>
-//       <div className="button-group">
-//         <button className="plans-continue-button" onClick={handleContinue}>
-//           Continue to payment
-//         </button>
-//         <button className="plans-back-button" onClick={handleBack}>
-//           Back
-//         </button>
-//       </div>
-//       <div className="support-link">
-//         <span>Questions? </span>
-//         <Link href="/photon-dropdown/contact-support">Contact support</Link>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default Plans;
 
 import React from "react";
 import Link from "next/link";
