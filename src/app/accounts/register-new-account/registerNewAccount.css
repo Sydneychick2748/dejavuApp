@@ -390,3 +390,45 @@
 .support-link a:hover {
   text-decoration: underline;
 }
+
+
+
+/* ********************************* Last Thing CSS *********************************************/
+
+.last-thing-container {
+  text-align: center;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
+}
+
+.setup-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.button-group {
+  margin-top: 20px;
+}
+
+.last-thing-button {
+  margin: 10px;
+  padding: 12px 25px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+}
+
+.last-thing-button:hover {
+  background-color: #0056b3;
+}
+
+.support-link {
+  margin-top: 20px;
+  font-size: 14px;
+}
+

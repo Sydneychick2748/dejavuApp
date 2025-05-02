@@ -67,10 +67,27 @@ export default function CreateAccount() {
     setStep(5); // Move to LastThing step
   };
 
-  const handleLastThing = () => {
-    console.log("Final form data:", formData);
-    console.log("Navigating to /");
-    router.replace("/"); // Use replace to avoid history issues
+  // const handleLastThing = () => {
+  //   console.log("Final form data:", formData);
+  //   console.log("Navigating to /");
+  //   router.replace("/"); // Use replace to avoid history issues
+  // };
+
+  const handleLastThing = (selection) => {
+    console.log("Final choice:", selection);
+    const router = useRouter();  // Make sure the router is initialized here.
+  
+    if (selection === 'tutorial') {
+      // Navigate to the tutorial page
+      console.log("Navigating to tutorial page");
+      router.replace('/tutorial');  // Adjust the URL as needed for the tutorial page
+    } else if (selection === 'dashboard') {
+      // Navigate to the dashboard
+      console.log("Navigating to dashboard");
+      router.replace('/dashboard');  // Adjust the URL as needed for the dashboard
+    } else {
+      console.log("Unknown selection:", selection);
+    }
   };
 
   return (
