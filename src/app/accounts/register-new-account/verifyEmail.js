@@ -1,15 +1,49 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./registerNewAccount.css";
-
-
+// const VerifyEmail = ({ email, onVerify }) => {
+//     const [verificationCode, setVerificationCode] = useState('');
+//     const router = useRouter();
+//     const [email, setEmail] = useState('');
+//     const [isVerified, setIsVerified] = useState(false);
+//     const handleEmailChange = (e) => setEmail(e.target.value);
+//     const handleCodeChange = (e) => setVerificationCode(e.target.value);
+//     const handleSendCode = () => console.log(`Sending verification code to ${email}`);
+//     const handleVerifyCode = () => {
+//         if (verificationCode === '123456') setIsVerified(true);
+//         else console.log('Invalid verification code');
+//     };
+//     return (
+//         <div className="verify-container">
+//             <div className="verify-box">
+//                 <h1>Verify Email</h1>
+//                 {!isVerified ? (
+//                     <>
+//                         <p>Please enter the code that was sent to your email to verify your account.</p>
+//                         <input
+//                             type="text"
+//                             placeholder="Verification code"
+//                             value={verificationCode}
+//                             onChange={handleCodeChange}
+//                         />
+//                         <button onClick={handleVerifyCode}>Continue</button>
+//                         <div className="support-link">
+//                             Questions? <a href="#">Contact support</a>
+//                         </div>
+//                     </>
+//                 ) : (
+//                     <p>Email verified successfully!</p>
+//                 )}
+//             </div>
+//         </div>
+//     );
+// };
+// export default VerifyEmail;
 const VerifyEmail = ({ email, onVerify }) => {
   const [verificationCode, setVerificationCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [sending, setSending] = useState(false);
-
   const handleCodeChange = (e) => setVerificationCode(e.target.value);
-
   const handleSendCode = () => {
     setSending(true);
     // Simulate API call to send verification code
@@ -19,7 +53,6 @@ const VerifyEmail = ({ email, onVerify }) => {
       setSending(false);
     }, 1000); // Simulates 1 second delay
   };
-
   const handleVerifyCode = () => {
     if (verificationCode === "123456") {
       onVerify(verificationCode); // Pass mock code to parent
@@ -27,7 +60,6 @@ const VerifyEmail = ({ email, onVerify }) => {
       alert("Invalid mock code (try 123456)");
     }
   };
-
   return (
     <div className="verify-container">
       <div className="verify-box">
@@ -38,7 +70,6 @@ const VerifyEmail = ({ email, onVerify }) => {
         <button onClick={handleSendCode} disabled={sending}>
           {sending ? "Sending..." : "Send Code"}
         </button>
-
         {codeSent && (
           <>
             <p>Enter the code that was sent to your email:</p>
@@ -51,9 +82,6 @@ const VerifyEmail = ({ email, onVerify }) => {
             <button onClick={handleVerifyCode}>Continue</button>
           </>
         )}
-
-       
-
         <div className="support-link">
           Questions? <a href="#">Contact support</a>
         </div>
@@ -61,5 +89,4 @@ const VerifyEmail = ({ email, onVerify }) => {
     </div>
   );
 };
-
 export default VerifyEmail;

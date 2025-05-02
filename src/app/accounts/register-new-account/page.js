@@ -2,12 +2,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
-import VerifyEmail from "./verifyEmail";
-import AccountSetUp from "./accountSetUp";
-import Plans from "./plans";
-import LastThing from "./lastThing";
-import "./registerNewAccount.css";
+import { useState } from "react";
+// import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+import VerifyEmail from "./verifyEmail"; // Import your VerifyEmail component
+import AccountSetUp from "./accountSetUp"; // Assuming this exists
+import Plans from "./plans"; // Assuming this exists
+import LastThing from "./lastThing"; // Assuming this exists
+import "./registerNewAccount.css"; // Optional for styling
 
 export default function CreateAccount() {
   const [step, setStep] = useState(1);
