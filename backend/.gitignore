@@ -43,3 +43,10 @@ segmented_output.png
 # Ignore database files
 databases/
 temp_zips/
+
+# Database dump files
+*.sql
+
+# Dependency lock files (if not using)
+Pipfile
+Pipfile.lock
