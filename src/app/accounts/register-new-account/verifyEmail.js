@@ -1,3 +1,5 @@
+
+
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import "./registerNewAccount.css";
@@ -6,7 +8,9 @@ const VerifyEmail = ({ email, onVerify }) => {
   const [verificationCode, setVerificationCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [sending, setSending] = useState(false);
+
   const handleCodeChange = (e) => setVerificationCode(e.target.value);
+  
   const handleSendCode = () => {
     setSending(true);
     // Simulate API call to send verification code
@@ -16,6 +20,7 @@ const VerifyEmail = ({ email, onVerify }) => {
       setSending(false);
     }, 1000); // Simulates 1 second delay
   };
+
   const handleVerifyCode = () => {
     if (verificationCode === "123456") {
       onVerify(verificationCode); // Pass mock code to parent
@@ -23,17 +28,19 @@ const VerifyEmail = ({ email, onVerify }) => {
       alert("Invalid mock code (try 123456)");
     }
   };
+
   return (
     <div className="verify-container">
       <div className="verify-box">
         <h1>Verify Email</h1>
         <p>
-          We’ll send a verification code to: <strong>{email}</strong>
+          We sent a verification code to: <strong>{email}</strong>
         </p>
-        <button onClick={handleSendCode} disabled={sending}>
-          {sending ? "Sending..." : "Send Code"}
-        </button>
-        {codeSent && (
+        {!codeSent ? (
+          <button onClick={handleSendCode} disabled={sending}>
+            {sending ? "Sending..." : "Send Code"}
+          </button>
+        ) : (
           <>
             <p>Enter the code that was sent to your email:</p>
             <input
@@ -52,4 +59,5 @@ const VerifyEmail = ({ email, onVerify }) => {
     </div>
   );
 };
+
 export default VerifyEmail;

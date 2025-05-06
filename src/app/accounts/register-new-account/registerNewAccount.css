@@ -179,7 +179,7 @@
 /************************************* Account Setup css *************************************************/
 .account-setup-container {
   max-width: 450px;
-  height: 100px;
+  height: 700px;  /* Adjusted height for more content space */
   margin: 100px auto;
   padding: 32px 24px;
   border-radius: 16px;
@@ -189,10 +189,10 @@
   flex-direction: column;
   align-items: center;
   background-color: white;
-  height: 600px;
   justify-content: space-between;
-  margin-top: -50px;
 }
+
+
 
 .setup-title {
   font-size: 20px;
@@ -200,16 +200,12 @@
   color: #2C3E50;
   text-align: left;
   width: 100%;
-}
-
-.spacer {
-  flex-grow: 1;
-  width: 100%;
+  margin-bottom: 20px; /* Adjust space between title and button */
 }
 
 .continue-button {
   width: 100%;
-  padding: 10px;
+  padding: 12px; /* Increased padding for a larger button */
   background-color: #3B82F6;
   color: white;
   border: none;
@@ -222,6 +218,11 @@
 
 .continue-button:hover {
   background-color: #2563EB;
+}
+
+.spacer {
+  flex-grow: 1;
+  width: 100%;
 }
 
 .support-link {
@@ -240,6 +241,7 @@
 .support-link a:hover {
   text-decoration: underline;
 }
+
 
 /*********************************************** Plans CSS ********************************************* */
 

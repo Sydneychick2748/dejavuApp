@@ -27,6 +27,8 @@
 // export default AccountSetUp;
 
 import React from "react";
+// import Link from "next/link";
+import "./registerNewAccount.css"; // Optional for styling
 
 const AccountSetUp = ({ onContinue }) => {
   return (
