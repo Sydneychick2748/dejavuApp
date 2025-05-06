@@ -1,6 +1,8 @@
-# dashboard/dashboard.py
 
-# from fastapi import APIRouter, File, UploadFile, Form
+
+
+
+# from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 # from fastapi.responses import FileResponse, JSONResponse
 # import shutil
 # import os
@@ -21,10 +23,12 @@
 # FRAME_DIR = "frames"
 # SAVED_FRAMES_DIR = "saved_frames"
 # TEMP_DIR = "temp_zips"
+# DATABASE_DIR = "databases"  # New directory for storing databases
 # os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # os.makedirs(FRAME_DIR, exist_ok=True)
 # os.makedirs(SAVED_FRAMES_DIR, exist_ok=True)
 # os.makedirs(TEMP_DIR, exist_ok=True)
+# os.makedirs(DATABASE_DIR, exist_ok=True)
 
 # # Utility Functions
 # def remove_background_rembg(input_path: str, output_path: str) -> str:
@@ -374,41 +378,56 @@
 
 # @router.post("/save-database")
 # async def save_database(
-#     main_folder_name: str = Form(...),
-#     subfolders: list[UploadFile] = File(...)
+#     user_id: str = Form(...),
+#     database_name: str = Form(...),
+#     save_path: str = Form(...),
+#     files: list[UploadFile] = File(...)
 # ):
-#     temp_dir = Path("temp_database")
 #     zip_id = str(uuid.uuid4())
 #     try:
-#         temp_dir.mkdir(exist_ok=True)
-#         main_folder_path = temp_dir / main_folder_name
-#         main_folder_path.mkdir(exist_ok=True)
+#         # Validate inputs
+#         if not user_id or not database_name or not save_path:
+#             raise HTTPException(status_code=400, detail="Missing required fields")
 
-#         for subfolder_file in subfolders:
-#             subfolder_name, file_name = os.path.split(subfolder_file.filename)
-#             subfolder_path = main_folder_path / subfolder_name
-#             subfolder_path.mkdir(exist_ok=True, parents=True)
-#             file_path = subfolder_path / file_name
+#         # Validate files
+#         if not files:
+#             raise HTTPException(status_code=400, detail="No files provided")
+
+#         # Use a fallback path if save_path is not writable
+#         final_save_path = save_path
+#         if save_path == "/Photon" or not os.access(save_path, os.W_OK):
+#             final_save_path = os.path.join(DATABASE_DIR, user_id)
+#             print(f"Save path {save_path} not writable, using fallback: {final_save_path}")
+
+#         # Ensure save_path exists (create if it doesn't)
+#         main_folder_path = Path(final_save_path) / database_name
+#         main_folder_path.mkdir(parents=True, exist_ok=True)
+
+#         # Save individual files
+#         saved_files = []
+#         for file in files:
+#             file_path = main_folder_path / file.filename
 #             with file_path.open("wb") as buffer:
-#                 shutil.copyfileobj(subfolder_file.file, buffer)
+#                 shutil.copyfileobj(file.file, buffer)
+#             saved_files.append(str(file_path))
+#             print(f"Saved file: {file_path}")
 
-#         zip_filename = f"{zip_id}_{main_folder_name}.zip"
+#         # Create a ZIP file
+#         zip_filename = f"{zip_id}_{database_name}.zip"
 #         zip_path = Path(TEMP_DIR) / zip_filename
 #         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
 #             for root, _, files in os.walk(main_folder_path):
 #                 for file in files:
 #                     file_path = Path(root) / file
-#                     arcname = str(file_path.relative_to(temp_dir))
+#                     arcname = str(file_path.relative_to(final_save_path))
 #                     zipf.write(file_path, arcname)
-
-#         shutil.rmtree(temp_dir, ignore_errors=True)
+#         print(f"Created ZIP file: {zip_path}")
 
 #         zip_url = f"http://localhost:8000/temp_zips/{zip_filename}"
+#         print(f"Database '{database_name}' saved successfully for user '{user_id}' at path: {final_save_path}")
 #         return JSONResponse(content={"zip_url": zip_url})
 #     except Exception as e:
 #         print(f"Error saving database: {e}")
-#         if temp_dir.exists():
-#             shutil.rmtree(temp_dir, ignore_errors=True)
 #         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 # @router.get("/cleanup-temp-zips")
@@ -481,9 +500,8 @@
 #         print("Error in /extract-metadata endpoint:")
 #         traceback.print_exc()
 #         return JSONResponse(content={"error": str(e)}, status_code=500)
-
-
-
+    
+    
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from fastapi.responses import FileResponse, JSONResponse
 import shutil
@@ -498,6 +516,7 @@ from pathlib import Path
 import traceback
 import zipfile
 import asyncio
+import json
 
 router = APIRouter()
 
@@ -875,6 +894,10 @@ async def save_database(
         if not files:
             raise HTTPException(status_code=400, detail="No files provided")
 
+        # Replace spaces with underscores in database name to avoid filesystem issues
+        safe_database_name = database_name.replace(" ", "_")
+        print(f"Original database name: {database_name}, Safe database name: {safe_database_name}")
+
         # Use a fallback path if save_path is not writable
         final_save_path = save_path
         if save_path == "/Photon" or not os.access(save_path, os.W_OK):
@@ -882,20 +905,50 @@ async def save_database(
             print(f"Save path {save_path} not writable, using fallback: {final_save_path}")
 
         # Ensure save_path exists (create if it doesn't)
-        main_folder_path = Path(final_save_path) / database_name
+        main_folder_path = Path(final_save_path) / safe_database_name
         main_folder_path.mkdir(parents=True, exist_ok=True)
+        print(f"Created database directory: {main_folder_path}")
 
-        # Save individual files
+        # Save individual files and extract frame counts for videos
         saved_files = []
+        frame_counts = []
         for file in files:
             file_path = main_folder_path / file.filename
-            with file_path.open("wb") as buffer:
+            # Save the file temporarily to extract metadata
+            temp_path = Path(UPLOAD_FOLDER) / f"temp_{file.filename}"
+            with temp_path.open("wb") as buffer:
                 shutil.copyfileobj(file.file, buffer)
+
+            # Extract frame count if it's a video
+            total_frames = 0
+            if file.filename.lower().endswith(('.mp4', '.avi', '.mov', '.mkv')):  # Check for video file extensions
+                try:
+                    metadata = await get_video_metadata(temp_path)
+                    total_frames = metadata["total_frames"]
+                    print(f"Extracted frame count for {file.filename}: {total_frames}")
+                except Exception as e:
+                    print(f"Error extracting metadata for {file.filename}: {e}")
+                    total_frames = 0
+
+            # Save the file to the database directory
+            shutil.move(temp_path, file_path)
             saved_files.append(str(file_path))
             print(f"Saved file: {file_path}")
 
+            # Store frame count with file identifier
+            frame_counts.append({
+                "file_id": file.filename,
+                "total_frames": total_frames
+            })
+
+        # Save frame counts to a metadata file
+        metadata_file = main_folder_path / "metadata.json"
+        with open(metadata_file, "w") as f:
+            json.dump({"frame_counts": frame_counts}, f)
+        print(f"Saved frame counts to {metadata_file}")
+
         # Create a ZIP file
-        zip_filename = f"{zip_id}_{database_name}.zip"
+        zip_filename = f"{zip_id}_{safe_database_name}.zip"
         zip_path = Path(TEMP_DIR) / zip_filename
         with zipfile.ZipFile(zip_path, "w", zipfile.ZIP_DEFLATED) as zipf:
             for root, _, files in os.walk(main_folder_path):
@@ -910,6 +963,38 @@ async def save_database(
         return JSONResponse(content={"zip_url": zip_url})
     except Exception as e:
         print(f"Error saving database: {e}")
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@router.get("/get-database-frame-counts/{user_id}/{database_name}")
+async def get_database_frame_counts(user_id: str, database_name: str):
+    try:
+        # Replace spaces with underscores in database name to match saved directory
+        safe_database_name = database_name.replace(" ", "_")
+        print(f"Looking for database: {user_id}/{safe_database_name}")
+
+        # Construct the path to the database directory
+        database_path = Path(DATABASE_DIR) / user_id / safe_database_name
+        print(f"Database path: {database_path}, Exists: {database_path.exists()}")
+
+        if not database_path.exists():
+            return JSONResponse(content={"error": f"Database directory not found at {database_path}"}, status_code=404)
+
+        # Load the metadata file
+        metadata_file = database_path / "metadata.json"
+        print(f"Metadata file: {metadata_file}, Exists: {metadata_file.exists()}")
+
+        if not metadata_file.exists():
+            return JSONResponse(content={"error": f"Metadata file not found at {metadata_file}"}, status_code=404)
+
+        with open(metadata_file, "r") as f:
+            metadata = json.load(f)
+        
+        print(f"Returning frame counts: {metadata}")
+        return JSONResponse(content=metadata)
+    except Exception as e:
+        print(f"Error in /get-database-frame-counts endpoint: {e}")
+        traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
 
 @router.get("/cleanup-temp-zips")
@@ -982,3 +1067,38 @@ async def extract_metadata(file: UploadFile = File(...)):
         print("Error in /extract-metadata endpoint:")
         traceback.print_exc()
         return JSONResponse(content={"error": str(e)}, status_code=500)
+
+@router.post("/get-frame-counts/")
+async def get_frame_counts(files: list[UploadFile] = File(...)):
+    try:
+        frame_counts = []
+        for file in files:
+            # Save the file temporarily
+            video_id = str(uuid.uuid4())
+            base_filename = os.path.basename(file.filename)
+            video_path = Path(UPLOAD_FOLDER) / f"{video_id}_{base_filename}"
+            with video_path.open("wb") as buffer:
+                shutil.copyfileobj(file.file, buffer)
+
+            # Get metadata to extract frame count
+            metadata = await get_video_metadata(video_path)
+            total_frames = metadata["total_frames"]
+
+            # Clean up the temporary file
+            video_path.unlink()
+
+            # Store the frame count with the file identifier
+            # Use a simpler identifier: just the filename and id (if available)
+            frame_counts.append({
+                "file_id": f"{file.filename}",  # Simplified to match frontend
+                "total_frames": total_frames
+            })
+
+        return JSONResponse(content={"frame_counts": frame_counts})
+    except Exception as e:
+        print("Error in /get-frame-counts endpoint:")
+        traceback.print_exc()
+        return JSONResponse(content={"error": str(e)}, status_code=500)
+
+
+
