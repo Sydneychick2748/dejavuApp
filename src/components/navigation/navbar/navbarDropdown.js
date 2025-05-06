@@ -87,12 +87,11 @@
 //   );
 // };
 // export default Navbar;
-
-
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import PreferencesModal from "../../../app/photon-dropdown/preferencesModal"; // Adjusted path
+import { PreferencesProvider } from "../../../contexts/PreferencesContext";
+import PreferencesModal from "../../../app/photon-dropdown/preferences-dropdown/preferencesModal"; // Fixed typo in path
 import PhotonLogo from "../../../../public/images/logos/photon-logo-white-only3.png";
 import Search from "../../../../public/images/logos/search.png";
 import History from "../../../../public/images/logos/history.png";
@@ -171,7 +170,7 @@ const Navbar = () => {
   };
 
   return (
-    <>
+    <PreferencesProvider>
       <div className="w-full h-20 bg-emerald-800 sticky top-0">
         <div className="container3 mx-auto px-4 h-full">
           <div className="header-layout flex justify-between items-center h-full">
@@ -308,8 +307,9 @@ const Navbar = () => {
       {showPreferencesModal && (
         <PreferencesModal onClose={() => setShowPreferencesModal(false)} />
       )}
-    </>
+    </PreferencesProvider>
   );
 };
 
 export default Navbar;
+

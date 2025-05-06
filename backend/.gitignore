@@ -39,3 +39,7 @@ segmented_output.png
 # Local configuration files
 .env
 *.local
+
+# Ignore database files
+databases/
+temp_zips/
