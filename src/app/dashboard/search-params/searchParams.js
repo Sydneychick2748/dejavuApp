@@ -2,23 +2,13 @@
 "use client";
 import React, { useState } from 'react';
 import { Box, Text, Button } from "@chakra-ui/react";
-import Simple from "@/components/searchParams/simple/simple";
-import Advanced from "@/components/searchParams/advanced/advanced";
+import Simple from "@/app/dashboard/search-params/simple/simple";
+import Advanced from "@/app/dashboard/search-params/advanced/advanced";
 import "./searchParams.css";
 export default function SettingsPanel() {
   const [activeTab, setActiveTab] = useState("Simple");
   return (
     <div className="settings">
-      {/* <Box className="headerBox">
-        <Text className="searchParamsWording">
-          Search Parameters...
-        </Text>
-        <Box className="infoBox">
-          <Text className="infoLetter">
-            i
-          </Text>
-        </Box>
-      </Box> */}
       <div className="container2">
         {/* Left Sidebar */}
         <div className="sidebar">
