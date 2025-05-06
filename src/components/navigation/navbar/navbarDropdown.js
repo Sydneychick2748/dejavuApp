@@ -87,12 +87,11 @@
 //   );
 // };
 // export default Navbar;
-
-
 import React, { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import PreferencesModal from "../../../app/photon-dropdown/preferencesModal"; // Adjusted path
+import { PreferencesProvider } from "../../../contexts/PreferencesContext";
+import PreferencesModal from "../../../app/photon-dropdown/preferences-dropdown/preferencesModal"; // Fixed typo in path
 import PhotonLogo from "../../../../public/images/logos/photon-logo-white-only3.png";
 import Search from "../../../../public/images/logos/search.png";
 import History from "../../../../public/images/logos/history.png";
@@ -171,7 +170,7 @@ const Navbar = () => {
   };
 
   return (
-    <>
+    <PreferencesProvider>
       <div className="w-full h-20 bg-emerald-800 sticky top-0">
         <div className="container3 mx-auto px-4 h-full">
           <div className="header-layout flex justify-between items-center h-full">
@@ -308,68 +307,10 @@ const Navbar = () => {
       {showPreferencesModal && (
         <PreferencesModal onClose={() => setShowPreferencesModal(false)} />
       )}
-    </>
+    </PreferencesProvider>
   );
 };
 
 export default Navbar;
 
-
-
-// THIS IS ORIGINAL HEADER FROM OUR FIGMA 
-
-// import React from "react";
-// import Link from "next/link";
-// import Image from "next/image";
-// import Logo from "../../../../public/images/logos/dvai-icon.png";
-// import ProfilePic from "../../../../public/images/logos/profile.png";
-// import "./navbar.css";
-// const Navbar = () => {
-//   return (
-//     <>
-//       <div className="w-full h-20 bg-emerald-800 sticky top-0">
-//         <div className="container3 mx-auto px-4 h-full">
-//           <div className="header-layout flex justify-between items-center h-full">
-//             <div>
-//               <Link href="/">
-//                 <div className="logo-div">
-//                   <Image src={Logo} alt="Logo" width={50} height={30} />
-//                   <span className="nav-text">TRACE THE UNTRACEABLE</span>
-//                 </div>
-//               </Link>
-//             </div>
-//             <div className="menu-layout">
-//               <div>
-//                 <Link href="/dashboard">
-//                   <p>DATABASE</p>
-//                 </Link>
-//               </div>
-//               <div>
-//                 <Link href="/help">
-//                   <p>HELP/TRAINING</p>
-//                 </Link>
-//               </div>
-//               <div>
-//                 <Link href="/contact">
-//                   <p>CONTACT</p>
-//                 </Link>
-//               </div>
-//             </div>
-//             <div className="profile-layout">
-//               <Link href="/accounts/profile">
-//                 <Image
-//                   src={ProfilePic}
-//                   alt="Profile outline image"
-//                   width={40}
-//                   height={24}
-//                 />
-//               </Link>
-//             </div>
-//           </div>
-//         </div>
-//       </div>
-//     </>
-//   );
-// };
-// export default Navbar;
 
