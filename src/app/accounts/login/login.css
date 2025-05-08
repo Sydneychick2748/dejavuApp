@@ -107,3 +107,113 @@
 .forgot-link:hover {
   text-decoration: underline;
 }
+
+
+/****************************************** ForgotPassword.css ***************************************************/
+
+
+/* Overall container for centering the box */
+.forgot-password-box {
+  width: 100%;
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.forgot-password-box h2 {
+  font-size: 24px;
+  color: #2a3d5d;  /* Dark blue for heading */
+  margin-bottom: 10px;
+}
+
+.forgot-password-box p {
+  font-size: 14px;
+  color: #5f6368;  /* Light gray for paragraph text */
+  margin-bottom: 20px;
+}
+
+.forgot-password-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 16px;
+  color: #333;  /* Dark color for input text */
+}
+
+.reset-input {
+  margin-bottom: 20px;
+}
+
+/* Button styling for reset button */
+.reset-btn {
+  width: 100%;
+  padding: 12px;
+  background-color: #007bff;  /* Blue button */
+  color: #fff;  /* White text */
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.reset-btn:hover {
+  background-color: #0056b3;  /* Darker blue on hover */
+}
+
+
+/* Styling for the "Back to Login" paragraph and link */
+.forgot-password-box .back-to-login {
+  font-size: 14px;
+  color: black !important;  
+}
+
+.forgot-password-box .back-to-login a {
+  color: black !important;  
+  text-decoration: none !important;  
+}
+
+.forgot-password-box .back-to-login a:hover {
+  text-decoration: underline !important;  
+}
+
+/* Styling for all links */
+.forgot-password-box a {
+  color: #007bff;  /* Blue color for links */
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password-box a:hover {
+  text-decoration: underline;
+}
+
+.forgot-password-box .forgot-link {
+  display: block;
+  margin-top: 10px;
+}
+
+.forgot-password-box .forgot-link:hover {
+  text-decoration: underline;
+}
+
+.contact-support {
+  margin-top: 20px;
+  font-size: 14px;
+}
+
+.contact-support a {
+  color: #007bff;  /* Blue color for contact support link */
+  text-decoration: none;
+}
+
+.contact-support a:hover {
+  text-decoration: underline;
+}
+
