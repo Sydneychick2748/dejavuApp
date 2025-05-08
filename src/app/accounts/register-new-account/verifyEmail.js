@@ -1,38 +1,23 @@
+
+
 import React, { useState } from "react";
 import "./registerNewAccount.css";
 
 const VerifyEmail = ({ email, onVerify, backendError, setBackendError }) => {
     const [verificationCode, setVerificationCode] = useState("");
 
+    console.log("VerifyEmail component rendered with email:", email);
+
     const handleCodeChange = (e) => {
-        setVerificationCode(e.target.value);
+        const newCode = e.target.value;
+        console.log("Verification code input changed to:", newCode);
+        setVerificationCode(newCode);
         setBackendError(""); // Clear error on input change
     };
 
-    const handleVerifyCode = async () => {
-        try {
-            const response = await fetch('http://127.0.0.1:8000/accounts/verify', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    email: email,
-                    verification_code: verificationCode,
-                }),
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.detail || 'Verification failed');
-            }
-
-            onVerify(verificationCode); // Move to next step
-        } catch (error) {
-            console.error("Verification error:", error.message);
-            setBackendError(error.message);
-        }
+    const handleVerifyCode = () => {
+        console.log("handleVerifyCode called with code:", verificationCode);
+        onVerify(verificationCode); // Pass code to CreateAccount.jsx
     };
 
     return (
@@ -47,7 +32,7 @@ const VerifyEmail = ({ email, onVerify, backendError, setBackendError }) => {
                         {backendError}
                     </p>
                 )}
-                <p>Enter the code that was sent to your email:</p>
+                <p>Enter the verification code received:</p>
                 <input
                     type="text"
                     placeholder="Enter verification code"
