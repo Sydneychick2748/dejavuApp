@@ -154,7 +154,9 @@ export default function LoginBox() {
           </>
         )}
       </div>
-      <p> Contact Support</p>
+      <div className="support-link-wrapper">
+        <a href="#" className="forgot-password-support">Contact support</a>
+      </div>   
     </div>
   );
 }

@@ -81,8 +81,8 @@ export default function VerificationCode({ onNextStep }) {
         className="verification-code-input"
       />
       <button onClick={handleSubmit} className="verification-code-submit">Submit</button>
-      <a href="#" className="verification-code-back">Back to login</a>
-      <a href="#" className="verification-code-support">Contact support</a>
+      <a href="http://localhost:3000/accounts/login" className="verification-code-back">Back to login</a>
+      {/* <a href="http://localhost:3000/accounts/login" className="verification-code-support">Contact support</a> */}
     </div>
   );
 }
