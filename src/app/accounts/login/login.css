@@ -113,107 +113,192 @@
 
 
 /* Overall container for centering the box */
-.forgot-password-box {
-  width: 100%;
-  max-width: 400px;
-  margin: 100px auto;
+.forgot-password-container {
+  background: #f5f7fa;
   padding: 20px;
-  background: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+  width: 400px;
   text-align: center;
+  color: #1a3c6e;
 }
 
-.forgot-password-box h2 {
+.forgot-password-title {
   font-size: 24px;
-  color: #2a3d5d;  /* Dark blue for heading */
   margin-bottom: 10px;
 }
 
-.forgot-password-box p {
+.forgot-password-instruction {
   font-size: 14px;
-  color: #5f6368;  /* Light gray for paragraph text */
   margin-bottom: 20px;
+  line-height: 1.5;
 }
 
-.forgot-password-box input {
+.forgot-password-input {
   width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  font-size: 16px;
-  color: #333;  /* Dark color for input text */
-}
-
-.reset-input {
+  padding: 10px;
   margin-bottom: 20px;
+  border: 2px solid #1a3c6e;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #666;
 }
 
-/* Button styling for reset button */
-.reset-btn {
+.forgot-password-submit {
   width: 100%;
-  padding: 12px;
-  background-color: #007bff;  /* Blue button */
-  color: #fff;  /* White text */
+  padding: 10px;
+  background-color: #1e90ff;
+  color: white;
   border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   font-size: 16px;
   cursor: pointer;
-  transition: background-color 0.3s;
 }
 
-.reset-btn:hover {
-  background-color: #0056b3;  /* Darker blue on hover */
+.forgot-password-submit:hover {
+  background-color: #1c86ee;
 }
 
-
-/* Styling for the "Back to Login" paragraph and link */
-.forgot-password-box .back-to-login {
-  font-size: 14px;
-  color: black !important;  
-}
-
-.forgot-password-box .back-to-login a {
-  color: black !important;  
-  text-decoration: none !important;  
-}
-
-.forgot-password-box .back-to-login a:hover {
-  text-decoration: underline !important;  
-}
-
-/* Styling for all links */
-.forgot-password-box a {
-  color: #007bff;  /* Blue color for links */
-  text-decoration: none;
-  font-size: 14px;
-}
-
-.forgot-password-box a:hover {
-  text-decoration: underline;
-}
-
-.forgot-password-box .forgot-link {
+.forgot-password-back,
+.forgot-password-support {
   display: block;
   margin-top: 10px;
-}
-
-.forgot-password-box .forgot-link:hover {
-  text-decoration: underline;
-}
-
-.contact-support {
-  margin-top: 20px;
+  color: #1e90ff;
+  text-decoration: none;
   font-size: 14px;
 }
 
-.contact-support a {
-  color: #007bff;  /* Blue color for contact support link */
-  text-decoration: none;
-}
-
-.contact-support a:hover {
+.forgot-password-back:hover,
+.forgot-password-support:hover {
   text-decoration: underline;
 }
 
+/************************************************ Verification Code CSS *************************************************/
+
+/* verificationCode.css */
+
+.verification-code-container {
+  background: #f5f7fa;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+  color: #1a3c6e;
+}
+
+.verification-code-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.verification-code-instruction {
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.verification-code-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 2px solid #1a3c6e;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.verification-code-submit {
+  width: 100%;
+  padding: 10px;
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.verification-code-submit:hover {
+  background-color: #1c86ee;
+}
+
+.verification-code-back,
+.verification-code-support {
+  display: block;
+  margin-top: 10px;
+  color: #1e90ff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.verification-code-back:hover,
+.verification-code-support:hover {
+  text-decoration: underline;
+}
+
+
+/****************************************** Reset Password CSS ************************************************/
+
+/* resetPassword.css */
+
+.reset-password-container {
+  background: #f5f7fa;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+  color: #1a3c6e;
+}
+
+.reset-password-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.reset-password-instruction {
+  font-size: 14px;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.reset-password-input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 2px solid #1a3c6e;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #666;
+}
+
+.reset-password-error {
+  color: red;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.reset-password-submit {
+  width: 100%;
+  padding: 10px;
+  background-color: #1e90ff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.reset-password-submit:hover {
+  background-color: #1c86ee;
+}
+
+.reset-password-support {
+  display: block;
+  margin-top: 10px;
+  color: #1e90ff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.reset-password-support:hover {
+  text-decoration: underline;
+}
