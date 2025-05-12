@@ -6,6 +6,7 @@
     background-position: center;
     background-repeat: no-repeat;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     padding: 40px;
@@ -21,7 +22,7 @@
   flex-direction: column;
   gap: 16px;
   font-family: "Poppins", sans-serif;
-  margin-bottom: 180px;
+  margin-bottom: 20px;
   margin-right: 50px;
 }
 
@@ -108,6 +109,23 @@
   text-decoration: underline;
 }
 
+.support-link-wrapper {
+  display: block;
+  text-align: center;
+  margin-top: 10px; /* Space between login box and the link */
+  width: 100%; /* Ensure it takes full width to avoid shifting right */
+}
+
+.forgot-password-support {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+}
+
+.forgot-password-support:hover {
+  text-decoration: underline;
+}
+
 
 /****************************************** ForgotPassword.css ***************************************************/
 
@@ -165,6 +183,7 @@
   color: #1e90ff;
   text-decoration: none;
   font-size: 14px;
+  padding-right: 50px;
 }
 
 .forgot-password-back:hover,

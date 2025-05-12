@@ -135,7 +135,7 @@ export default function ResetPassword({ onBackToLogin }) {
       />
       {error && <p className="reset-password-error">{error}</p>}
       <button onClick={handleSubmit} className="reset-password-submit">Save new password</button>
-      <a href="#" className="reset-password-support">Contact support</a>
+      {/* <a href="#" className="reset-password-support">Contact support</a> */}
     </div>
   );
 }

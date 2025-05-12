@@ -86,8 +86,8 @@ export default function ForgotPassword({ onNextStep }) {
         className="forgot-password-input"
       />
       <button onClick={handleSubmit} className="forgot-password-submit">Submit</button>
-      <a href="#" className="forgot-password-back">Back to login</a>
-      <a href="#" className="forgot-password-support">Contact support</a>
+      <a href="http://localhost:3000/accounts/login" className="forgot-password-back">Back to login</a>
+      {/* <a href="http://localhost:3000/accounts/login" className="forgot-password-support">Contact support</a> */}
     </div>
   );
 }
