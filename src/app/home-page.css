@@ -60,7 +60,7 @@
   
   .powered-box {
     width: 700px;
-    height: 140px;
+    height: 70px;
     background: rgba(73, 132, 248, 0.1); /* 10% opacity blue */
     border-top-right-radius: 15px;
     border-bottom-right-radius: 15px;
@@ -105,7 +105,7 @@
     background-color: #e5ebff;
     color: #3d8bff;
     border: 1px solid #3d8bff;
-    width: 180px;
+    width: 250px;
     border-radius: 10px;
     font-size: 1rem;
     height: 30px;
