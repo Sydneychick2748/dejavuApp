@@ -26,10 +26,10 @@ export default function Home() {
           <a href="#" className="learn-link">Learn more ›</a>
 
           <div className="powered-box">
-            <span className="poweredBy">Powered by</span>
-            <img src="/images/logos/DVAILogoHorizontalDark.png" alt="DejaVuAI Logo" className="logo" />
+            {/* <span className="poweredBy">Powered by</span> */}
+            {/* <img src="/images/logos/DVAILogoHorizontalDark.png" alt="DejaVuAI Logo" className="logo" /> */}
             <div className="powered-buttons">
-              <button className="about-btn">About DejaVuAI®</button>
+              <button className="about-btn">Learn More About DejaVuAI®</button>
               <button className="visit-btn">Visit website ›</button>
             </div>
           </div>
