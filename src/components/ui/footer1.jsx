@@ -1,21 +1,22 @@
-// import { Box, Heading } from "@chakra-ui/react";
 
-// export default function Footer1() {
-//     return (
-//         <Box as="footer" className="headerFooter1-gradient footer">
-//             <Heading as="h1" size="lg">
-//             </Heading>
-//         </Box>
-//     );
-// }
+
+import "../../app/globals.css";
+import React from "react";
 
 const Footer1 = () => {
-    return (
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: '#f3f3f3' }}>
-        <p>© {new Date().getFullYear()} DejaVuAI. All rights reserved.</p>
-      </footer>
-    );
-  };
-  
-  export default Footer1;
+  return (
+    <footer className="footer" >
+      <div>
+        <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>About the Application</a>
+        <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>About DejaVuAI®</a>
+        <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>Terms of Use</a>
+        <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>Privacy & User Data</a>
+        <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>Contact</a>
+      </div>
+      <p style={{ marginTop: '0.5rem', color: '#808080' }}>© {new Date().getFullYear()} DejaVuAI® Inc. All rights reserved.</p>
+    </footer>
+  );
+};
+
+export default Footer1;
   
