@@ -11,8 +11,8 @@
 
 const Footer1 = () => {
     return (
-      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: '#f3f3f3' }}>
-        <p>© {new Date().getFullYear()} DejaVuAI. All rights reserved.</p>
+      <footer style={{ padding: '1rem', textAlign: 'center', backgroundColor: 'black' }}>
+        <p>©  DejaVuAI. All rights reserved.</p>
       </footer>
     );
   };

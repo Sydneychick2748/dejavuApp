@@ -17,7 +17,7 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
-# Pydantic model for user registration data
+# Pydantic models
 class UserCreate(BaseModel):
     first_name: str
     last_name: str
@@ -25,10 +25,13 @@ class UserCreate(BaseModel):
     phone: str
     password: str
 
-# Pydantic model for email verification
 class VerifyEmail(BaseModel):
     email: str
     verification_code: str
+
+class UserLogin(BaseModel):
+    email: str
+    password: str
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -56,7 +59,7 @@ async def register_user(user: UserCreate, db: Session = Depends(get_db)):
 
     # Hash the password
     hashed_password = pwd_context.hash(user.password)
-    logger.info(f"Password hashed for {user.email}")
+    logger.info(f"Password hashed for {user.email}: {hashed_password}")
 
     # Generate verification code
     verification_code = generate_verification_code()
@@ -173,3 +176,45 @@ async def verify_email(verify_data: VerifyEmail, db: Session = Depends(get_db)):
     logger.info(f"Post-verification user state: {verify_data.email}, is_verified: {updated_user.is_verified}, verification_code: {updated_user.verification_code}")
 
     return {"message": "Email verified successfully", "is_verified": True}
+
+@router.post("/login")
+async def login(user: UserLogin, db: Session = Depends(get_db)):
+    logger.info(f"Login attempt for email: {user.email}")
+
+    # Find user by email
+    db_user = db.execute(
+        text("SELECT * FROM users WHERE email = :email"),
+        {"email": user.email}
+    ).fetchone()
+
+    if not db_user:
+        logger.info(f"Login failed: User not found: {user.email}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    # Check if user is verified
+    if not db_user.is_verified:
+        logger.info(f"Login failed: Email not verified: {user.email}")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Email not verified. Please verify your email before logging in."
+        )
+
+    # Debug password verification
+    logger.info(f"Stored hashed password for {user.email}: {db_user.password}")
+    logger.info(f"Provided password: {user.password}")
+    password_match = pwd_context.verify(user.password, db_user.password)
+    logger.info(f"Password verification result: {password_match}")
+
+    # Verify password
+    if not password_match:
+        logger.info(f"Login failed: Invalid password for {user.email}")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password"
+        )
+
+    logger.info(f"Login successful for {user.email}")
+    return {"message": "Login successful", "email": user.email}
