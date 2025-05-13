@@ -4,6 +4,7 @@ import "../../app/globals.css";
 import React from "react";
 
 const Footer1 = () => {
+
   return (
     <footer className="footer" >
       <div>
@@ -19,4 +20,3 @@ const Footer1 = () => {
 };
 
 export default Footer1;
-  
