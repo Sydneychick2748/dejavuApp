@@ -9,6 +9,23 @@ body {
     background-color: white;
 }
 
+
+
+ 
+
+  .footer {
+    margin-top: 4rem; /* or less */
+    padding: 1.5rem 0; /* reduce padding if needed */
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none;
+    text-align: center;
+    color: black;
+  }
+  
+  
+  
+
 .container {
     display: flex;
     flex-direction: column;
@@ -73,13 +90,13 @@ footer {
 }  */
 
 /************************************** Footer1 CSS *******************************************/
-
+/* 
 .footer {
     padding: 2.5rem;
     text-align: center;
     background-color: transparent;
     color: black;
-  }
+  } */
   
   .footer-links {
     margin-bottom: 0.5rem;
@@ -94,3 +111,12 @@ footer {
   .footer-copyright {
     margin: 0;
   }
+
+  .footer {
+    padding: 2.5rem;
+    text-align: center;
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none;
+  }
+ 
