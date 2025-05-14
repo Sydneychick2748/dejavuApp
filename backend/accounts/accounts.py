@@ -1,6 +1,7 @@
 
 
 
+
 # from fastapi import APIRouter, Depends, HTTPException, status
 # from pydantic import BaseModel
 # from sqlalchemy.orm import Session
@@ -289,8 +290,18 @@
 
 #     if not user:
 #         # Log all users in the database for debugging
-#         all_users = db.execute(text("SELECT email, phone, is_verified FROM users")).fetchall()
-#         logger.info(f"All users in database: {[{col: getattr(user, col) for col in user.keys()} for user in all_users]}")
+#         try:
+#             all_users = db.execute(text("SELECT email, phone, is_verified FROM users")).fetchall()
+#             # Convert each row to a dictionary manually
+#             users_list = [
+#                 {"email": user.email, "phone": user.phone, "is_verified": user.is_verified}
+#                 for user in all_users
+#             ]
+#             logger.info(f"All users in database: {users_list}")
+#         except Exception as e:
+#             logger.error(f"Database error while fetching all users for debug: {str(e)}")
+#             users_list = []
+
 #         logger.info(f"Forgot password failed: User not found: {data.emailOrPhone}")
 #         raise HTTPException(
 #             status_code=status.HTTP_404_NOT_FOUND,
@@ -340,16 +351,18 @@
 #     logger.info(f"Database connection info: {db.bind.url}")
 #     try:
 #         all_users = db.execute(text("SELECT email, phone, is_verified FROM users")).fetchall()
-#         logger.info(f"Debug - All users in database: {[{col: getattr(user, col) for col in user.keys()} for user in all_users]}")
-#         return {"message": "Users logged to console", "users": [{col: getattr(user, col) for col in user.keys()} for user in all_users]}
+#         users_list = [
+#             {"email": user.email, "phone": user.phone, "is_verified": user.is_verified}
+#             for user in all_users
+#         ]
+#         logger.info(f"Debug - All users in database: {users_list}")
+#         return {"message": "Users logged to console", "users": users_list}
 #     except Exception as e:
 #         logger.error(f"Error fetching users for debug: {str(e)}")
 #         raise HTTPException(
 #             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
 #             detail="Failed to fetch users from database"
 #         )
-
-
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
@@ -385,6 +398,10 @@ class UserLogin(BaseModel):
 
 class ForgotPassword(BaseModel):
     emailOrPhone: str
+
+class VerifyResetCode(BaseModel):
+    emailOrPhone: str
+    verificationCode: str
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -612,7 +629,7 @@ async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
 
     # Clean phone number if provided (remove parentheses and dashes)
     cleaned_phone = data.emailOrPhone.replace("(", "").replace(")", "").replace("-", "") if is_phone else None
-    logger.info(f"Cleaned phone number (if phone): {cleaned_phone}")
+    logger.info(f"Raw input: {data.emailOrPhone}, Cleaned phone number (if phone): {cleaned_phone}")
 
     # Find user by email or phone
     user = None
@@ -641,7 +658,6 @@ async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
         # Log all users in the database for debugging
         try:
             all_users = db.execute(text("SELECT email, phone, is_verified FROM users")).fetchall()
-            # Convert each row to a dictionary manually
             users_list = [
                 {"email": user.email, "phone": user.phone, "is_verified": user.is_verified}
                 for user in all_users
@@ -692,7 +708,96 @@ async def forgot_password(data: ForgotPassword, db: Session = Depends(get_db)):
         )
 
     # For now, log the verification code (simulating sending it via email/SMS)
-    return {"message": "Verification code generated", "verification_code": verification_code}
+    return {"message": "Verification code generated", "verification_code": verification_code, "emailOrPhone": data.emailOrPhone}
+
+@router.post("/verify-reset-code")
+async def verify_reset_code(data: VerifyResetCode, db: Session = Depends(get_db)):
+    logger.info(f"Database connection info: {db.bind.url}")
+    logger.info(f"Verify reset code attempt for: {data.emailOrPhone}, code: {data.verificationCode}")
+
+    # Simple validation: determine if the input is an email or phone number
+    is_email = "@" in data.emailOrPhone
+    is_phone = not is_email
+    logger.info(f"Input type - is_email: {is_email}, is_phone: {is_phone}")
+
+    # Clean phone number if provided (remove parentheses and dashes)
+    cleaned_phone = data.emailOrPhone.replace("(", "").replace(")", "").replace("-", "") if is_phone else None
+    logger.info(f"Raw input: {data.emailOrPhone}, Cleaned phone number (if phone): {cleaned_phone}")
+
+    # Find user by email or phone
+    user = None
+    try:
+        if is_email:
+            email_lower = data.emailOrPhone.lower()
+            logger.info(f"Querying user by email (case-insensitive): {email_lower}")
+            user = db.execute(
+                text("SELECT * FROM users WHERE TRIM(LOWER(email)) = TRIM(LOWER(:email))"),
+                {"email": data.emailOrPhone}
+            ).fetchone()
+        elif is_phone:
+            logger.info(f"Querying user by phone: {cleaned_phone}")
+            user = db.execute(
+                text("SELECT * FROM users WHERE TRIM(phone) = TRIM(:phone)"),
+                {"phone": cleaned_phone}
+            ).fetchone()
+    except Exception as e:
+        logger.error(f"Database error during user lookup: {str(e)}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to query user in database"
+        )
+
+    if not user:
+        logger.info(f"Verify reset code failed: User not found: {data.emailOrPhone}")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+
+    # Log user details
+    logger.info(f"User found - email: {user.email}, phone: {user.phone}, is_verified: {user.is_verified}")
+
+    # Check if user is verified
+    if not user.is_verified:
+        logger.info(f"Verify reset code failed: User not verified: {data.emailOrPhone}")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="User is not verified. Please verify your account first."
+        )
+
+    # Check verification code
+    stored_code = str(user.verification_code).strip() if user.verification_code else None
+    entered_code = str(data.verificationCode).strip()
+    logger.info(f"Comparing codes - stored: '{stored_code}', entered: '{entered_code}'")
+
+    if stored_code is None or stored_code != entered_code:
+        logger.info(f"Verify reset code failed: Invalid code for {data.emailOrPhone}, stored: '{stored_code}', entered: '{entered_code}'")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="This is not the right code, please go back to login"
+        )
+
+    # Clear the verification code after successful validation
+    try:
+        db.execute(
+            text("""
+            UPDATE users
+            SET verification_code = NULL
+            WHERE email = :email
+            """),
+            {"email": user.email}
+        )
+        db.commit()
+        logger.info(f"Verification code cleared for user: {user.email}")
+    except Exception as e:
+        logger.error(f"Database error during verification code clearing for {user.email}: {str(e)}")
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to clear verification code in database"
+        )
+
+    return {"message": "Verification code validated successfully"}
 
 # Debug endpoint to log all users (for testing purposes)
 @router.get("/debug/users")
