@@ -23,7 +23,7 @@ flex-direction: column;
 gap: 16px;
 font-family: "Poppins", sans-serif;
 margin-bottom: 20px;
-margin-right: 50px;
+margin-right: 70px;
 }
 
 .login-box h2 {
@@ -83,6 +83,7 @@ height: 40px;
 display: flex;
 align-items: center;
 justify-content: center;
+width: 100%;
 }
 
 .login-btn:hover {
@@ -110,6 +111,9 @@ height: 40px;
 display: flex;
 align-items: center;
 justify-content: center;
+width: 100%;
+margin-top: 20px;
+margin-bottom: 10px;
 }
 
 .create-btn:hover {
