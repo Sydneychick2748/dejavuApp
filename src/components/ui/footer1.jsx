@@ -6,7 +6,7 @@ import React from "react";
 const Footer1 = () => {
 
   return (
-    <footer className="footer" >
+    <footer className="footer1" >
       <div>
         <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>About the Application</a>
         <a href="#" style={{ margin: '0 1rem', color: '#808080', textDecoration: 'none' }}>About DejaVuAI®</a>
