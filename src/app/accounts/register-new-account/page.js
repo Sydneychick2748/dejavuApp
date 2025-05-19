@@ -448,7 +448,7 @@ export default function CreateAccount() {
                         />
                         {mounted && (
                             <FontAwesomeIcon
-                                icon={showPassword ? faEye : faEyeSlash}
+                                icon={showPassword ? faEyeSlash:faEye }
                                 onClick={togglePasswordVisibility}
                                 style={{
                                     position: "absolute",
@@ -490,7 +490,7 @@ export default function CreateAccount() {
                         />
                         {mounted && (
                             <FontAwesomeIcon
-                                icon={showConfirmPassword ? faEye : faEyeSlash}
+                                icon={showConfirmPassword ?faEyeSlash: faEye}
                                 onClick={toggleConfirmPasswordVisibility}
                                 style={{
                                     position: "absolute",
