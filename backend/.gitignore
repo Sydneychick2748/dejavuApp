@@ -18,6 +18,7 @@ uploads/
 videos/
 temp_*/
 
+
 # Media files
 *.mp4
 *.jpg
@@ -43,6 +44,7 @@ segmented_output.png
 # Ignore database files
 databases/
 temp_zips/
+backend/temp_storage_database/
 
 # Database dump files
 *.sql
